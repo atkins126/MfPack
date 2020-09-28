@@ -5,7 +5,7 @@
 // Project: MfPack - Shared
 // Project location: https://sourceforge.net/projects/MFPack
 //                   https://github.com/FactoryXCode/MfPack
-// Module: WinApi.MmReg.pas
+// Module: WinApi.MMReg.pas
 // Kind: Pascal / Delphi unit
 // Release date: 27-06-2012
 // Language: ENU
@@ -57,7 +57,7 @@
 // Users may distribute this source code provided that this header is included
 // in full at the top of the file.
 // =============================================================================
-unit WinApi.MmReg;
+unit WinApi.WinMM.MMReg;
 
   {$HPPEMIT '#include "mmreg.h"'}
 
@@ -66,7 +66,8 @@ interface
 uses
   {WinApi}
   WinApi.Windows,
-  WinApi.MMSystem;
+  WinApi.WinMM.MMiscApi,
+  WinApi.WinMM.MMeApi;
 
   {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}

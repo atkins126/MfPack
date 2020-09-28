@@ -18,7 +18,6 @@
 // Initiator(s): Tony (maXcomX), Peter (OzShips)
 // Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships)
 //
-
 //------------------------------------------------------------------------------
 // CHANGE LOG
 // Date       Person              Reason
@@ -229,8 +228,6 @@ type
   {$EXTERNALSYM UUID}
 {$ENDIF}
 
-// =============================================================================
-
 
 // =============================================================================
 // Source: WTypesbase.h
@@ -241,7 +238,7 @@ type
 type
 
   //
-  // undefine those in MfPack.inc, if you have compiler trouble
+  // undefine those in WinApiTypes.inc, if you have compiler trouble
   //
 
 {$IFDEF MFP_Hyper}
@@ -1210,6 +1207,12 @@ type
 {$IFDEF MFP_LPSTR}
   LPSTR = PAnsiChar;
   {$EXTERNALSYM LPSTR}
+{$ENDIF}
+
+
+{$IFDEF MFP_HPSTR}
+  HPSTR = PAnsiChar;
+  {$EXTERNALSYM HPSTR}
 {$ENDIF}
 
 

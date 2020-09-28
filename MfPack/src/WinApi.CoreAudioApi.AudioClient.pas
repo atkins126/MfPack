@@ -67,7 +67,7 @@ uses
   {WinApi}
   WinApi.WinApiTypes,
   WinApi.WinError,
-  WinApi.MMReg,
+  WinApi.WinMM.MMReg,
   WinApi.AudioMediaType,
   {CoreAudioApi}
   WinApi.CoreAudioApi.AudioSessionTypes;
@@ -799,7 +799,7 @@ type
   // the "tracing context" identifier can ease correlation of which audio client instance belongs to which application context
   //
   // Sample app code:
-  // TMfPPROPVARIANT var;
+  // PPROPVARIANT var;
   // PropVariantInit(&var);
   // auto p = reinterpret_cast<AudioClient3ActivationParams *>CoTaskMemAlloc(sizeof(AudioClient3ActivationParams));
   // if (nullptr == p) { ... }
