@@ -123,11 +123,11 @@ const
 
   //* general data types */
 type
-  VERSION = UINT;               { major (high byte), minor (low byte) }
+  VERSION = type UINT;               { major (high byte), minor (low byte) }
   {$EXTERNALSYM VERSION}
-  MMVERSION = UINT;             { major (high byte), minor (low byte) }
+  MMVERSION = type UINT;             { major (high byte), minor (low byte) }
   {$EXTERNALSYM MMVERSION}
-  MMRESULT = UINT;              { error return code, 0 means no error }
+  MMRESULT = type UINT;              { error return code, 0 means no error }
   {$EXTERNALSYM MMRESULT}
 
   //* MMTIME data structure */
@@ -181,9 +181,9 @@ type
 
   // This function is also defined in WinApi.MmReg.pas and WinApi.MediaFoundationApi.MfMetLib.pas
   function MAKEFOURCC(const ch0: AnsiChar;
-                    const ch1: AnsiChar;
-                    const ch2: AnsiChar;
-                    const ch3: AnsiChar): FOURCC; inline;
+                      const ch1: AnsiChar;
+                      const ch2: AnsiChar;
+                      const ch3: AnsiChar): FOURCC; inline;
   {$EXTERNALSYM MAKEFOURCC}
 
 
