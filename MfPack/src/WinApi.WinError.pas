@@ -354,7 +354,7 @@ const
   {$EXTERNALSYM FACILITY_DXCORE}
   FACILITY_LEAP                       = 2184;
   {$EXTERNALSYM FACILITY_LEAP}
-  FACILITY_AUDCLNT                    = 2185;
+  FACILITY_AUDCLNT                    = 2185;  // = $889
   {$EXTERNALSYM FACILITY_AUDCLNT}
   FACILITY_WINCODEC_DWRITE_DWM        = 2200;
   {$EXTERNALSYM FACILITY_WINCODEC_DWRITE_DWM}
@@ -32442,6 +32442,7 @@ function PropagateResult(hrPrevious: DWORD;
                          scBase: DWORD): DWORD; inline;
 
 // ****** End of OBSOLETE functions.
+
 const
 
   E_NOT_SET                           = HRESULT(ERROR_NOT_FOUND);
