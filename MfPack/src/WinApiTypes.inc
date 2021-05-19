@@ -10,7 +10,7 @@
 // Release date: 04-01-2016
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.0.1
 // Description: Holds compiler definitions used by Media Foundation,
 //              WASAPI and Core Audio.
 //
@@ -739,6 +739,9 @@ const
  {$DEFINE MFP_LPCSTR}
 // {$UNDEF MFP_LPCSTR}
 
+ {$DEFINE MFP_TCHAR}
+// {$UNDEF MFP_TCHAR}
+ 
  {$DEFINE MFP_WCHAR}
 // {$UNDEF MFP_WCHAR}
 
@@ -924,9 +927,6 @@ const
 
  {$DEFINE MFP_VARTYPE}
 // {$UNDEF MFP_VARTYPE}
-
- {$DEFINE MFP_VARENUM}
-// {$UNDEF MFP_VARENUM}
 
  {$DEFINE MFP_PROPID}
 // {$UNDEF MFP_PROPID}

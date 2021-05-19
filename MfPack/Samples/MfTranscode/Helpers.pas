@@ -10,7 +10,7 @@
 // Release date: 24-01-2020
 // Language: ENU
 //
-// Version: 3.0.0
+// Version: 3.0.1
 // Description: Helpers for the Transcoding sample,
 //
 // Company: FactoryX
@@ -70,6 +70,7 @@ uses
   WinApi.WinApiTypes,
   WinApi.ComBaseApi,
   WinApi.MMReg,
+  WinApi.Unknwn,
   {System}
   System.SysUtils,
   {MediaFoundationApi}
@@ -239,7 +240,7 @@ function GetPresentationDescriptorFromTopology(pTopology: IMFTopology;
 var
   hr: HResult;
   pCollection: IMFCollection;
-  pUnk: IUnknown;
+  pUnk: PIUnknown;
   pNode: IMFTopologyNode;
   pPD: IMFPresentationDescriptor;
 
@@ -256,7 +257,8 @@ begin
   // Any of the source nodes should have the PresentationDescriptor, so take the first
   // object in the collection.
 
-  hr := pCollection.GetElement(0, pUnk);
+  hr := pCollection.GetElement(0,
+                               pUnk);
   if FAILED(hr) then
     goto done;
 
