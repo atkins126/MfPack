@@ -10,7 +10,7 @@
 // Release date: 13-08-2019
 // Language: ENU
 //
-// Revision Version: 3.0.1
+// Revision Version: 3.1.0
 // Description: Language tag definitions file.
 //
 // Initiator(s): Tony (maXcomX), Peter (OzShips)
@@ -19,17 +19,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -150,8 +150,10 @@ type
 
     {Public methods}
 
-    constructor Create();
+    constructor  Create();
     destructor Destroy(); override;
+
+    procedure Clear();
 
     // Gets the readable language from a LCID
     // siLocale can be one of the following:
@@ -313,10 +315,22 @@ end;
 
 
 destructor TLanguageTags.Destroy();
+var
+   i: integer;
 begin
-  lp_MatchList.Free;
-  Finalize(TimedTxtPropsArray);
+  Clear();
   inherited Destroy();
+end;
+
+
+procedure TLanguageTags.Clear();
+
+begin
+  lp_MatchList.Clear;
+  lp_MatchList.Free;
+  SetLength(TimedTxtPropsArray, 0);
+  Finalize(TimedTxtPropsArray);
+  TimedTxtPropsArray := nil;
 end;
 
 

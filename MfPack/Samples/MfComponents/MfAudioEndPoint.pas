@@ -10,9 +10,9 @@
 // Release date: 13-08-2020
 // Language: ENU
 //
-// Version: 3.0.1
+// Version: 3.1.0
 //
-// Description: Component to manage capture or render endpoints (and properties).
+// Description: Component to manage capture or render endpoints and properties.
 //              It also provides an audio endpoint callback.
 //
 // Company: FactoryX
@@ -23,17 +23,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -78,7 +78,7 @@ uses
   WinApi.ActiveX.ObjBase,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfUtils,
-  {WinApi.CoreAudioApi}
+  {CoreAudioApi}
   WinApi.CoreAudioApi.FunctionDiscoveryKeys_devpkey,
   WinApi.CoreAudioApi.MMDeviceApi,
   WinApi.CoreAudioApi.MMDevApiUtils,
@@ -137,10 +137,10 @@ type
                         // eMultimedia      = Music, movies, narration, and live music recording.
                         // eCommunications  = Voice communications (talking to another person).
 
-    fState: eState;       // The state or states of the endpoints that are to be included in the collection
-                          // Possible values or combinations are:
-                          //   DEVICE_STATE_ACTIVE, DEVICE_STATE_DISABLED, DEVICE_STATE_NOTPRESENT or DEVICE_STATE_UNPLUGGED
-                          //   To include all endpoints, regardless of state, set dwStateMask = DEVICE_STATEMASK_ALL
+    fState: eState;     // The state or states of the endpoints that are to be included in the collection
+                        // Possible values or combinations are:
+                        //   DEVICE_STATE_ACTIVE, DEVICE_STATE_DISABLED, DEVICE_STATE_NOTPRESENT or DEVICE_STATE_UNPLUGGED
+                        //   To include all endpoints, regardless of state, set dwStateMask = DEVICE_STATEMASK_ALL
 
     g_guidEventContext: TGuid; // Client's proprietary event-context GUID
     FOnNotify: TOnNotify;      // Component's Eventhandler
@@ -374,8 +374,8 @@ end;
 
 
 procedure TMfAudioEndPoint.GetVolumeRange(out pflVolumeMindB: Single;
-                                     out pflVolumeMaxdB: Single;
-                                     out pflVolumeIncrementdB: Single);
+                                          out pflVolumeMaxdB: Single;
+                                          out pflVolumeIncrementdB: Single);
 var
   hr: HResult;
 begin
@@ -606,7 +606,7 @@ begin
               hr := fSelectedIMMDevice.Activate(IID_IAudioEndpointVolume,
                                                 INT(CLSCTX_INPROC_SERVER),
                                                 Nil,
-                                                IUnknown(FAudioEndpoint));
+                                                Pointer(FAudioEndpoint));
 
               if Succeeded(hr) then
                 begin

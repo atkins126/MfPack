@@ -10,7 +10,7 @@
 // Release date: 30-04-2019
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 //
 // Description: Public API definitions shared by DWrite, D2D, and DImage.
 //
@@ -23,20 +23,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/05/2020                     Kraftwerk release. (WIN10 May 2020 update, version 2004)
-//                                #1 Autobahn
-// 10/08/2020 All                 #2 => #2b The Model
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: - Requires Windows Vista or later.
 //
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -349,7 +347,7 @@ type
 
   // Represents a 4-by-3 matrix.
   PD2D_MATRIX_4X3_F = ^D2D_MATRIX_4X3_F;
-  D2D_MATRIX_4X3_F = record
+  D2D_MATRIX_4X3_F = Object //record
     _11: Single;
     _12: Single;
     _13: Single;
@@ -371,7 +369,7 @@ type
 
   // Represents a 4-by-4 matrix.
   PD2D_MATRIX_4X4_F = ^D2D_MATRIX_4X4_F;
-  D2D_MATRIX_4X4_F = record
+  D2D_MATRIX_4X4_F = Object //record
     _11: Single;
     _12: Single;
     _13: Single;
@@ -397,7 +395,7 @@ type
 
   // Represents a 5-by-4 matrix.
   PD2D_MATRIX_5X4_F = ^D2D_MATRIX_5X4_F;
-  D2D_MATRIX_5X4_F = record
+  D2D_MATRIX_5X4_F = Object //record
     _11: Single;
     _12: Single;
     _13: Single;

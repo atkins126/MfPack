@@ -10,7 +10,7 @@
 // Release date: 01-05-2019
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Error code definitions for the Win32 API functions.
 //
 // Organisation: FactoryX
@@ -21,18 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: When using MfPack, use this unit and not the outdated
 //          Error code definitions from Delphi <= ver 10.4
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -292,6 +292,8 @@ const
   {$EXTERNALSYM FACILITY_USERMODE_LICENSING}
   FACILITY_SOS                        = 160;
   {$EXTERNALSYM FACILITY_SOS}
+  FACILITY_OCP_UPDATE_AGENT           = 173;
+  {$EXTERNALSYM FACILITY_OCP_UPDATE_AGENT}
   FACILITY_DEBUGGERS                  = 176;
   {$EXTERNALSYM FACILITY_DEBUGGERS}
   FACILITY_SPP                        = 256;
@@ -324,6 +326,10 @@ const
   {$EXTERNALSYM FACILITY_DEPLOYMENT_SERVICES_MULTICAST_CLIENT}
   FACILITY_DEPLOYMENT_SERVICES_CONTENT_PROVIDER = 293;
   {$EXTERNALSYM FACILITY_DEPLOYMENT_SERVICES_CONTENT_PROVIDER}
+  FACILITY_HSP_SERVICES               = 296;
+  {$EXTERNALSYM FACILITY_HSP_SERVICES}
+  FACILITY_HSP_SOFTWARE               = 297;
+  {$EXTERNALSYM FACILITY_HSP_SOFTWARE}
   FACILITY_LINGUISTIC_SERVICES        = 305;
   {$EXTERNALSYM FACILITY_LINGUISTIC_SERVICES}
   FACILITY_AUDIOSTREAMING             = 1094;
@@ -352,9 +358,11 @@ const
   {$EXTERNALSYM FACILITY_DIRECT3D12_DEBUG}
   FACILITY_DXCORE                     = 2176;
   {$EXTERNALSYM FACILITY_DXCORE}
+  FACILITY_PRESENTATION               = 2177;
+  {$EXTERNALSYM FACILITY_PRESENTATION}
   FACILITY_LEAP                       = 2184;
   {$EXTERNALSYM FACILITY_LEAP}
-  FACILITY_AUDCLNT                    = 2185;  // = $889
+  FACILITY_AUDCLNT                    = 2185;
   {$EXTERNALSYM FACILITY_AUDCLNT}
   FACILITY_WINCODEC_DWRITE_DWM        = 2200;
   {$EXTERNALSYM FACILITY_WINCODEC_DWRITE_DWM}
@@ -380,6 +388,8 @@ const
   {$EXTERNALSYM FACILITY_MOBILE}
   FACILITY_SQLITE                     = 1967;
   {$EXTERNALSYM FACILITY_SQLITE}
+  FACILITY_SERVICE_FABRIC             = 1968;
+  {$EXTERNALSYM FACILITY_SERVICE_FABRIC}
   FACILITY_UTC                        = 1989;
   {$EXTERNALSYM FACILITY_UTC}
   FACILITY_WEP                        = 2049;
@@ -2579,7 +2589,7 @@ const
 //
 // MessageText:
 //
-// The system cannot find message text for message number 0x%1 in the message file for %2.
+// The system cannot find message text for message number $%1 in the message file for %2.
 //
   ERROR_MR_MID_NOT_FOUND              = 317;
   {$EXTERNALSYM ERROR_MR_MID_NOT_FOUND}
@@ -2739,7 +2749,7 @@ const
 //
 // MessageText:
 //
-// An operation is not supported on a resident file.
+// The specified operation is not supported on a resident file.
 //
   ERROR_RESIDENT_FILE_NOT_SUPPORTED   = 334;
   {$EXTERNALSYM ERROR_RESIDENT_FILE_NOT_SUPPORTED}
@@ -2749,7 +2759,7 @@ const
 //
 // MessageText:
 //
-// An operation is not supported on a compressed file.
+// The specified operation is not supported on a compressed file.
 //
   ERROR_COMPRESSED_FILE_NOT_SUPPORTED = 335;
   {$EXTERNALSYM ERROR_COMPRESSED_FILE_NOT_SUPPORTED}
@@ -2759,7 +2769,7 @@ const
 //
 // MessageText:
 //
-// An operation is not supported on a directory.
+// The specified operation is not supported on a directory.
 //
   ERROR_DIRECTORY_NOT_SUPPORTED       = 336;
   {$EXTERNALSYM ERROR_DIRECTORY_NOT_SUPPORTED}
@@ -3000,7 +3010,7 @@ const
 //
 // MessageText:
 //
-// This operation is not supported on a DAX volume.
+// The specified operation is not supported on a DAX volume.
 //
   ERROR_NOT_SUPPORTED_ON_DAX          = 360;
   {$EXTERNALSYM ERROR_NOT_SUPPORTED_ON_DAX}
@@ -3844,6 +3854,66 @@ const
   ERROR_UNEXPECTED_NTCACHEMANAGER_ERROR = 443;
   {$EXTERNALSYM ERROR_UNEXPECTED_NTCACHEMANAGER_ERROR}
 
+//
+// MessageId: ERROR_LINUX_SUBSYSTEM_UPDATE_REQUIRED
+//
+// MessageText:
+//
+// WSL 2 requires an update to its kernel component. For information please visit https://aka.ms/wsl2kernel
+//
+  ERROR_LINUX_SUBSYSTEM_UPDATE_REQUIRED= 444;
+  {$EXTERNALSYM ERROR_LINUX_SUBSYSTEM_UPDATE_REQUIRED}
+
+//
+// MessageId: ERROR_DLP_POLICY_WARNS_AGAINST_OPERATION
+//
+// MessageText:
+//
+// This action is blocked, but you can choose to allow it. Please refer to the data loss prevention notification for further information.
+//
+  ERROR_DLP_POLICY_WARNS_AGAINST_OPERATION= 445;
+  {$EXTERNALSYM ERROR_DLP_POLICY_WARNS_AGAINST_OPERATION}
+
+//
+// MessageId: ERROR_DLP_POLICY_DENIES_OPERATION
+//
+// MessageText:
+//
+// This action is blocked. Please refer to the data loss prevention notification for further information.
+//
+  ERROR_DLP_POLICY_DENIES_OPERATION   = 446;
+  {$EXTERNALSYM ERROR_DLP_POLICY_DENIES_OPERATION}
+
+//
+// MessageId: ERROR_SECURITY_DENIES_OPERATION
+//
+// MessageText:
+//
+// Access is denied because the file contains potentially unwanted software or content the security administrator decided to block.
+//
+  ERROR_SECURITY_DENIES_OPERATION     = 447;
+  {$EXTERNALSYM ERROR_SECURITY_DENIES_OPERATION}
+
+//
+// MessageId: ERROR_UNTRUSTED_MOUNT_POINT
+//
+// MessageText:
+//
+// The path cannot be traversed because it contains an untrusted mount point.
+//
+  ERROR_UNTRUSTED_MOUNT_POINT         = 448;
+  {$EXTERNALSYM ERROR_UNTRUSTED_MOUNT_POINT}
+
+// Data Loss Prevention error code to suppress showing UX/error message. Still adding error text for consistency.
+//
+// MessageId: ERROR_DLP_POLICY_SILENTLY_FAIL
+//
+// MessageText:
+//
+// This action is blocked. Please refer to the data loss prevention notification for further information.
+//
+  ERROR_DLP_POLICY_SILENTLY_FAIL      = 449;
+  {$EXTERNALSYM ERROR_DLP_POLICY_SILENTLY_FAIL}
 
 //
 // **** Available SYSTEM error codes ****
@@ -3964,7 +4034,48 @@ const
 //
 // There not all declared custom capabilities are found in the SCCD.
 //
-  ERROR_CAPAUTHZ_SCCD_NO_CAPABILITY_MATCH= 460;
+  ERROR_CAPAUTHZ_SCCD_NO_CAPABILITY_MATCH = 460;
+  {$EXTERNALSYM ERROR_CAPAUTHZ_SCCD_NO_CAPABILITY_MATCH}
+
+//
+// MessageId: ERROR_CIMFS_IMAGE_CORRUPT
+//
+// MessageText:
+//
+// The CimFS image is corrupt.
+//
+  ERROR_CIMFS_IMAGE_CORRUPT           = 470;
+  {$EXTERNALSYM ERROR_CIMFS_IMAGE_CORRUPT}
+
+//
+// MessageId: ERROR_CIMFS_IMAGE_VERSION_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The system does not support this version of the CimFS image.
+//
+  ERROR_CIMFS_IMAGE_VERSION_NOT_SUPPORTED = 471;
+  {$EXTERNALSYM ERROR_CIMFS_IMAGE_VERSION_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_STORAGE_STACK_ACCESS_DENIED
+//
+// MessageText:
+//
+// The storage stack returned STATUS_ACCESS_DENEID for the current operation.
+//
+  ERROR_STORAGE_STACK_ACCESS_DENIED   = 472;
+  {$EXTERNALSYM ERROR_STORAGE_STACK_ACCESS_DENIED}
+
+//
+// MessageId: ERROR_INSUFFICIENT_VIRTUAL_ADDR_RESOURCES
+//
+// MessageText:
+//
+// Insufficient Virtual Address resources to complete the operation.
+//
+  ERROR_INSUFFICIENT_VIRTUAL_ADDR_RESOURCES = 473;
+  {$EXTERNALSYM ERROR_INSUFFICIENT_VIRTUAL_ADDR_RESOURCES}
 
 //
 // **** Available SYSTEM error codes ****
@@ -4023,14 +4134,124 @@ const
   {$EXTERNALSYM ERROR_INVALID_ADDRESS}
 
 //
-// MessageId: ERROR_VRF_CFG_ENABLED
+// MessageId: ERROR_HAS_SYSTEM_CRITICAL_FILES
 //
 // MessageText:
 //
-// Driver Verifier Volatile settings cannot be set when CFG is enabled.
+// The volume contains paging, crash dump or other system critical files.
 //
-  ERROR_VRF_CFG_ENABLED               = 1183;
-  {$EXTERNALSYM ERROR_VRF_CFG_ENABLED}
+  ERROR_HAS_SYSTEM_CRITICAL_FILES     = 488;
+  {$EXTERNALSYM ERROR_HAS_SYSTEM_CRITICAL_FILES}
+
+
+// MessageId: ERROR_ENCRYPTED_FILE_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The specified operation is not supported on an encrypted file.
+//
+  ERROR_ENCRYPTED_FILE_NOT_SUPPORTED  = 489;
+  {$EXTERNALSYM ERROR_ENCRYPTED_FILE_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_SPARSE_FILE_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The specified operation is not supported on a sparse file.
+//
+  ERROR_SPARSE_FILE_NOT_SUPPORTED     = 490;
+  {$EXTERNALSYM ERROR_SPARSE_FILE_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_PAGEFILE_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The specified operation is not supported on a pagefile.
+//
+  ERROR_PAGEFILE_NOT_SUPPORTED        = 491;
+  {$EXTERNALSYM ERROR_PAGEFILE_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_VOLUME_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The specified operation is not supported on a volume.
+//
+  ERROR_VOLUME_NOT_SUPPORTED          = 492;
+  {$EXTERNALSYM ERROR_VOLUME_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_BYPASSIO
+//
+// MessageText:
+//
+// The specified operation is not supported on a BypassIO enabled file.
+//
+  ERROR_NOT_SUPPORTED_WITH_BYPASSIO   = 493;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_BYPASSIO}
+
+//
+// MessageId: ERROR_NO_BYPASSIO_DRIVER_SUPPORT
+//
+// MessageText:
+//
+// The specified driver does not support BypassIO operations.
+//
+  ERROR_NO_BYPASSIO_DRIVER_SUPPORT    = 494;
+  {$EXTERNALSYM ERROR_NO_BYPASSIO_DRIVER_SUPPORT}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_ENCRYPTION
+//
+// MessageText:
+//
+// The specified operation is not supported while encryption is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_ENCRYPTION = 495;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_ENCRYPTION}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_COMPRESSION
+//
+// MessageText:
+//
+// The specified operation is not supported while compression is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_COMPRESSION = 496;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_COMPRESSION}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_REPLICATION
+//
+// MessageText:
+//
+// The specified operation is not supported while replication is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_REPLICATION = 497;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_REPLICATION}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_DEDUPLICATION
+//
+// MessageText:
+//
+// The specified operation is not supported while deduplication is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_DEDUPLICATION = 498;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_DEDUPLICATION}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_AUDITING
+//
+// MessageText:
+//
+// The specified operation is not supported while auditing is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_AUDITING   = 499;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_AUDITING}
 
 //
 // MessageId: ERROR_PARTITION_TERMINATING
@@ -4054,6 +4275,86 @@ const
 //
   ERROR_USER_PROFILE_LOAD             = 500;
   {$EXTERNALSYM ERROR_USER_PROFILE_LOAD}
+
+//
+// MessageId: ERROR_SESSION_KEY_TOO_SHORT
+//
+// MessageText:
+//
+// The negotiated session key does not meet the minimum length requirement.
+//
+  ERROR_SESSION_KEY_TOO_SHORT         = 501;
+  {$EXTERNALSYM ERROR_SESSION_KEY_TOO_SHORT}
+
+// MessageId: ERROR_ACCESS_DENIED_APPDATA
+//
+// MessageText:
+//
+// Access denied when accessing the user profile.
+//
+  {$EXTERNALSYM ERROR_ACCESS_DENIED_APPDATA}
+  ERROR_ACCESS_DENIED_APPDATA         = 502;
+  {$EXTERNALSYM ERROR_ACCESS_DENIED_APPDATA}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_MONITORING
+//
+// MessageText:
+//
+// The specified operation is not supported while monitoring is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_MONITORING = 503;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_MONITORING}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_SNAPSHOT
+//
+// MessageText:
+//
+// The specified operation is not supported while snapshot is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_SNAPSHOT   = 504;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_SNAPSHOT}
+
+//
+// MessageId: ERROR_NOT_SUPPORTED_WITH_VIRTUALIZATION
+//
+// MessageText:
+//
+// The specified operation is not supported while virtualization is enabled on the target object.
+//
+  ERROR_NOT_SUPPORTED_WITH_VIRTUALIZATION = 505;
+  {$EXTERNALSYM ERROR_NOT_SUPPORTED_WITH_VIRTUALIZATION}
+
+//
+// MessageId: ERROR_BYPASSIO_FLT_NOT_SUPPORTED
+//
+// MessageText:
+//
+// At least one minifilter does not support bypass IO.
+//
+  ERROR_BYPASSIO_FLT_NOT_SUPPORTED    = 506;
+  {$EXTERNALSYM ERROR_BYPASSIO_FLT_NOT_SUPPORTED}
+
+//
+// MessageId: ERROR_DEVICE_RESET_REQUIRED
+//
+// MessageText:
+//
+// The device needs to be reset.
+//
+  ERROR_DEVICE_RESET_REQUIRED         = 507;
+  {$EXTERNALSYM ERROR_DEVICE_RESET_REQUIRED}
+
+//
+// MessageId: ERROR_VOLUME_WRITE_ACCESS_DENIED
+//
+// MessageText:
+//
+// The volume is opened for exclusive write access, preventing files from being opened for write access.
+//
+  ERROR_VOLUME_WRITE_ACCESS_DENIED    = 508;
+  {$EXTERNALSYM ERROR_VOLUME_WRITE_ACCESS_DENIED}
 
 //
 // **** Available SYSTEM error codes ****
@@ -4392,7 +4693,7 @@ const
 //
 // MessageText:
 //
-// Page file quota was exceeded.
+// Pagefile quota was exceeded.
 //
   ERROR_PAGEFILE_QUOTA_EXCEEDED       = 567;
   {$EXTERNALSYM ERROR_PAGEFILE_QUOTA_EXCEEDED}
@@ -4468,7 +4769,7 @@ const
 // MessageText:
 //
 // {Application Error}
-// The exception %s (0x%08lx) occurred in the application at location 0x%08lx.
+// The exception %s ($%08lx) occurred in the application at location $%08lx.
 //
   ERROR_UNHANDLED_EXCEPTION           = 574;
   {$EXTERNALSYM ERROR_UNHANDLED_EXCEPTION}
@@ -4479,7 +4780,7 @@ const
 // MessageText:
 //
 // {Application Error}
-// The application was unable to start correctly (0x%lx). Click OK to close the application.
+// The application was unable to start correctly ($%lx). Click OK to close the application.
 //
   ERROR_APP_INIT_FAILURE              = 575;
   {$EXTERNALSYM ERROR_APP_INIT_FAILURE}
@@ -4653,7 +4954,7 @@ const
 // MessageText:
 //
 // {Fatal System Error}
-// The %hs system process terminated unexpectedly with a status of 0x%08x (0x%08x 0x%08x).
+// The %hs system process terminated unexpectedly with a status of $%08x ($%08x $%08x).
 // The system has been shut down.
 //
   ERROR_SYSTEM_PROCESS_TERMINATED     = 591;
@@ -6901,6 +7202,46 @@ const
   {$EXTERNALSYM ERROR_ENCLAVE_VIOLATION}
 
 //
+// MessageId: ERROR_SERVER_TRANSPORT_CONFLICT
+//
+// MessageText:
+//
+// Multiple mappings to shared resource(s) on a server, using more than one transport, are not allowed. Use a single transport for all mappings to a server and try again.
+//
+  ERROR_SERVER_TRANSPORT_CONFLICT     = 816;
+  {$EXTERNALSYM ERROR_SERVER_TRANSPORT_CONFLICT}
+
+//
+// MessageId: ERROR_CERTIFICATE_VALIDATION_PREFERENCE_CONFLICT
+//
+// MessageText:
+//
+// Multiple mappings to shared resource(s) on a server, using different certificate validation preferences, are not allowed. Use the same preference for all mappings to a server and try again.
+//
+  ERROR_CERTIFICATE_VALIDATION_PREFERENCE_CONFLICT = 817;
+  {$EXTERNALSYM ERROR_CERTIFICATE_VALIDATION_PREFERENCE_CONFLICT}
+
+//
+// MessageId: ERROR_FT_READ_FROM_COPY_FAILURE
+//
+// MessageText:
+//
+// The specified copy of the requested data could not be read.
+//
+  ERROR_FT_READ_FROM_COPY_FAILURE     = 818;
+  {$EXTERNALSYM ERROR_FT_READ_FROM_COPY_FAILURE}
+
+//
+// MessageId: ERROR_SECTION_DIRECT_MAP_ONLY
+//
+// MessageText:
+//
+// The section creation request was failed because it would have been satisfied with a direct map and the caller explicitly signified this was not wanted.
+//
+  ERROR_SECTION_DIRECT_MAP_ONLY       = 819;
+  {$EXTERNALSYM ERROR_SECTION_DIRECT_MAP_ONLY}
+
+//
 // **** Available SYSTEM error codes ****
 //
 //
@@ -8227,7 +8568,7 @@ const
 //
 // MessageText:
 //
-// The system shutdown cannot safely proceed without enabling storage maintenance mode for physical disks connected to this cluster node.
+// The system shutdown cannot safely proceed without enabling node maintenance mode for cluster node and waiting for the drain to complete.
 //
   ERROR_SHUTDOWN_DISKS_NOT_IN_MAINTENANCE_MODE = 1192;
   {$EXTERNALSYM ERROR_SHUTDOWN_DISKS_NOT_IN_MAINTENANCE_MODE}
@@ -14054,12 +14395,62 @@ const
   ERROR_APPEXEC_UNKNOWN_USER          = 3067;
   {$EXTERNALSYM ERROR_APPEXEC_UNKNOWN_USER}
 
+//
+// MessageId: ERROR_APPEXEC_APP_COMPAT_BLOCK
+//
+// MessageText:
+//
+// The application is blocked by app compat policy.
+//
+  ERROR_APPEXEC_APP_COMPAT_BLOCK      = 3068;
+  {$EXTERNALSYM ERROR_APPEXEC_APP_COMPAT_BLOCK}
+
+//
+// MessageId: ERROR_APPEXEC_CALLER_WAIT_TIMEOUT
+//
+// MessageText:
+//
+// The caller specified wait timed out before the operation completed.
+//
+  ERROR_APPEXEC_CALLER_WAIT_TIMEOUT   = 3069;
+  {$EXTERNALSYM ERROR_APPEXEC_CALLER_WAIT_TIMEOUT}
+
+//
+// MessageId: ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_TERMINATION
+//
+// MessageText:
+//
+// The caller specified wait timed out before the operation completed because a host termination is in queued.
+//
+  ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_TERMINATION = 3070;
+  {$EXTERNALSYM ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_TERMINATION}
+
+//
+// MessageId: ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_LICENSING
+//
+// MessageText:
+//
+// The caller specified wait timed out before the operation completed because a licensing operation is being performed.
+//
+  ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_LICENSING = 3071;
+  {$EXTERNALSYM ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_LICENSING}
+
+//
+// MessageId: ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_RESOURCES
+//
+// MessageText:
+//
+// The caller specified wait timed out before the operation completed because resources are being acquired.
+//
+  ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_RESOURCES = 3072;
+  {$EXTERNALSYM ERROR_APPEXEC_CALLER_WAIT_TIMEOUT_RESOURCES}
+
 
 ///////////////////////////////////////////////////
 //                                               //
 //             Verifier Error Codes              //
 //                                               //
-//         3080 (0xc08) to 3199 (0xc7f)          //
+//         3080 ($c08) to 3199 ($c7f)          //
 ///////////////////////////////////////////////////
 //
 // MessageId: ERROR_VRF_VOLATILE_CFG_AND_IO_ENABLED
@@ -14068,7 +14459,7 @@ const
 //
 // Enabling driver verification from volatile command is currently not supported when both CFG and IO are enabled.
 //
-  ERROR_VRF_VOLATILE_CFG_AND_IO_ENABLED= 3080;
+  ERROR_VRF_VOLATILE_CFG_AND_IO_ENABLED = 3080;
   {$EXTERNALSYM ERROR_VRF_VOLATILE_CFG_AND_IO_ENABLED}
 
 //
@@ -14108,7 +14499,7 @@ const
 //
 // The specified rule class (a.k.a. flag) is not supported from volatile mode.
 //
-  ERROR_VRF_VOLATILE_NOT_SUPPORTED_RULECLASS= 3084;
+  ERROR_VRF_VOLATILE_NOT_SUPPORTED_RULECLASS = 3084;
   {$EXTERNALSYM ERROR_VRF_VOLATILE_NOT_SUPPORTED_RULECLASS}
 
 //
@@ -14130,6 +14521,107 @@ const
 //
   ERROR_VRF_VOLATILE_NMI_REGISTERED   = 3086;
   {$EXTERNALSYM ERROR_VRF_VOLATILE_NMI_REGISTERED}
+
+//
+// MessageId: ERROR_VRF_VOLATILE_SETTINGS_CONFLICT
+//
+// MessageText:
+//
+// Volatile verification settings cannot be changed when verification is enabled from boot or DIF volatile verification is enabled.
+//
+  ERROR_VRF_VOLATILE_SETTINGS_CONFLICT = 3087;
+  {$EXTERNALSYM ERROR_VRF_VOLATILE_SETTINGS_CONFLICT}
+
+// MessageId: ERROR_DIF_IOCALLBACK_NOT_REPLACED
+//
+// MessageText:
+//
+// The specified driver is not associated with driver object or driver extension.
+//
+  ERROR_DIF_IOCALLBACK_NOT_REPLACED   = 3190;
+  {$EXTERNALSYM ERROR_DIF_IOCALLBACK_NOT_REPLACED}
+
+
+
+//
+// MessageId: ERROR_DIF_LIVEDUMP_LIMIT_EXCEEDED
+//
+// MessageText:
+//
+// Verifier's internal data size exceeds the limit of live dump secondary data.
+//
+  ERROR_DIF_LIVEDUMP_LIMIT_EXCEEDED   = 3191;
+  {$EXTERNALSYM ERROR_DIF_LIVEDUMP_LIMIT_EXCEEDED}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_SECTION_NOT_LOCKED
+//
+// MessageText:
+//
+// Verification cannot start because an attempt to lock code or data section failed.
+//
+  ERROR_DIF_VOLATILE_SECTION_NOT_LOCKED = 3192;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_SECTION_NOT_LOCKED}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_DRIVER_HOTPATCHED
+//
+// MessageText:
+//
+// DIF volatile verification is not supported for hotpatched driver.
+//
+  ERROR_DIF_VOLATILE_DRIVER_HOTPATCHED = 3193;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_DRIVER_HOTPATCHED}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_INVALID_INFO
+//
+// MessageText:
+//
+// The passed system DIF information is invalid.
+//
+  ERROR_DIF_VOLATILE_INVALID_INFO     = 3194;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_INVALID_INFO}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_DRIVER_IS_NOT_RUNNING
+//
+// MessageText:
+//
+// DIF volatile verification only supports on loaded drivers.
+//
+  ERROR_DIF_VOLATILE_DRIVER_IS_NOT_RUNNING = 3195;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_DRIVER_IS_NOT_RUNNING}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_PLUGIN_IS_NOT_RUNNING
+//
+// MessageText:
+//
+// Currently no plugin is running.
+//
+  ERROR_DIF_VOLATILE_PLUGIN_IS_NOT_RUNNING = 3196;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_PLUGIN_IS_NOT_RUNNING}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_PLUGIN_CHANGE_NOT_ALLOWED
+//
+// MessageText:
+//
+// Currently running plugin must be removed before applying a new plugin.
+//
+  ERROR_DIF_VOLATILE_PLUGIN_CHANGE_NOT_ALLOWED = 3197;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_PLUGIN_CHANGE_NOT_ALLOWED}
+
+//
+// MessageId: ERROR_DIF_VOLATILE_NOT_ALLOWED
+//
+// MessageText:
+//
+// The plugin is not allowed to run in volatile mode.
+//
+  ERROR_DIF_VOLATILE_NOT_ALLOWED      = 3198;
+  {$EXTERNALSYM ERROR_DIF_VOLATILE_NOT_ALLOWED}
 
 //
 // MessageId: ERROR_DIF_BINDING_API_NOT_FOUND
@@ -15524,6 +16016,16 @@ const
   ERROR_WOF_FILE_RESOURCE_TABLE_CORRUPT = 4448;
   {$EXTERNALSYM ERROR_WOF_FILE_RESOURCE_TABLE_CORRUPT}
 
+//
+// MessageId: ERROR_OBJECT_IS_IMMUTABLE
+//
+// MessageText:
+//
+// The request cannot be completed as it requires modifying an immutable object.
+//
+  ERROR_OBJECT_IS_IMMUTABLE           = 4449;
+  {$EXTERNALSYM ERROR_OBJECT_IS_IMMUTABLE}
+
 
 ///////////////////////////////////////////////////
 //                                               //
@@ -15609,6 +16111,46 @@ const
 //
   ERROR_SYSTEM_INTEGRITY_SUPPLEMENTAL_POLICY_NOT_AUTHORIZED = 4555;
   {$EXTERNALSYM ERROR_SYSTEM_INTEGRITY_SUPPLEMENTAL_POLICY_NOT_AUTHORIZED}
+
+//
+// MessageId: ERROR_SYSTEM_INTEGRITY_REPUTATION_MALICIOUS
+//
+// MessageText:
+//
+// System Integrity policy has been violated.  Malicious binary reputation.
+//
+  ERROR_SYSTEM_INTEGRITY_REPUTATION_MALICIOUS = 4556;
+  {$EXTERNALSYM ERROR_SYSTEM_INTEGRITY_REPUTATION_MALICIOUS}
+
+//
+// MessageId: ERROR_SYSTEM_INTEGRITY_REPUTATION_PUA
+//
+// MessageText:
+//
+// System Integrity policy has been violated.  Potentially unwanted application.
+//
+  ERROR_SYSTEM_INTEGRITY_REPUTATION_PUA = 4557;
+  {$EXTERNALSYM ERROR_SYSTEM_INTEGRITY_REPUTATION_PUA}
+
+//
+// MessageId: ERROR_SYSTEM_INTEGRITY_REPUTATION_DANGEROUS_EXT
+//
+// MessageText:
+//
+// System Integrity policy has been violated.  Dangerous file extension from the web.
+//
+  ERROR_SYSTEM_INTEGRITY_REPUTATION_DANGEROUS_EXT = 4558;
+  {$EXTERNALSYM ERROR_SYSTEM_INTEGRITY_REPUTATION_DANGEROUS_EXT}
+
+//
+// MessageId: ERROR_SYSTEM_INTEGRITY_REPUTATION_OFFLINE
+//
+// MessageText:
+//
+// System Integrity policy has been violated.  Unable to contact reputation service for unknown file.
+//
+  ERROR_SYSTEM_INTEGRITY_REPUTATION_OFFLINE = 4559;
+  {$EXTERNALSYM ERROR_SYSTEM_INTEGRITY_REPUTATION_OFFLINE}
 
 
 
@@ -16632,12 +17174,6 @@ const
 //
   ERROR_NO_ADMIN_ACCESS_POINT         = 5090;
   {$EXTERNALSYM ERROR_NO_ADMIN_ACCESS_POINT}
-
-///*
-// Should we remove this comment? apperr2.w definitions are used by netapi/netcmd, and is unrelated to winerror.
-// Original comment: Codes from 4300 through 5889 overlap with codes in ds\published\inc\apperr2.w.
-// Do not add any more error codes in that range.
-//*/
 
 //
 // MessageId: ERROR_CLUSTER_MEMBERSHIP_INVALID_STATE
@@ -22857,7 +23393,7 @@ const
 // MessageText:
 //
 // Security Accounts Manager initialization failed because of the following error: %1.
-// Error Status: 0x%2. Please shutdown this system and reboot into Directory Services Restore Mode, check the event log for more detailed information.
+// Error Status: $%2. Please shutdown this system and reboot into Directory Services Restore Mode, check the event log for more detailed information.
 //
   ERROR_DS_SAM_INIT_FAILURE           = 8504;
   {$EXTERNALSYM ERROR_DS_SAM_INIT_FAILURE}
@@ -23227,7 +23763,7 @@ const
 // MessageText:
 //
 // Security Accounts Manager initialization failed because of the following error: %1.
-// Error Status: 0x%2. Click OK to shut down the system and reboot into Safe Mode. Check the event log for detailed information.
+// Error Status: $%2. Click OK to shut down the system and reboot into Safe Mode. Check the event log for detailed information.
 //
   ERROR_SAM_INIT_FAILURE              = 8541;
   {$EXTERNALSYM ERROR_SAM_INIT_FAILURE}
@@ -23426,7 +23962,7 @@ const
 // MessageText:
 //
 // Directory Services could not start because of the following error: %1.
-// Error Status: 0x%2. Please click OK to shutdown the system. You can use the recovery console to diagnose the system further.
+// Error Status: $%2. Please click OK to shutdown the system. You can use the recovery console to diagnose the system further.
 //
   ERROR_DS_INIT_FAILURE_CONSOLE       = 8561;
   {$EXTERNALSYM ERROR_DS_INIT_FAILURE_CONSOLE}
@@ -23437,7 +23973,7 @@ const
 // MessageText:
 //
 // Security Accounts Manager initialization failed because of the following error: %1.
-// Error Status: 0x%2. Please click OK to shutdown the system. You can use the recovery console to diagnose the system further.
+// Error Status: $%2. Please click OK to shutdown the system. You can use the recovery console to diagnose the system further.
 //
   ERROR_DS_SAM_INIT_FAILURE_CONSOLE   = 8562;
   {$EXTERNALSYM ERROR_DS_SAM_INIT_FAILURE_CONSOLE}
@@ -24316,6 +24852,16 @@ const
   ERROR_DS_VALUE_KEY_NOT_UNIQUE       = 8650;
   {$EXTERNALSYM ERROR_DS_VALUE_KEY_NOT_UNIQUE}
 
+//
+// MessageId: ERROR_WEAK_WHFBKEY_BLOCKED
+//
+// MessageText:
+//
+// The Security Account Manager blocked the use of a weak Windows Hello for Business key.
+//
+  ERROR_WEAK_WHFBKEY_BLOCKED          = 8651;
+  {$EXTERNALSYM ERROR_WEAK_WHFBKEY_BLOCKED}
+
 
 ///////////////////////////////////////////////////
 //                                                /
@@ -24349,7 +24895,7 @@ const
   DNS_ERROR_MASK                      = $00002328;  // 9000 or DNS_ERROR_RESPONSE_CODES_BASE
   {$EXTERNALSYM DNS_ERROR_MASK}
 
-// DNS_ERROR_RCODE_FORMAT_ERROR          0x00002329
+// DNS_ERROR_RCODE_FORMAT_ERROR          $00002329
 //
 // MessageId: DNS_ERROR_RCODE_FORMAT_ERROR
 //
@@ -24360,7 +24906,7 @@ const
   DNS_ERROR_RCODE_FORMAT_ERROR        = 9001;
   {$EXTERNALSYM DNS_ERROR_RCODE_FORMAT_ERROR}
 
-// DNS_ERROR_RCODE_SERVER_FAILURE        0x0000232a
+// DNS_ERROR_RCODE_SERVER_FAILURE        $0000232a
 //
 // MessageId: DNS_ERROR_RCODE_SERVER_FAILURE
 //
@@ -24371,7 +24917,7 @@ const
   DNS_ERROR_RCODE_SERVER_FAILURE      = 9002;
   {$EXTERNALSYM DNS_ERROR_RCODE_SERVER_FAILURE}
 
-// DNS_ERROR_RCODE_NAME_ERROR            0x0000232b
+// DNS_ERROR_RCODE_NAME_ERROR            $0000232b
 //
 // MessageId: DNS_ERROR_RCODE_NAME_ERROR
 //
@@ -24382,7 +24928,7 @@ const
   DNS_ERROR_RCODE_NAME_ERROR          = 9003;
   {$EXTERNALSYM DNS_ERROR_RCODE_NAME_ERROR}
 
-// DNS_ERROR_RCODE_NOT_IMPLEMENTED       0x0000232c
+// DNS_ERROR_RCODE_NOT_IMPLEMENTED       $0000232c
 //
 // MessageId: DNS_ERROR_RCODE_NOT_IMPLEMENTED
 //
@@ -24393,7 +24939,7 @@ const
   DNS_ERROR_RCODE_NOT_IMPLEMENTED     = 9004;
   {$EXTERNALSYM DNS_ERROR_RCODE_NOT_IMPLEMENTED}
 
-// DNS_ERROR_RCODE_REFUSED               0x0000232d
+// DNS_ERROR_RCODE_REFUSED               $0000232d
 //
 // MessageId: DNS_ERROR_RCODE_REFUSED
 //
@@ -24404,7 +24950,7 @@ const
   DNS_ERROR_RCODE_REFUSED             = 9005;
   {$EXTERNALSYM DNS_ERROR_RCODE_REFUSED}
 
-// DNS_ERROR_RCODE_YXDOMAIN              0x0000232e
+// DNS_ERROR_RCODE_YXDOMAIN              $0000232e
 //
 // MessageId: DNS_ERROR_RCODE_YXDOMAIN
 //
@@ -24415,7 +24961,7 @@ const
   DNS_ERROR_RCODE_YXDOMAIN            = 9006;
   {$EXTERNALSYM DNS_ERROR_RCODE_YXDOMAIN}
 
-// DNS_ERROR_RCODE_YXRRSET               0x0000232f
+// DNS_ERROR_RCODE_YXRRSET               $0000232f
 //
 // MessageId: DNS_ERROR_RCODE_YXRRSET
 //
@@ -24426,7 +24972,7 @@ const
   DNS_ERROR_RCODE_YXRRSET             = 9007;
   {$EXTERNALSYM DNS_ERROR_RCODE_YXRRSET}
 
-// DNS_ERROR_RCODE_NXRRSET               0x00002330
+// DNS_ERROR_RCODE_NXRRSET               $00002330
 //
 // MessageId: DNS_ERROR_RCODE_NXRRSET
 //
@@ -24437,7 +24983,7 @@ const
   DNS_ERROR_RCODE_NXRRSET             = 9008;
   {$EXTERNALSYM DNS_ERROR_RCODE_NXRRSET}
 
-// DNS_ERROR_RCODE_NOTAUTH               0x00002331
+// DNS_ERROR_RCODE_NOTAUTH               $00002331
 //
 // MessageId: DNS_ERROR_RCODE_NOTAUTH
 //
@@ -24448,7 +24994,7 @@ const
   DNS_ERROR_RCODE_NOTAUTH             = 9009;
   {$EXTERNALSYM DNS_ERROR_RCODE_NOTAUTH}
 
-// DNS_ERROR_RCODE_NOTZONE               0x00002332
+// DNS_ERROR_RCODE_NOTZONE               $00002332
 //
 // MessageId: DNS_ERROR_RCODE_NOTZONE
 //
@@ -24459,7 +25005,7 @@ const
   DNS_ERROR_RCODE_NOTZONE             = 9010;
   {$EXTERNALSYM DNS_ERROR_RCODE_NOTZONE}
 
-// DNS_ERROR_RCODE_BADSIG                0x00002338
+// DNS_ERROR_RCODE_BADSIG                $00002338
 //
 // MessageId: DNS_ERROR_RCODE_BADSIG
 //
@@ -24470,7 +25016,7 @@ const
   DNS_ERROR_RCODE_BADSIG              = 9016;
   {$EXTERNALSYM DNS_ERROR_RCODE_BADSIG}
 
-// DNS_ERROR_RCODE_BADKEY                0x00002339
+// DNS_ERROR_RCODE_BADKEY                $00002339
 //
 // MessageId: DNS_ERROR_RCODE_BADKEY
 //
@@ -24481,7 +25027,7 @@ const
   DNS_ERROR_RCODE_BADKEY              = 9017;
   {$EXTERNALSYM DNS_ERROR_RCODE_BADKEY}
 
-// DNS_ERROR_RCODE_BADTIME               0x0000233a
+// DNS_ERROR_RCODE_BADTIME               $0000233a
 //
 // MessageId: DNS_ERROR_RCODE_BADTIME
 //
@@ -24809,7 +25355,7 @@ const
   DNS_ERROR_PACKET_FMT_BASE           = 9500;
   {$EXTERNALSYM DNS_ERROR_PACKET_FMT_BASE}
 
-// DNS_INFO_NO_RECORDS                   0x0000251d
+// DNS_INFO_NO_RECORDS                   $0000251d
 //
 // MessageId: DNS_INFO_NO_RECORDS
 //
@@ -24820,7 +25366,7 @@ const
   DNS_INFO_NO_RECORDS                 = 9501;
   {$EXTERNALSYM DNS_INFO_NO_RECORDS}
 
-// DNS_ERROR_BAD_PACKET                  0x0000251e
+// DNS_ERROR_BAD_PACKET                  $0000251e
 //
 // MessageId: DNS_ERROR_BAD_PACKET
 //
@@ -24831,7 +25377,7 @@ const
   DNS_ERROR_BAD_PACKET                = 9502;
   {$EXTERNALSYM DNS_ERROR_BAD_PACKET}
 
-// DNS_ERROR_NO_PACKET                   0x0000251f
+// DNS_ERROR_NO_PACKET                   $0000251f
 //
 // MessageId: DNS_ERROR_NO_PACKET
 //
@@ -24842,7 +25388,7 @@ const
   DNS_ERROR_NO_PACKET                 = 9503;
   {$EXTERNALSYM DNS_ERROR_NO_PACKET}
 
-// DNS_ERROR_RCODE                       0x00002520
+// DNS_ERROR_RCODE                       $00002520
 //
 // MessageId: DNS_ERROR_RCODE
 //
@@ -24853,7 +25399,7 @@ const
   DNS_ERROR_RCODE                     = 9504;
   {$EXTERNALSYM DNS_ERROR_RCODE}
 
-// DNS_ERROR_UNSECURE_PACKET             0x00002521
+// DNS_ERROR_UNSECURE_PACKET             $00002521
 //
 // MessageId: DNS_ERROR_UNSECURE_PACKET
 //
@@ -24867,7 +25413,7 @@ const
   DNS_STATUS_PACKET_UNSECURE          = DNS_ERROR_UNSECURE_PACKET;
   {$EXTERNALSYM DNS_STATUS_PACKET_UNSECURE}
 
-// DNS_REQUEST_PENDING                     0x00002522
+// DNS_REQUEST_PENDING                     $00002522
 //
 // MessageId: DNS_REQUEST_PENDING
 //
@@ -24893,7 +25439,7 @@ const
   DNS_ERROR_GENERAL_API_BASE          = 9550;
   {$EXTERNALSYM DNS_ERROR_GENERAL_API_BASE}
 
-// DNS_ERROR_INVALID_TYPE                0x0000254f
+// DNS_ERROR_INVALID_TYPE                $0000254f
 //
 // MessageId: DNS_ERROR_INVALID_TYPE
 //
@@ -24904,7 +25450,7 @@ const
   DNS_ERROR_INVALID_TYPE              = 9551;
   {$EXTERNALSYM DNS_ERROR_INVALID_TYPE}
 
-// DNS_ERROR_INVALID_IP_ADDRESS          0x00002550
+// DNS_ERROR_INVALID_IP_ADDRESS          $00002550
 //
 // MessageId: DNS_ERROR_INVALID_IP_ADDRESS
 //
@@ -24915,7 +25461,7 @@ const
   DNS_ERROR_INVALID_IP_ADDRESS        = 9552;
   {$EXTERNALSYM DNS_ERROR_INVALID_IP_ADDRESS}
 
-// DNS_ERROR_INVALID_PROPERTY            0x00002551
+// DNS_ERROR_INVALID_PROPERTY            $00002551
 //
 // MessageId: DNS_ERROR_INVALID_PROPERTY
 //
@@ -24926,7 +25472,7 @@ const
   DNS_ERROR_INVALID_PROPERTY          = 9553;
   {$EXTERNALSYM DNS_ERROR_INVALID_PROPERTY}
 
-// DNS_ERROR_TRY_AGAIN_LATER             0x00002552
+// DNS_ERROR_TRY_AGAIN_LATER             $00002552
 //
 // MessageId: DNS_ERROR_TRY_AGAIN_LATER
 //
@@ -24937,7 +25483,7 @@ const
   DNS_ERROR_TRY_AGAIN_LATER           = 9554;
   {$EXTERNALSYM DNS_ERROR_TRY_AGAIN_LATER}
 
-// DNS_ERROR_NOT_UNIQUE                  0x00002553
+// DNS_ERROR_NOT_UNIQUE                  $00002553
 //
 // MessageId: DNS_ERROR_NOT_UNIQUE
 //
@@ -24948,7 +25494,7 @@ const
   DNS_ERROR_NOT_UNIQUE                = 9555;
   {$EXTERNALSYM DNS_ERROR_NOT_UNIQUE}
 
-// DNS_ERROR_NON_RFC_NAME                0x00002554
+// DNS_ERROR_NON_RFC_NAME                $00002554
 //
 // MessageId: DNS_ERROR_NON_RFC_NAME
 //
@@ -24959,7 +25505,7 @@ const
   DNS_ERROR_NON_RFC_NAME              = 9556;
   {$EXTERNALSYM DNS_ERROR_NON_RFC_NAME}
 
-// DNS_STATUS_FQDN                       0x00002555
+// DNS_STATUS_FQDN                       $00002555
 //
 // MessageId: DNS_STATUS_FQDN
 //
@@ -24970,7 +25516,7 @@ const
   DNS_STATUS_FQDN                     = 9557;
   {$EXTERNALSYM DNS_STATUS_FQDN}
 
-// DNS_STATUS_DOTTED_NAME                0x00002556
+// DNS_STATUS_DOTTED_NAME                $00002556
 //
 // MessageId: DNS_STATUS_DOTTED_NAME
 //
@@ -24981,7 +25527,7 @@ const
   DNS_STATUS_DOTTED_NAME              = 9558;
   {$EXTERNALSYM DNS_STATUS_DOTTED_NAME}
 
-// DNS_STATUS_SINGLE_PART_NAME           0x00002557
+// DNS_STATUS_SINGLE_PART_NAME           $00002557
 //
 // MessageId: DNS_STATUS_SINGLE_PART_NAME
 //
@@ -24992,7 +25538,7 @@ const
   DNS_STATUS_SINGLE_PART_NAME         = 9559;
   {$EXTERNALSYM DNS_STATUS_SINGLE_PART_NAME}
 
-// DNS_ERROR_INVALID_NAME_CHAR           0x00002558
+// DNS_ERROR_INVALID_NAME_CHAR           $00002558
 //
 // MessageId: DNS_ERROR_INVALID_NAME_CHAR
 //
@@ -25003,7 +25549,7 @@ const
   DNS_ERROR_INVALID_NAME_CHAR         = 9560;
   {$EXTERNALSYM DNS_ERROR_INVALID_NAME_CHAR}
 
-// DNS_ERROR_NUMERIC_NAME                0x00002559
+// DNS_ERROR_NUMERIC_NAME                $00002559
 //
 // MessageId: DNS_ERROR_NUMERIC_NAME
 //
@@ -25014,7 +25560,7 @@ const
   DNS_ERROR_NUMERIC_NAME              = 9561;
   {$EXTERNALSYM DNS_ERROR_NUMERIC_NAME}
 
-// DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER  0x0000255A
+// DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER  $0000255A
 //
 // MessageId: DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER
 //
@@ -25025,7 +25571,7 @@ const
   DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER = 9562;
   {$EXTERNALSYM DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER}
 
-// DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION  0x0000255B
+// DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION  $0000255B
 //
 // MessageId: DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION
 //
@@ -25036,7 +25582,7 @@ const
   DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION = 9563;
   {$EXTERNALSYM DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION}
 
-// DNS_ERROR_CANNOT_FIND_ROOT_HINTS  0x0000255C
+// DNS_ERROR_CANNOT_FIND_ROOT_HINTS  $0000255C
 //
 // MessageId: DNS_ERROR_CANNOT_FIND_ROOT_HINTS
 //
@@ -25047,7 +25593,7 @@ const
   DNS_ERROR_CANNOT_FIND_ROOT_HINTS    = 9564;
   {$EXTERNALSYM DNS_ERROR_CANNOT_FIND_ROOT_HINTS}
 
-// DNS_ERROR_INCONSISTENT_ROOT_HINTS  0x0000255D
+// DNS_ERROR_INCONSISTENT_ROOT_HINTS  $0000255D
 //
 // MessageId: DNS_ERROR_INCONSISTENT_ROOT_HINTS
 //
@@ -25058,7 +25604,7 @@ const
   DNS_ERROR_INCONSISTENT_ROOT_HINTS   = 9565;
   {$EXTERNALSYM DNS_ERROR_INCONSISTENT_ROOT_HINTS}
 
-// DNS_ERROR_DWORD_VALUE_TOO_SMALL    0x0000255E
+// DNS_ERROR_DWORD_VALUE_TOO_SMALL    $0000255E
 //
 // MessageId: DNS_ERROR_DWORD_VALUE_TOO_SMALL
 //
@@ -25069,7 +25615,7 @@ const
   DNS_ERROR_DWORD_VALUE_TOO_SMALL     = 9566;
   {$EXTERNALSYM DNS_ERROR_DWORD_VALUE_TOO_SMALL}
 
-// DNS_ERROR_DWORD_VALUE_TOO_LARGE    0x0000255F
+// DNS_ERROR_DWORD_VALUE_TOO_LARGE    $0000255F
 //
 // MessageId: DNS_ERROR_DWORD_VALUE_TOO_LARGE
 //
@@ -25080,7 +25626,7 @@ const
   DNS_ERROR_DWORD_VALUE_TOO_LARGE     = 9567;
   {$EXTERNALSYM DNS_ERROR_DWORD_VALUE_TOO_LARGE}
 
-// DNS_ERROR_BACKGROUND_LOADING       0x00002560
+// DNS_ERROR_BACKGROUND_LOADING       $00002560
 //
 // MessageId: DNS_ERROR_BACKGROUND_LOADING
 //
@@ -25091,7 +25637,7 @@ const
   DNS_ERROR_BACKGROUND_LOADING        = 9568;
   {$EXTERNALSYM DNS_ERROR_BACKGROUND_LOADING}
 
-// DNS_ERROR_NOT_ALLOWED_ON_RODC      0x00002561
+// DNS_ERROR_NOT_ALLOWED_ON_RODC      $00002561
 //
 // MessageId: DNS_ERROR_NOT_ALLOWED_ON_RODC
 //
@@ -25102,7 +25648,7 @@ const
   DNS_ERROR_NOT_ALLOWED_ON_RODC       = 9569;
   {$EXTERNALSYM DNS_ERROR_NOT_ALLOWED_ON_RODC}
 
-// DNS_ERROR_NOT_ALLOWED_UNDER_DNAME   0x00002562
+// DNS_ERROR_NOT_ALLOWED_UNDER_DNAME   $00002562
 //
 // MessageId: DNS_ERROR_NOT_ALLOWED_UNDER_DNAME
 //
@@ -25113,7 +25659,7 @@ const
   DNS_ERROR_NOT_ALLOWED_UNDER_DNAME   = 9570;
   {$EXTERNALSYM DNS_ERROR_NOT_ALLOWED_UNDER_DNAME}
 
-// DNS_ERROR_DELEGATION_REQUIRED       0x00002563
+// DNS_ERROR_DELEGATION_REQUIRED       $00002563
 //
 // MessageId: DNS_ERROR_DELEGATION_REQUIRED
 //
@@ -25124,7 +25670,7 @@ const
   DNS_ERROR_DELEGATION_REQUIRED       = 9571;
   {$EXTERNALSYM DNS_ERROR_DELEGATION_REQUIRED}
 
-// DNS_ERROR_INVALID_POLICY_TABLE        0x00002564
+// DNS_ERROR_INVALID_POLICY_TABLE        $00002564
 //
 // MessageId: DNS_ERROR_INVALID_POLICY_TABLE
 //
@@ -25135,7 +25681,7 @@ const
   DNS_ERROR_INVALID_POLICY_TABLE      = 9572;
   {$EXTERNALSYM DNS_ERROR_INVALID_POLICY_TABLE}
 
-// DNS_ERROR_ADDRESS_REQUIRED        0x00002565
+// DNS_ERROR_ADDRESS_REQUIRED        $00002565
 //
 // MessageId: DNS_ERROR_ADDRESS_REQUIRED
 //
@@ -25154,7 +25700,7 @@ const
   DNS_ERROR_ZONE_BASE                 = 9600;
   {$EXTERNALSYM DNS_ERROR_ZONE_BASE}
 
-// DNS_ERROR_ZONE_DOES_NOT_EXIST         0x00002581
+// DNS_ERROR_ZONE_DOES_NOT_EXIST         $00002581
 //
 // MessageId: DNS_ERROR_ZONE_DOES_NOT_EXIST
 //
@@ -25165,7 +25711,7 @@ const
   DNS_ERROR_ZONE_DOES_NOT_EXIST       = 9601;
   {$EXTERNALSYM DNS_ERROR_ZONE_DOES_NOT_EXIST}
 
-// DNS_ERROR_NO_ZONE_INFO                0x00002582
+// DNS_ERROR_NO_ZONE_INFO                $00002582
 //
 // MessageId: DNS_ERROR_NO_ZONE_INFO
 //
@@ -25176,7 +25722,7 @@ const
   DNS_ERROR_NO_ZONE_INFO              = 9602;
   {$EXTERNALSYM DNS_ERROR_NO_ZONE_INFO}
 
-// DNS_ERROR_INVALID_ZONE_OPERATION      0x00002583
+// DNS_ERROR_INVALID_ZONE_OPERATION      $00002583
 //
 // MessageId: DNS_ERROR_INVALID_ZONE_OPERATION
 //
@@ -25187,7 +25733,7 @@ const
   DNS_ERROR_INVALID_ZONE_OPERATION    = 9603;
   {$EXTERNALSYM DNS_ERROR_INVALID_ZONE_OPERATION}
 
-// DNS_ERROR_ZONE_CONFIGURATION_ERROR    0x00002584
+// DNS_ERROR_ZONE_CONFIGURATION_ERROR    $00002584
 //
 // MessageId: DNS_ERROR_ZONE_CONFIGURATION_ERROR
 //
@@ -25198,7 +25744,7 @@ const
   DNS_ERROR_ZONE_CONFIGURATION_ERROR  = 9604;
   {$EXTERNALSYM DNS_ERROR_ZONE_CONFIGURATION_ERROR}
 
-// DNS_ERROR_ZONE_HAS_NO_SOA_RECORD      0x00002585
+// DNS_ERROR_ZONE_HAS_NO_SOA_RECORD      $00002585
 //
 // MessageId: DNS_ERROR_ZONE_HAS_NO_SOA_RECORD
 //
@@ -25209,7 +25755,7 @@ const
   DNS_ERROR_ZONE_HAS_NO_SOA_RECORD    = 9605;
   {$EXTERNALSYM DNS_ERROR_ZONE_HAS_NO_SOA_RECORD}
 
-// DNS_ERROR_ZONE_HAS_NO_NS_RECORDS      0x00002586
+// DNS_ERROR_ZONE_HAS_NO_NS_RECORDS      $00002586
 //
 // MessageId: DNS_ERROR_ZONE_HAS_NO_NS_RECORDS
 //
@@ -25220,7 +25766,7 @@ const
   DNS_ERROR_ZONE_HAS_NO_NS_RECORDS    = 9606;
   {$EXTERNALSYM DNS_ERROR_ZONE_HAS_NO_NS_RECORDS}
 
-// DNS_ERROR_ZONE_LOCKED                 0x00002587
+// DNS_ERROR_ZONE_LOCKED                 $00002587
 //
 // MessageId: DNS_ERROR_ZONE_LOCKED
 //
@@ -25231,7 +25777,7 @@ const
   DNS_ERROR_ZONE_LOCKED               = 9607;
   {$EXTERNALSYM DNS_ERROR_ZONE_LOCKED}
 
-// DNS_ERROR_ZONE_CREATION_FAILED        0x00002588
+// DNS_ERROR_ZONE_CREATION_FAILED        $00002588
 //
 // MessageId: DNS_ERROR_ZONE_CREATION_FAILED
 //
@@ -25242,7 +25788,7 @@ const
   DNS_ERROR_ZONE_CREATION_FAILED      = 9608;
   {$EXTERNALSYM DNS_ERROR_ZONE_CREATION_FAILED}
 
-// DNS_ERROR_ZONE_ALREADY_EXISTS         0x00002589
+// DNS_ERROR_ZONE_ALREADY_EXISTS         $00002589
 //
 // MessageId: DNS_ERROR_ZONE_ALREADY_EXISTS
 //
@@ -25253,7 +25799,7 @@ const
   DNS_ERROR_ZONE_ALREADY_EXISTS       = 9609;
   {$EXTERNALSYM DNS_ERROR_ZONE_ALREADY_EXISTS}
 
-// DNS_ERROR_AUTOZONE_ALREADY_EXISTS     0x0000258a
+// DNS_ERROR_AUTOZONE_ALREADY_EXISTS     $0000258a
 //
 // MessageId: DNS_ERROR_AUTOZONE_ALREADY_EXISTS
 //
@@ -25264,7 +25810,7 @@ const
   DNS_ERROR_AUTOZONE_ALREADY_EXISTS   = 9610;
   {$EXTERNALSYM DNS_ERROR_AUTOZONE_ALREADY_EXISTS}
 
-// DNS_ERROR_INVALID_ZONE_TYPE           0x0000258b
+// DNS_ERROR_INVALID_ZONE_TYPE           $0000258b
 //
 // MessageId: DNS_ERROR_INVALID_ZONE_TYPE
 //
@@ -25275,7 +25821,7 @@ const
   DNS_ERROR_INVALID_ZONE_TYPE         = 9611;
   {$EXTERNALSYM DNS_ERROR_INVALID_ZONE_TYPE}
 
-// DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP 0x0000258c
+// DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP $0000258c
 //
 // MessageId: DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP
 //
@@ -25285,7 +25831,7 @@ const
 //
   DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP= 9612;
 
-// DNS_ERROR_ZONE_NOT_SECONDARY          0x0000258d
+// DNS_ERROR_ZONE_NOT_SECONDARY          $0000258d
 //
 // MessageId: DNS_ERROR_ZONE_NOT_SECONDARY
 //
@@ -25296,7 +25842,7 @@ const
   DNS_ERROR_ZONE_NOT_SECONDARY        = 9613;
   {$EXTERNALSYM DNS_ERROR_ZONE_NOT_SECONDARY}
 
-// DNS_ERROR_NEED_SECONDARY_ADDRESSES    0x0000258e
+// DNS_ERROR_NEED_SECONDARY_ADDRESSES    $0000258e
 //
 // MessageId: DNS_ERROR_NEED_SECONDARY_ADDRESSES
 //
@@ -25307,7 +25853,7 @@ const
   DNS_ERROR_NEED_SECONDARY_ADDRESSES  = 9614;
   {$EXTERNALSYM DNS_ERROR_NEED_SECONDARY_ADDRESSES}
 
-// DNS_ERROR_WINS_INIT_FAILED            0x0000258f
+// DNS_ERROR_WINS_INIT_FAILED            $0000258f
 //
 // MessageId: DNS_ERROR_WINS_INIT_FAILED
 //
@@ -25318,7 +25864,7 @@ const
   DNS_ERROR_WINS_INIT_FAILED          = 9615;
   {$EXTERNALSYM DNS_ERROR_WINS_INIT_FAILED}
 
-// DNS_ERROR_NEED_WINS_SERVERS           0x00002590
+// DNS_ERROR_NEED_WINS_SERVERS           $00002590
 //
 // MessageId: DNS_ERROR_NEED_WINS_SERVERS
 //
@@ -25329,7 +25875,7 @@ const
   DNS_ERROR_NEED_WINS_SERVERS         = 9616;
   {$EXTERNALSYM DNS_ERROR_NEED_WINS_SERVERS}
 
-// DNS_ERROR_NBSTAT_INIT_FAILED          0x00002591
+// DNS_ERROR_NBSTAT_INIT_FAILED          $00002591
 //
 // MessageId: DNS_ERROR_NBSTAT_INIT_FAILED
 //
@@ -25340,7 +25886,7 @@ const
   DNS_ERROR_NBSTAT_INIT_FAILED        = 9617;
   {$EXTERNALSYM DNS_ERROR_NBSTAT_INIT_FAILED}
 
-// DNS_ERROR_SOA_DELETE_INVALID          0x00002592
+// DNS_ERROR_SOA_DELETE_INVALID          $00002592
 //
 // MessageId: DNS_ERROR_SOA_DELETE_INVALID
 //
@@ -25351,7 +25897,7 @@ const
   DNS_ERROR_SOA_DELETE_INVALID        = 9618;
   {$EXTERNALSYM DNS_ERROR_SOA_DELETE_INVALID}
 
-// DNS_ERROR_FORWARDER_ALREADY_EXISTS    0x00002593
+// DNS_ERROR_FORWARDER_ALREADY_EXISTS    $00002593
 //
 // MessageId: DNS_ERROR_FORWARDER_ALREADY_EXISTS
 //
@@ -25362,7 +25908,7 @@ const
   DNS_ERROR_FORWARDER_ALREADY_EXISTS  = 9619;
   {$EXTERNALSYM DNS_ERROR_FORWARDER_ALREADY_EXISTS}
 
-// DNS_ERROR_ZONE_REQUIRES_MASTER_IP     0x00002594
+// DNS_ERROR_ZONE_REQUIRES_MASTER_IP     $00002594
 //
 // MessageId: DNS_ERROR_ZONE_REQUIRES_MASTER_IP
 //
@@ -25373,7 +25919,7 @@ const
   DNS_ERROR_ZONE_REQUIRES_MASTER_IP   = 9620;
   {$EXTERNALSYM DNS_ERROR_ZONE_REQUIRES_MASTER_IP}
 
-// DNS_ERROR_ZONE_IS_SHUTDOWN            0x00002595
+// DNS_ERROR_ZONE_IS_SHUTDOWN            $00002595
 //
 // MessageId: DNS_ERROR_ZONE_IS_SHUTDOWN
 //
@@ -25384,7 +25930,7 @@ const
   DNS_ERROR_ZONE_IS_SHUTDOWN          = 9621;
   {$EXTERNALSYM DNS_ERROR_ZONE_IS_SHUTDOWN}
 
-// DNS_ERROR_ZONE_LOCKED_FOR_SIGNING     0x00002596
+// DNS_ERROR_ZONE_LOCKED_FOR_SIGNING     $00002596
 //
 // MessageId: DNS_ERROR_ZONE_LOCKED_FOR_SIGNING
 //
@@ -25403,7 +25949,7 @@ const
   DNS_ERROR_DATAFILE_BASE             = 9650;
   {$EXTERNALSYM DNS_ERROR_DATAFILE_BASE}
 
-// DNS                                   0x000025b3
+// DNS                                   $000025b3
 //
 // MessageId: DNS_ERROR_PRIMARY_REQUIRES_DATAFILE
 //
@@ -25414,7 +25960,7 @@ const
   DNS_ERROR_PRIMARY_REQUIRES_DATAFILE = 9651;
   {$EXTERNALSYM DNS_ERROR_PRIMARY_REQUIRES_DATAFILE}
 
-// DNS                                   0x000025b4
+// DNS                                   $000025b4
 //
 // MessageId: DNS_ERROR_INVALID_DATAFILE_NAME
 //
@@ -25425,7 +25971,7 @@ const
   DNS_ERROR_INVALID_DATAFILE_NAME     = 9652;
   {$EXTERNALSYM DNS_ERROR_INVALID_DATAFILE_NAME}
 
-// DNS                                   0x000025b5
+// DNS                                   $000025b5
 //
 // MessageId: DNS_ERROR_DATAFILE_OPEN_FAILURE
 //
@@ -25436,7 +25982,7 @@ const
   DNS_ERROR_DATAFILE_OPEN_FAILURE     = 9653;
   {$EXTERNALSYM DNS_ERROR_DATAFILE_OPEN_FAILURE}
 
-// DNS                                   0x000025b6
+// DNS                                   $000025b6
 //
 // MessageId: DNS_ERROR_FILE_WRITEBACK_FAILED
 //
@@ -25447,7 +25993,7 @@ const
   DNS_ERROR_FILE_WRITEBACK_FAILED     = 9654;
   {$EXTERNALSYM DNS_ERROR_FILE_WRITEBACK_FAILED}
 
-// DNS                                   0x000025b7
+// DNS                                   $000025b7
 //
 // MessageId: DNS_ERROR_DATAFILE_PARSING
 //
@@ -25466,7 +26012,7 @@ const
   DNS_ERROR_DATABASE_BASE             = 9700;
   {$EXTERNALSYM DNS_ERROR_DATABASE_BASE}
 
-// DNS_ERROR_RECORD_DOES_NOT_EXIST       0x000025e5
+// DNS_ERROR_RECORD_DOES_NOT_EXIST       $000025e5
 //
 // MessageId: DNS_ERROR_RECORD_DOES_NOT_EXIST
 //
@@ -25477,7 +26023,7 @@ const
   DNS_ERROR_RECORD_DOES_NOT_EXIST     = 9701;
   {$EXTERNALSYM DNS_ERROR_RECORD_DOES_NOT_EXIST}
 
-// DNS_ERROR_RECORD_FORMAT               0x000025e6
+// DNS_ERROR_RECORD_FORMAT               $000025e6
 //
 // MessageId: DNS_ERROR_RECORD_FORMAT
 //
@@ -25488,7 +26034,7 @@ const
   DNS_ERROR_RECORD_FORMAT             = 9702;
   {$EXTERNALSYM DNS_ERROR_RECORD_FORMAT}
 
-// DNS_ERROR_NODE_CREATION_FAILED        0x000025e7
+// DNS_ERROR_NODE_CREATION_FAILED        $000025e7
 //
 // MessageId: DNS_ERROR_NODE_CREATION_FAILED
 //
@@ -25499,7 +26045,7 @@ const
   DNS_ERROR_NODE_CREATION_FAILED      = 9703;
   {$EXTERNALSYM DNS_ERROR_NODE_CREATION_FAILED}
 
-// DNS_ERROR_UNKNOWN_RECORD_TYPE         0x000025e8
+// DNS_ERROR_UNKNOWN_RECORD_TYPE         $000025e8
 //
 // MessageId: DNS_ERROR_UNKNOWN_RECORD_TYPE
 //
@@ -25510,7 +26056,7 @@ const
   DNS_ERROR_UNKNOWN_RECORD_TYPE       = 9704;
   {$EXTERNALSYM DNS_ERROR_UNKNOWN_RECORD_TYPE}
 
-// DNS_ERROR_RECORD_TIMED_OUT            0x000025e9
+// DNS_ERROR_RECORD_TIMED_OUT            $000025e9
 //
 // MessageId: DNS_ERROR_RECORD_TIMED_OUT
 //
@@ -25521,7 +26067,7 @@ const
   DNS_ERROR_RECORD_TIMED_OUT          = 9705;
   {$EXTERNALSYM DNS_ERROR_RECORD_TIMED_OUT}
 
-// DNS_ERROR_NAME_NOT_IN_ZONE            0x000025ea
+// DNS_ERROR_NAME_NOT_IN_ZONE            $000025ea
 //
 // MessageId: DNS_ERROR_NAME_NOT_IN_ZONE
 //
@@ -25532,7 +26078,7 @@ const
   DNS_ERROR_NAME_NOT_IN_ZONE          = 9706;
   {$EXTERNALSYM DNS_ERROR_NAME_NOT_IN_ZONE}
 
-// DNS_ERROR_CNAME_LOOP                  0x000025eb
+// DNS_ERROR_CNAME_LOOP                  $000025eb
 //
 // MessageId: DNS_ERROR_CNAME_LOOP
 //
@@ -25543,7 +26089,7 @@ const
   DNS_ERROR_CNAME_LOOP                = 9707;
   {$EXTERNALSYM DNS_ERROR_CNAME_LOOP}
 
-// DNS_ERROR_NODE_IS_CNAME               0x000025ec
+// DNS_ERROR_NODE_IS_CNAME               $000025ec
 //
 // MessageId: DNS_ERROR_NODE_IS_CNAME
 //
@@ -25554,7 +26100,7 @@ const
   DNS_ERROR_NODE_IS_CNAME             = 9708;
   {$EXTERNALSYM DNS_ERROR_NODE_IS_CNAME}
 
-// DNS_ERROR_CNAME_COLLISION             0x000025ed
+// DNS_ERROR_CNAME_COLLISION             $000025ed
 //
 // MessageId: DNS_ERROR_CNAME_COLLISION
 //
@@ -25565,7 +26111,7 @@ const
   DNS_ERROR_CNAME_COLLISION           = 9709;
   {$EXTERNALSYM DNS_ERROR_CNAME_COLLISION}
 
-// DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT    0x000025ee
+// DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT    $000025ee
 //
 // MessageId: DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT
 //
@@ -25576,7 +26122,7 @@ const
   DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT  = 9710;
   {$EXTERNALSYM DNS_ERROR_RECORD_ONLY_AT_ZONE_ROOT}
 
-// DNS_ERROR_RECORD_ALREADY_EXISTS       0x000025ef
+// DNS_ERROR_RECORD_ALREADY_EXISTS       $000025ef
 //
 // MessageId: DNS_ERROR_RECORD_ALREADY_EXISTS
 //
@@ -25587,7 +26133,7 @@ const
   DNS_ERROR_RECORD_ALREADY_EXISTS     = 9711;
   {$EXTERNALSYM DNS_ERROR_RECORD_ALREADY_EXISTS}
 
-// DNS_ERROR_SECONDARY_DATA              0x000025f0
+// DNS_ERROR_SECONDARY_DATA              $000025f0
 //
 // MessageId: DNS_ERROR_SECONDARY_DATA
 //
@@ -25598,7 +26144,7 @@ const
   DNS_ERROR_SECONDARY_DATA            = 9712;
   {$EXTERNALSYM DNS_ERROR_SECONDARY_DATA}
 
-// DNS_ERROR_NO_CREATE_CACHE_DATA        0x000025f1
+// DNS_ERROR_NO_CREATE_CACHE_DATA        $000025f1
 //
 // MessageId: DNS_ERROR_NO_CREATE_CACHE_DATA
 //
@@ -25609,7 +26155,7 @@ const
   DNS_ERROR_NO_CREATE_CACHE_DATA      = 9713;
   {$EXTERNALSYM DNS_ERROR_NO_CREATE_CACHE_DATA}
 
-// DNS_ERROR_NAME_DOES_NOT_EXIST         0x000025f2
+// DNS_ERROR_NAME_DOES_NOT_EXIST         $000025f2
 //
 // MessageId: DNS_ERROR_NAME_DOES_NOT_EXIST
 //
@@ -25620,7 +26166,7 @@ const
   DNS_ERROR_NAME_DOES_NOT_EXIST       = 9714;
   {$EXTERNALSYM DNS_ERROR_NAME_DOES_NOT_EXIST}
 
-// DNS_WARNING_PTR_CREATE_FAILED         0x000025f3
+// DNS_WARNING_PTR_CREATE_FAILED         $000025f3
 //
 // MessageId: DNS_WARNING_PTR_CREATE_FAILED
 //
@@ -25631,7 +26177,7 @@ const
   DNS_WARNING_PTR_CREATE_FAILED       = 9715;
   {$EXTERNALSYM DNS_WARNING_PTR_CREATE_FAILED}
 
-// DNS_WARNING_DOMAIN_UNDELETED          0x000025f4
+// DNS_WARNING_DOMAIN_UNDELETED          $000025f4
 //
 // MessageId: DNS_WARNING_DOMAIN_UNDELETED
 //
@@ -25642,7 +26188,7 @@ const
   DNS_WARNING_DOMAIN_UNDELETED        = 9716;
   {$EXTERNALSYM DNS_WARNING_DOMAIN_UNDELETED}
 
-// DNS_ERROR_DS_UNAVAILABLE              0x000025f5
+// DNS_ERROR_DS_UNAVAILABLE              $000025f5
 //
 // MessageId: DNS_ERROR_DS_UNAVAILABLE
 //
@@ -25653,7 +26199,7 @@ const
   DNS_ERROR_DS_UNAVAILABLE            = 9717;
   {$EXTERNALSYM DNS_ERROR_DS_UNAVAILABLE}
 
-// DNS_ERROR_DS_ZONE_ALREADY_EXISTS      0x000025f6
+// DNS_ERROR_DS_ZONE_ALREADY_EXISTS      $000025f6
 //
 // MessageId: DNS_ERROR_DS_ZONE_ALREADY_EXISTS
 //
@@ -25664,7 +26210,7 @@ const
   DNS_ERROR_DS_ZONE_ALREADY_EXISTS    = 9718;
   {$EXTERNALSYM DNS_ERROR_DS_ZONE_ALREADY_EXISTS}
 
-// DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE      0x000025f7
+// DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE      $000025f7
 //
 // MessageId: DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE
 //
@@ -25675,7 +26221,7 @@ const
   DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE    = 9719;
   {$EXTERNALSYM DNS_ERROR_NO_BOOTFILE_IF_DS_ZONE}
 
-// DNS_ERROR_NODE_IS_DNAME               0x000025f8
+// DNS_ERROR_NODE_IS_DNAME               $000025f8
 //
 // MessageId: DNS_ERROR_NODE_IS_DNAME
 //
@@ -25686,7 +26232,7 @@ const
   DNS_ERROR_NODE_IS_DNAME             = 9720;
   {$EXTERNALSYM DNS_ERROR_NODE_IS_DNAME}
 
-// DNS_ERROR_DNAME_COLLISION             0x000025f9
+// DNS_ERROR_DNAME_COLLISION             $000025f9
 //
 // MessageId: DNS_ERROR_DNAME_COLLISION
 //
@@ -25697,7 +26243,7 @@ const
   DNS_ERROR_DNAME_COLLISION           = 9721;
   {$EXTERNALSYM DNS_ERROR_DNAME_COLLISION}
 
-// DNS_ERROR_ALIAS_LOOP                  0x000025fa
+// DNS_ERROR_ALIAS_LOOP                  $000025fa
 //
 // MessageId: DNS_ERROR_ALIAS_LOOP
 //
@@ -25716,7 +26262,7 @@ const
   DNS_ERROR_OPERATION_BASE            = 9750;
   {$EXTERNALSYM DNS_ERROR_OPERATION_BASE}
 
-// DNS_INFO_AXFR_COMPLETE                0x00002617
+// DNS_INFO_AXFR_COMPLETE                $00002617
 //
 // MessageId: DNS_INFO_AXFR_COMPLETE
 //
@@ -25727,7 +26273,7 @@ const
   DNS_INFO_AXFR_COMPLETE              = 9751;
   {$EXTERNALSYM DNS_INFO_AXFR_COMPLETE}
 
-// DNS_ERROR_AXFR                        0x00002618
+// DNS_ERROR_AXFR                        $00002618
 //
 // MessageId: DNS_ERROR_AXFR
 //
@@ -25738,7 +26284,7 @@ const
   DNS_ERROR_AXFR                      = 9752;
   {$EXTERNALSYM DNS_ERROR_AXFR}
 
-// DNS_INFO_ADDED_LOCAL_WINS             0x00002619
+// DNS_INFO_ADDED_LOCAL_WINS             $00002619
 //
 // MessageId: DNS_INFO_ADDED_LOCAL_WINS
 //
@@ -25757,7 +26303,7 @@ const
   DNS_ERROR_SECURE_BASE               = 9800;
   {$EXTERNALSYM DNS_ERROR_SECURE_BASE}
 
-// DNS_STATUS_CONTINUE_NEEDED            0x00002649
+// DNS_STATUS_CONTINUE_NEEDED            $00002649
 //
 // MessageId: DNS_STATUS_CONTINUE_NEEDED
 //
@@ -25776,7 +26322,7 @@ const
   DNS_ERROR_SETUP_BASE                = 9850;
   {$EXTERNALSYM DNS_ERROR_SETUP_BASE}
 
-// DNS_ERROR_NO_TCPIP                    0x0000267b
+// DNS_ERROR_NO_TCPIP                    $0000267b
 //
 // MessageId: DNS_ERROR_NO_TCPIP
 //
@@ -25787,7 +26333,7 @@ const
   DNS_ERROR_NO_TCPIP                  = 9851;
   {$EXTERNALSYM DNS_ERROR_NO_TCPIP}
 
-// DNS_ERROR_NO_DNS_SERVERS              0x0000267c
+// DNS_ERROR_NO_DNS_SERVERS              $0000267c
 //
 // MessageId: DNS_ERROR_NO_DNS_SERVERS
 //
@@ -25806,7 +26352,7 @@ const
   DNS_ERROR_DP_BASE                   = 9900;
   {$EXTERNALSYM DNS_ERROR_DP_BASE}
 
-// DNS_ERROR_DP_DOES_NOT_EXIST           0x000026ad
+// DNS_ERROR_DP_DOES_NOT_EXIST           $000026ad
 //
 // MessageId: DNS_ERROR_DP_DOES_NOT_EXIST
 //
@@ -25817,7 +26363,7 @@ const
   DNS_ERROR_DP_DOES_NOT_EXIST         = 9901;
   {$EXTERNALSYM DNS_ERROR_DP_DOES_NOT_EXIST}
 
-// DNS_ERROR_DP_ALREADY_EXISTS           0x000026ae
+// DNS_ERROR_DP_ALREADY_EXISTS           $000026ae
 //
 // MessageId: DNS_ERROR_DP_ALREADY_EXISTS
 //
@@ -25828,7 +26374,7 @@ const
   DNS_ERROR_DP_ALREADY_EXISTS         = 9902;
   {$EXTERNALSYM DNS_ERROR_DP_ALREADY_EXISTS}
 
-// DNS_ERROR_DP_NOT_ENLISTED             0x000026af
+// DNS_ERROR_DP_NOT_ENLISTED             $000026af
 //
 // MessageId: DNS_ERROR_DP_NOT_ENLISTED
 //
@@ -25839,7 +26385,7 @@ const
   DNS_ERROR_DP_NOT_ENLISTED           = 9903;
   {$EXTERNALSYM DNS_ERROR_DP_NOT_ENLISTED}
 
-// DNS_ERROR_DP_ALREADY_ENLISTED         0x000026b0
+// DNS_ERROR_DP_ALREADY_ENLISTED         $000026b0
 //
 // MessageId: DNS_ERROR_DP_ALREADY_ENLISTED
 //
@@ -25850,7 +26396,7 @@ const
   DNS_ERROR_DP_ALREADY_ENLISTED       = 9904;
   {$EXTERNALSYM DNS_ERROR_DP_ALREADY_ENLISTED}
 
-// DNS_ERROR_DP_NOT_AVAILABLE            0x000026b1
+// DNS_ERROR_DP_NOT_AVAILABLE            $000026b1
 //
 // MessageId: DNS_ERROR_DP_NOT_AVAILABLE
 //
@@ -25861,7 +26407,7 @@ const
   DNS_ERROR_DP_NOT_AVAILABLE          = 9905;
   {$EXTERNALSYM DNS_ERROR_DP_NOT_AVAILABLE}
 
-// DNS_ERROR_DP_FSMO_ERROR               0x000026b2
+// DNS_ERROR_DP_FSMO_ERROR               $000026b2
 //
 // MessageId: DNS_ERROR_DP_FSMO_ERROR
 //
@@ -25875,7 +26421,7 @@ const
 //
 // DNS RRL errors from 9911 to 9920
 //
-// DNS_ERROR_RRL_NOT_ENABLED 0x000026B7
+// DNS_ERROR_RRL_NOT_ENABLED $000026B7
 //
 // MessageId: DNS_ERROR_RRL_NOT_ENABLED
 //
@@ -25886,7 +26432,7 @@ const
   DNS_ERROR_RRL_NOT_ENABLED           = 9911;
   {$EXTERNALSYM DNS_ERROR_RRL_NOT_ENABLED}
 
-// DNS_ERROR_RRL_INVALID_WINDOW_SIZE 0x000026B8
+// DNS_ERROR_RRL_INVALID_WINDOW_SIZE $000026B8
 //
 // MessageId: DNS_ERROR_RRL_INVALID_WINDOW_SIZE
 //
@@ -25897,7 +26443,7 @@ const
   DNS_ERROR_RRL_INVALID_WINDOW_SIZE   = 9912;
   {$EXTERNALSYM DNS_ERROR_RRL_INVALID_WINDOW_SIZE}
 
-// DNS_ERROR_RRL_INVALID_IPV4_PREFIX 0x000026B9
+// DNS_ERROR_RRL_INVALID_IPV4_PREFIX $000026B9
 //
 // MessageId: DNS_ERROR_RRL_INVALID_IPV4_PREFIX
 //
@@ -25908,7 +26454,7 @@ const
   DNS_ERROR_RRL_INVALID_IPV4_PREFIX   = 9913;
   {$EXTERNALSYM DNS_ERROR_RRL_INVALID_IPV4_PREFIX}
 
-// DNS_ERROR_RRL_INVALID_IPV6_PREFIX 0x000026BA
+// DNS_ERROR_RRL_INVALID_IPV6_PREFIX $000026BA
 //
 // MessageId: DNS_ERROR_RRL_INVALID_IPV6_PREFIX
 //
@@ -25919,7 +26465,7 @@ const
   DNS_ERROR_RRL_INVALID_IPV6_PREFIX   = 9914;
   {$EXTERNALSYM DNS_ERROR_RRL_INVALID_IPV6_PREFIX}
 
-// DNS_ERROR_RRL_INVALID_TC_RATE 0x000026BB
+// DNS_ERROR_RRL_INVALID_TC_RATE $000026BB
 //
 // MessageId: DNS_ERROR_RRL_INVALID_TC_RATE
 //
@@ -25930,7 +26476,7 @@ const
   DNS_ERROR_RRL_INVALID_TC_RATE       = 9915;
   {$EXTERNALSYM DNS_ERROR_RRL_INVALID_TC_RATE}
 
-// DNS_ERROR_RRL_INVALID_LEAK_RATE 0x000026BC
+// DNS_ERROR_RRL_INVALID_LEAK_RATE $000026BC
 //
 // MessageId: DNS_ERROR_RRL_INVALID_LEAK_RATE
 //
@@ -25941,7 +26487,7 @@ const
   DNS_ERROR_RRL_INVALID_LEAK_RATE     = 9916;
   {$EXTERNALSYM DNS_ERROR_RRL_INVALID_LEAK_RATE}
 
-// DNS_ERROR_RRL_LEAK_RATE_LESSTHAN_TC_RATE 0x000026BD
+// DNS_ERROR_RRL_LEAK_RATE_LESSTHAN_TC_RATE $000026BD
 //
 // MessageId: DNS_ERROR_RRL_LEAK_RATE_LESSTHAN_TC_RATE
 //
@@ -25955,7 +26501,7 @@ const
 //
 // DNS Virtualization errors from 9921 to 9950
 //
-// DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS    0x000026c1
+// DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS    $000026c1
 //
 // MessageId: DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS
 //
@@ -25966,7 +26512,7 @@ const
   DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS = 9921;
   {$EXTERNALSYM DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS}
 
-// DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST    0x000026c2
+// DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST    $000026c2
 //
 // MessageId: DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST
 //
@@ -25977,7 +26523,7 @@ const
   DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST = 9922;
   {$EXTERNALSYM DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST}
 
-// DNS_ERROR_VIRTUALIZATION_TREE_LOCKED        0x000026c3
+// DNS_ERROR_VIRTUALIZATION_TREE_LOCKED        $000026c3
 //
 // MessageId: DNS_ERROR_VIRTUALIZATION_TREE_LOCKED
 //
@@ -25988,7 +26534,7 @@ const
   DNS_ERROR_VIRTUALIZATION_TREE_LOCKED = 9923;
   {$EXTERNALSYM DNS_ERROR_VIRTUALIZATION_TREE_LOCKED}
 
-// DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME      0x000026c4
+// DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME      $000026c4
 //
 // MessageId: DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME
 //
@@ -25999,7 +26545,7 @@ const
   DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME = 9924;
   {$EXTERNALSYM DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME}
 
-// DNS_ERROR_DEFAULT_VIRTUALIZATION_INSTANCE   0x000026c5
+// DNS_ERROR_DEFAULT_VIRTUALIZATION_INSTANCE   $000026c5
 //
 // MessageId: DNS_ERROR_DEFAULT_VIRTUALIZATION_INSTANCE
 //
@@ -26014,7 +26560,7 @@ const
 //
 // DNS ZoneScope errors from 9951 to 9970
 //
-// DNS_ERROR_ZONESCOPE_ALREADY_EXISTS               0x000026df
+// DNS_ERROR_ZONESCOPE_ALREADY_EXISTS               $000026df
 //
 // MessageId: DNS_ERROR_ZONESCOPE_ALREADY_EXISTS
 //
@@ -26025,7 +26571,7 @@ const
   DNS_ERROR_ZONESCOPE_ALREADY_EXISTS  = 9951;
   {$EXTERNALSYM DNS_ERROR_ZONESCOPE_ALREADY_EXISTS}
 
-// DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST       0x000026e0
+// DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST       $000026e0
 //
 // MessageId: DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST
 //
@@ -26036,7 +26582,7 @@ const
   DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST  = 9952;
   {$EXTERNALSYM DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST}
 
-// DNS_ERROR_DEFAULT_ZONESCOPE 0x000026e1
+// DNS_ERROR_DEFAULT_ZONESCOPE $000026e1
 //
 // MessageId: DNS_ERROR_DEFAULT_ZONESCOPE
 //
@@ -26047,7 +26593,7 @@ const
   DNS_ERROR_DEFAULT_ZONESCOPE         = 9953;
   {$EXTERNALSYM DNS_ERROR_DEFAULT_ZONESCOPE}
 
-// DNS_ERROR_INVALID_ZONESCOPE_NAME 0x000026e2
+// DNS_ERROR_INVALID_ZONESCOPE_NAME $000026e2
 //
 // MessageId: DNS_ERROR_INVALID_ZONESCOPE_NAME
 //
@@ -26058,7 +26604,7 @@ const
   DNS_ERROR_INVALID_ZONESCOPE_NAME    = 9954;
   {$EXTERNALSYM DNS_ERROR_INVALID_ZONESCOPE_NAME}
 
-// DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES 0x000026e3
+// DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES $000026e3
 //
 // MessageId: DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES
 //
@@ -26069,7 +26615,7 @@ const
   DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES = 9955;
   {$EXTERNALSYM DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES}
 
-// DNS_ERROR_LOAD_ZONESCOPE_FAILED 0x000026e4
+// DNS_ERROR_LOAD_ZONESCOPE_FAILED $000026e4
 //
 // MessageId: DNS_ERROR_LOAD_ZONESCOPE_FAILED
 //
@@ -26080,7 +26626,7 @@ const
   DNS_ERROR_LOAD_ZONESCOPE_FAILED     = 9956;
   {$EXTERNALSYM DNS_ERROR_LOAD_ZONESCOPE_FAILED}
 
-// DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED 0x000026e5
+// DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED $000026e5
 //
 // MessageId: DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED
 //
@@ -26091,7 +26637,7 @@ const
   DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED = 9957;
   {$EXTERNALSYM DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED}
 
-// DNS_ERROR_INVALID_SCOPE_NAME 0x000026e6
+// DNS_ERROR_INVALID_SCOPE_NAME $000026e6
 //
 // MessageId: DNS_ERROR_INVALID_SCOPE_NAME
 //
@@ -26102,7 +26648,7 @@ const
   DNS_ERROR_INVALID_SCOPE_NAME        = 9958;
   {$EXTERNALSYM DNS_ERROR_INVALID_SCOPE_NAME}
 
-// DNS_ERROR_SCOPE_DOES_NOT_EXIST       0x000026e7
+// DNS_ERROR_SCOPE_DOES_NOT_EXIST       $000026e7
 //
 // MessageId: DNS_ERROR_SCOPE_DOES_NOT_EXIST
 //
@@ -26113,7 +26659,7 @@ const
   DNS_ERROR_SCOPE_DOES_NOT_EXIST      = 9959;
   {$EXTERNALSYM DNS_ERROR_SCOPE_DOES_NOT_EXIST}
 
-// DNS_ERROR_DEFAULT_SCOPE 0x000026e8
+// DNS_ERROR_DEFAULT_SCOPE $000026e8
 //
 // MessageId: DNS_ERROR_DEFAULT_SCOPE
 //
@@ -26124,7 +26670,7 @@ const
   DNS_ERROR_DEFAULT_SCOPE             = 9960;
   {$EXTERNALSYM DNS_ERROR_DEFAULT_SCOPE}
 
-// DNS_ERROR_INVALID_SCOPE_OPERATION 0x000026e9
+// DNS_ERROR_INVALID_SCOPE_OPERATION $000026e9
 //
 // MessageId: DNS_ERROR_INVALID_SCOPE_OPERATION
 //
@@ -26135,7 +26681,7 @@ const
   DNS_ERROR_INVALID_SCOPE_OPERATION   = 9961;
   {$EXTERNALSYM DNS_ERROR_INVALID_SCOPE_OPERATION}
 
-// DNS_ERROR_SCOPE_LOCKED 0x000026ea
+// DNS_ERROR_SCOPE_LOCKED $000026ea
 //
 // MessageId: DNS_ERROR_SCOPE_LOCKED
 //
@@ -26146,7 +26692,7 @@ const
   DNS_ERROR_SCOPE_LOCKED              = 9962;
   {$EXTERNALSYM DNS_ERROR_SCOPE_LOCKED}
 
-// DNS_ERROR_SCOPE_ALREADY_EXISTS 0x000026eb
+// DNS_ERROR_SCOPE_ALREADY_EXISTS $000026eb
 //
 // MessageId: DNS_ERROR_SCOPE_ALREADY_EXISTS
 //
@@ -26161,7 +26707,7 @@ const
 //
 // DNS Policy errors from 9971 to 9999
 //
-// DNS_ERROR_POLICY_ALREADY_EXISTS 0x000026f3
+// DNS_ERROR_POLICY_ALREADY_EXISTS $000026f3
 //
 // MessageId: DNS_ERROR_POLICY_ALREADY_EXISTS
 //
@@ -26172,7 +26718,7 @@ const
   DNS_ERROR_POLICY_ALREADY_EXISTS     = 9971;
   {$EXTERNALSYM DNS_ERROR_POLICY_ALREADY_EXISTS}
 
-// DNS_ERROR_POLICY_DOES_NOT_EXIST 0x000026f4
+// DNS_ERROR_POLICY_DOES_NOT_EXIST $000026f4
 //
 // MessageId: DNS_ERROR_POLICY_DOES_NOT_EXIST
 //
@@ -26183,7 +26729,7 @@ const
   DNS_ERROR_POLICY_DOES_NOT_EXIST     = 9972;
   {$EXTERNALSYM DNS_ERROR_POLICY_DOES_NOT_EXIST}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA 0x000026f5
+// DNS_ERROR_POLICY_INVALID_CRITERIA $000026f5
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA
 //
@@ -26194,7 +26740,7 @@ const
   DNS_ERROR_POLICY_INVALID_CRITERIA   = 9973;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_CRITERIA}
 
-// DNS_ERROR_POLICY_INVALID_SETTINGS 0x000026f6
+// DNS_ERROR_POLICY_INVALID_SETTINGS $000026f6
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_SETTINGS
 //
@@ -26205,7 +26751,7 @@ const
   DNS_ERROR_POLICY_INVALID_SETTINGS   = 9974;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_SETTINGS}
 
-// DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED 0x000026f7
+// DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED $000026f7
 //
 // MessageId: DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED
 //
@@ -26216,7 +26762,7 @@ const
   DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED = 9975;
   {$EXTERNALSYM DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED}
 
-// DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST 0x000026f8
+// DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST $000026f8
 //
 // MessageId: DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST
 //
@@ -26227,7 +26773,7 @@ const
   DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST = 9976;
   {$EXTERNALSYM DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST}
 
-// DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS 0x000026f9
+// DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS $000026f9
 //
 // MessageId: DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS
 //
@@ -26238,7 +26784,7 @@ const
   DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS = 9977;
   {$EXTERNALSYM DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS}
 
-// DNS_ERROR_SUBNET_DOES_NOT_EXIST 0x000026fa
+// DNS_ERROR_SUBNET_DOES_NOT_EXIST $000026fa
 //
 // MessageId: DNS_ERROR_SUBNET_DOES_NOT_EXIST
 //
@@ -26249,7 +26795,7 @@ const
   DNS_ERROR_SUBNET_DOES_NOT_EXIST     = 9978;
   {$EXTERNALSYM DNS_ERROR_SUBNET_DOES_NOT_EXIST}
 
-// DNS_ERROR_SUBNET_ALREADY_EXISTS 0x000026fb
+// DNS_ERROR_SUBNET_ALREADY_EXISTS $000026fb
 //
 // MessageId: DNS_ERROR_SUBNET_ALREADY_EXISTS
 //
@@ -26260,7 +26806,7 @@ const
   DNS_ERROR_SUBNET_ALREADY_EXISTS     = 9979;
   {$EXTERNALSYM DNS_ERROR_SUBNET_ALREADY_EXISTS}
 
-// DNS_ERROR_POLICY_LOCKED 0x000026fc
+// DNS_ERROR_POLICY_LOCKED $000026fc
 //
 // MessageId: DNS_ERROR_POLICY_LOCKED
 //
@@ -26271,7 +26817,7 @@ const
   DNS_ERROR_POLICY_LOCKED             = 9980;
   {$EXTERNALSYM DNS_ERROR_POLICY_LOCKED}
 
-// DNS_ERROR_POLICY_INVALID_WEIGHT 0x000026fd
+// DNS_ERROR_POLICY_INVALID_WEIGHT $000026fd
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_WEIGHT
 //
@@ -26282,7 +26828,7 @@ const
   DNS_ERROR_POLICY_INVALID_WEIGHT     = 9981;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_WEIGHT}
 
-// DNS_ERROR_POLICY_INVALID_NAME 0x000026fe
+// DNS_ERROR_POLICY_INVALID_NAME $000026fe
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_NAME
 //
@@ -26293,7 +26839,7 @@ const
   DNS_ERROR_POLICY_INVALID_NAME       = 9982;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_NAME}
 
-// DNS_ERROR_POLICY_MISSING_CRITERIA 0x000026ff
+// DNS_ERROR_POLICY_MISSING_CRITERIA $000026ff
 //
 // MessageId: DNS_ERROR_POLICY_MISSING_CRITERIA
 //
@@ -26304,7 +26850,7 @@ const
   DNS_ERROR_POLICY_MISSING_CRITERIA   = 9983;
   {$EXTERNALSYM DNS_ERROR_POLICY_MISSING_CRITERIA}
 
-// DNS_ERROR_INVALID_CLIENT_SUBNET_NAME 0x00002700
+// DNS_ERROR_INVALID_CLIENT_SUBNET_NAME $00002700
 //
 // MessageId: DNS_ERROR_INVALID_CLIENT_SUBNET_NAME
 //
@@ -26315,7 +26861,7 @@ const
   DNS_ERROR_INVALID_CLIENT_SUBNET_NAME = 9984;
   {$EXTERNALSYM DNS_ERROR_INVALID_CLIENT_SUBNET_NAME}
 
-// DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID 0x00002701
+// DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID $00002701
 //
 // MessageId: DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID
 //
@@ -26326,7 +26872,7 @@ const
   DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID = 9985;
   {$EXTERNALSYM DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID}
 
-// DNS_ERROR_POLICY_SCOPE_MISSING 0x00002702
+// DNS_ERROR_POLICY_SCOPE_MISSING $00002702
 //
 // MessageId: DNS_ERROR_POLICY_SCOPE_MISSING
 //
@@ -26337,7 +26883,7 @@ const
   DNS_ERROR_POLICY_SCOPE_MISSING      = 9986;
   {$EXTERNALSYM DNS_ERROR_POLICY_SCOPE_MISSING}
 
-// DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED 0x00002703
+// DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED $00002703
 //
 // MessageId: DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED
 //
@@ -26348,7 +26894,7 @@ const
   DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED  = 9987;
   {$EXTERNALSYM DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED}
 
-// DNS_ERROR_SERVERSCOPE_IS_REFERENCED 0x00002704
+// DNS_ERROR_SERVERSCOPE_IS_REFERENCED $00002704
 //
 // MessageId: DNS_ERROR_SERVERSCOPE_IS_REFERENCED
 //
@@ -26359,7 +26905,7 @@ const
   DNS_ERROR_SERVERSCOPE_IS_REFERENCED = 9988;
   {$EXTERNALSYM DNS_ERROR_SERVERSCOPE_IS_REFERENCED}
 
-// DNS_ERROR_ZONESCOPE_IS_REFERENCED 0x00002705
+// DNS_ERROR_ZONESCOPE_IS_REFERENCED $00002705
 //
 // MessageId: DNS_ERROR_ZONESCOPE_IS_REFERENCED
 //
@@ -26370,7 +26916,7 @@ const
   DNS_ERROR_ZONESCOPE_IS_REFERENCED   = 9989;
   {$EXTERNALSYM DNS_ERROR_ZONESCOPE_IS_REFERENCED}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET 0x00002706
+// DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET $00002706
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET
 //
@@ -26381,7 +26927,7 @@ const
   DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET = 9990;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_TRANSPORT_PROTOCOL 0x00002707
+// DNS_ERROR_POLICY_INVALID_CRITERIA_TRANSPORT_PROTOCOL $00002707
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_TRANSPORT_PROTOCOL
 //
@@ -26391,7 +26937,7 @@ const
 //
   DNS_ERROR_POLICY_INVALID_CRITERIA_TRANSPORT_PROTOCOL= 9991;
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_NETWORK_PROTOCOL 0x00002708
+// DNS_ERROR_POLICY_INVALID_CRITERIA_NETWORK_PROTOCOL $00002708
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_NETWORK_PROTOCOL
 //
@@ -26401,7 +26947,7 @@ const
 //
   DNS_ERROR_POLICY_INVALID_CRITERIA_NETWORK_PROTOCOL= 9992;
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE 0x00002709
+// DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE $00002709
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE
 //
@@ -26412,7 +26958,7 @@ const
   DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE = 9993;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN 0x0000270A
+// DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN $0000270A
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN
 //
@@ -26423,7 +26969,7 @@ const
   DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN = 9994;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE 0x0000270B
+// DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE $0000270B
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE
 //
@@ -26434,7 +26980,7 @@ const
   DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE = 9995;
   {$EXTERNALSYM DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE}
 
-// DNS_ERROR_POLICY_INVALID_CRITERIA_TIME_OF_DAY 0x0000270C
+// DNS_ERROR_POLICY_INVALID_CRITERIA_TIME_OF_DAY $0000270C
 //
 // MessageId: DNS_ERROR_POLICY_INVALID_CRITERIA_TIME_OF_DAY
 //
@@ -31067,7 +31613,7 @@ const
 //
 // MessageText:
 //
-// The monitor's VCP Version (0xDF) VCP code returned an invalid version value.
+// The monitor's VCP Version ($DF) VCP code returned an invalid version value.
 //
   ERROR_MCA_INVALID_VCP_VERSION       = 15201;
   {$EXTERNALSYM ERROR_MCA_INVALID_VCP_VERSION}
@@ -31087,7 +31633,7 @@ const
 //
 // MessageText:
 //
-// The MCCS version in a monitor's mccs_ver capability does not match the MCCS version the monitor reports when the VCP Version (0xDF) VCP code is used.
+// The MCCS version in a monitor's mccs_ver capability does not match the MCCS version the monitor reports when the VCP Version ($DF) VCP code is used.
 //
   ERROR_MCA_MCCS_VERSION_MISMATCH     = 15203;
   {$EXTERNALSYM ERROR_MCA_MCCS_VERSION_MISMATCH}
@@ -31720,6 +32266,7 @@ const
 // This app package type is not supported on this filesystem
 //
   ERROR_PACKAGE_NOT_SUPPORTED_ON_FILESYSTEM= 15635;
+  {$EXTERNALSYM ERROR_PACKAGE_NOT_SUPPORTED_ON_FILESYSTEM}
 
 //
 // MessageId: ERROR_PACKAGE_MOVE_BLOCKED_BY_STREAMING
@@ -31929,6 +32476,136 @@ const
 //
   ERROR_PACKAGED_SERVICE_REQUIRES_ADMIN_PRIVILEGES = 15656;
   {$EXTERNALSYM ERROR_PACKAGED_SERVICE_REQUIRES_ADMIN_PRIVILEGES}
+
+//
+// MessageId: ERROR_REDIRECTION_TO_DEFAULT_ACCOUNT_NOT_ALLOWED
+//
+// MessageText:
+//
+// The package deployment failed because the operation would have redirected to default account, when the caller said not to do so.
+//
+  ERROR_REDIRECTION_TO_DEFAULT_ACCOUNT_NOT_ALLOWED = 15657;
+  {$EXTERNALSYM ERROR_REDIRECTION_TO_DEFAULT_ACCOUNT_NOT_ALLOWED}
+
+//
+// MessageId: ERROR_PACKAGE_LACKS_CAPABILITY_TO_DEPLOY_ON_HOST
+//
+// MessageText:
+//
+// The package deployment failed because the package requires a capability to natively target this host.
+//
+  ERROR_PACKAGE_LACKS_CAPABILITY_TO_DEPLOY_ON_HOST = 15658;
+  {$EXTERNALSYM ERROR_PACKAGE_LACKS_CAPABILITY_TO_DEPLOY_ON_HOST}
+
+//
+// MessageId: ERROR_UNSIGNED_PACKAGE_INVALID_CONTENT
+//
+// MessageText:
+//
+// The package deployment failed because its content is not valid for an unsigned package.
+//
+  ERROR_UNSIGNED_PACKAGE_INVALID_CONTENT = 15659;
+  {$EXTERNALSYM ERROR_UNSIGNED_PACKAGE_INVALID_CONTENT}
+
+//
+// MessageId: ERROR_UNSIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE
+//
+// MessageText:
+//
+// The package deployment failed because its publisher is not in the unsigned namespace.
+//
+  ERROR_UNSIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE = 15660;
+  {$EXTERNALSYM ERROR_UNSIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE}
+
+//
+// MessageId: ERROR_SIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE
+//
+// MessageText:
+//
+// The package deployment failed because its publisher is not in the signed namespace.
+//
+  ERROR_SIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE = 15661;
+  {$EXTERNALSYM ERROR_SIGNED_PACKAGE_INVALID_PUBLISHER_NAMESPACE}
+
+//
+// MessageId: ERROR_PACKAGE_EXTERNAL_LOCATION_NOT_ALLOWED
+//
+// MessageText:
+//
+// The package deployment failed because it must allow external content to be deployed with an external location.
+//
+  ERROR_PACKAGE_EXTERNAL_LOCATION_NOT_ALLOWED = 15662;
+  {$EXTERNALSYM ERROR_PACKAGE_EXTERNAL_LOCATION_NOT_ALLOWED}
+
+//
+// MessageId: ERROR_INSTALL_FULLTRUST_HOSTRUNTIME_REQUIRES_MAIN_PACKAGE_FULLTRUST_CAPABILITY
+//
+// MessageText:
+//
+// A host runtime dependency resolving to a package with full trust content requires the main package to have the runFullTrust capability.
+//
+  ERROR_INSTALL_FULLTRUST_HOSTRUNTIME_REQUIRES_MAIN_PACKAGE_FULLTRUST_CAPABILITY = 15663;
+  {$EXTERNALSYM ERROR_INSTALL_FULLTRUST_HOSTRUNTIME_REQUIRES_MAIN_PACKAGE_FULLTRUST_CAPABILITY}
+
+//
+// MessageId: ERROR_PACKAGE_LACKS_CAPABILITY_FOR_MANDATORY_STARTUPTASKS
+//
+// MessageText:
+//
+// The package deployment failed because the package requires a capability for mandatory startup tasks.
+//
+  ERROR_PACKAGE_LACKS_CAPABILITY_FOR_MANDATORY_STARTUPTASKS = 15664;
+  {$EXTERNALSYM ERROR_PACKAGE_LACKS_CAPABILITY_FOR_MANDATORY_STARTUPTASKS}
+
+//
+// MessageId: ERROR_INSTALL_RESOLVE_HOSTRUNTIME_DEPENDENCY_FAILED
+//
+// MessageText:
+//
+// Package failed host runtime dependency or conflict validation.
+//
+  ERROR_INSTALL_RESOLVE_HOSTRUNTIME_DEPENDENCY_FAILED = 15665;
+  {$EXTERNALSYM ERROR_INSTALL_RESOLVE_HOSTRUNTIME_DEPENDENCY_FAILED}
+
+//
+// MessageId: ERROR_MACHINE_SCOPE_NOT_ALLOWED
+//
+// MessageText:
+//
+// The package deployment failed because it uses a machine scope but doesn't have the required capability.
+//
+  ERROR_MACHINE_SCOPE_NOT_ALLOWED     = 15666;
+  {$EXTERNALSYM ERROR_MACHINE_SCOPE_NOT_ALLOWED}
+
+//
+// MessageId: ERROR_CLASSIC_COMPAT_MODE_NOT_ALLOWED
+//
+// MessageText:
+//
+// The package deployment failed because it uses classic compatmode but doesn't have the required capability.
+//
+  ERROR_CLASSIC_COMPAT_MODE_NOT_ALLOWED = 15667;
+  {$EXTERNALSYM ERROR_CLASSIC_COMPAT_MODE_NOT_ALLOWED}
+
+//
+// MessageId: ERROR_STAGEFROMUPDATEAGENT_PACKAGE_NOT_APPLICABLE
+//
+// MessageText:
+//
+// AppxUpdateAgent attempted to stage a package that is not applicable.
+//
+  ERROR_STAGEFROMUPDATEAGENT_PACKAGE_NOT_APPLICABLE = 15668;
+  {$EXTERNALSYM ERROR_STAGEFROMUPDATEAGENT_PACKAGE_NOT_APPLICABLE}
+
+//
+// MessageId: ERROR_PACKAGE_NOT_REGISTERED_FOR_USER
+//
+// MessageText:
+//
+// The application cannot be started for the target user.  Please have the user explicitly install this package.
+//
+  ERROR_PACKAGE_NOT_REGISTERED_FOR_USER = 15669;
+  {$EXTERNALSYM ERROR_PACKAGE_NOT_REGISTERED_FOR_USER}
 
 
 //////////////////////////
@@ -32472,7 +33149,7 @@ const
 //
 
 //
-// Codes 0x4000-0x40ff are reserved for OLE
+// Codes $4000-$40ff are reserved for OLE
 //
 //
 // Error codes
@@ -33367,7 +34044,7 @@ const
 // ******************
 
 //
-// Codes 0x0-0x01ff are reserved for the OLE group of
+// Codes $0-$01ff are reserved for the OLE group of
 // interfaces.
 //
 
@@ -36752,7 +37429,7 @@ const
 // FACILITY_WINDOWS
 // ******************
 //
-// Codes 0x0-0x01ff are reserved for the OLE group of
+// Codes $0-$01ff are reserved for the OLE group of
 // interfaces.
 //
 //
@@ -36916,7 +37593,7 @@ const
   {$EXTERNALSYM CO_E_ELEVATION_DISABLED}
 
 //
-// Codes 0x0200-0x02ff are reserved for the APPX errors
+// Codes $0200-$02ff are reserved for the APPX errors
 //
 //
 // MessageId: APPX_E_PACKAGING_INTERNAL
@@ -37158,9 +37835,18 @@ const
   APPX_E_INVALID_PACKAGE_FOLDER_ACLS  = HRESULT($80080217);
   {$EXTERNALSYM APPX_E_INVALID_PACKAGE_FOLDER_ACLS}
 
+// MessageId: APPX_E_INVALID_PUBLISHER_BRIDGING
+//
+// MessageText:
+//
+// The publisher bridging artifact is invalid.
+//
+  APPX_E_INVALID_PUBLISHER_BRIDGING   = HRESULT($80080218);
+  {$EXTERNALSYM APPX_E_INVALID_PUBLISHER_BRIDGING}
+
 //
 //
-// Codes 0x0300-0x030f are reserved for background task error codes.
+// Codes $0300-$030f are reserved for background task error codes.
 //
 //
 // MessageId: BT_E_SPURIOUS_ACTIVATION
@@ -38205,7 +38891,7 @@ const
 
 //*++
 //
-// MessageId's 0x0305 - 0x031f (inclusive) are reserved for **STORAGE**
+// MessageId's $0305 - $031f (inclusive) are reserved for **STORAGE**
 // copy protection errors.
 //
 //--*/
@@ -38214,7 +38900,7 @@ const
 // FACILITY_RPC
 // ******************
 //
-// Codes 0x0-0x11 are propagated from 16 bit OLE.
+// Codes $0-$11 are propagated from 16 bit OLE.
 //
 //
 // MessageId: RPC_E_CALL_REJECTED
@@ -42360,7 +43046,7 @@ const
   {$EXTERNALSYM CERTSRV_E_PENDING_CLIENT_RESPONSE}
 
 //
-// The range 0x5000-0x51ff is reserved for XENROLL errors.
+// The range $5000-$51ff is reserved for XENROLL errors.
 //
 //
 // MessageId: XENROLL_E_KEY_NOT_EXPORTABLE
@@ -44646,10 +45332,10 @@ const
 //
 //
 // The following are the subranges  within the COMPLUS facility
-// 0x400 - 0x4ff               COMADMIN_E_CAT
-// 0x600 - 0x6ff               COMQC errors
-// 0x700 - 0x7ff               MSDTC errors
-// 0x800 - 0x8ff               Other COMADMIN errors
+// $400 - $4ff               COMADMIN_E_CAT
+// $600 - $6ff               COMQC errors
+// $700 - $7ff               MSDTC errors
+// $800 - $8ff               Other COMADMIN errors
 //
 // COMPLUS Admin errors
 //
@@ -45506,7 +46192,7 @@ const
   {$EXTERNALSYM COMQC_E_UNTRUSTED_ENQUEUER}
 
 //
-// The range 0x700-0x7ff is reserved for MSDTC errors.
+// The range $700-$7ff is reserved for MSDTC errors.
 //
 //
 // MessageId: MSDTC_E_DUPLICATE_RESOURCE
@@ -45519,7 +46205,7 @@ const
   {$EXTERNALSYM MSDTC_E_DUPLICATE_RESOURCE}
 
 //
-// More COMADMIN errors from 0x8**
+// More COMADMIN errors from $8**
 //
 //
 // MessageId: COMADMIN_E_OBJECT_PARENT_MISSING
@@ -45790,6 +46476,421 @@ const
 //
   COMADMIN_E_PARTITIONS_DISABLED      = HRESULT($80110824);
   {$EXTERNALSYM COMADMIN_E_PARTITIONS_DISABLED}
+
+//
+// FACILITY_WINDOWS_CE
+// The following are MDM Registration and Enrollment errors
+//
+//
+// MessageId: MENROLL_E_DEVICE_MESSAGE_FORMAT_ERROR
+//
+// MessageText:
+//
+// Invalid Schema, Message Format Error from server.
+//
+  MENROLL_E_DEVICE_MESSAGE_FORMAT_ERROR= HRESULT($80180001);
+  {$EXTERNALSYM MENROLL_E_DEVICE_MESSAGE_FORMAT_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_AUTHENTICATION_ERROR
+//
+// MessageText:
+//
+// Server failed to authenticate the user.
+//
+  MENROLL_E_DEVICE_AUTHENTICATION_ERROR = HRESULT($80180002);
+  {$EXTERNALSYM MENROLL_E_DEVICE_AUTHENTICATION_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_AUTHORIZATION_ERROR
+//
+// MessageText:
+//
+// The user is not authorized to enroll.
+//
+  MENROLL_E_DEVICE_AUTHORIZATION_ERROR = HRESULT($80180003);
+  {$EXTERNALSYM MENROLL_E_DEVICE_AUTHORIZATION_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_CERTIFICATEREQUEST_ERROR
+//
+// MessageText:
+//
+// The user has no permission for the certificate template or the certificate authority is unreachable.
+//
+  MENROLL_E_DEVICE_CERTIFICATEREQUEST_ERROR = HRESULT($80180004);
+  {$EXTERNALSYM MENROLL_E_DEVICE_CERTIFICATEREQUEST_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_CONFIGMGRSERVER_ERROR
+//
+// MessageText:
+//
+// The MDM server encountered an error.
+//
+  MENROLL_E_DEVICE_CONFIGMGRSERVER_ERROR = HRESULT($80180005);
+  {$EXTERNALSYM MENROLL_E_DEVICE_CONFIGMGRSERVER_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_INTERNALSERVICE_ERROR
+//
+// MessageText:
+//
+// There was an unhandled exception on the server.
+//
+  MENROLL_E_DEVICE_INTERNALSERVICE_ERROR = HRESULT($80180006);
+  {$EXTERNALSYM MENROLL_E_DEVICE_INTERNALSERVICE_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_INVALIDSECURITY_ERROR
+//
+// MessageText:
+//
+// The server was not able to validate the user credentials.
+//
+  MENROLL_E_DEVICE_INVALIDSECURITY_ERROR = HRESULT($80180007);
+  {$EXTERNALSYM MENROLL_E_DEVICE_INVALIDSECURITY_ERROR}
+
+//
+// MessageId: MENROLL_E_DEVICE_UNKNOWN_ERROR
+//
+// MessageText:
+//
+// Unknown server error.
+//
+  MENROLL_E_DEVICE_UNKNOWN_ERROR      = HRESULT($80180008);
+  {$EXTERNALSYM MENROLL_E_DEVICE_UNKNOWN_ERROR}
+
+//
+// MessageId: MENROLL_E_ENROLLMENT_IN_PROGRESS
+//
+// MessageText:
+//
+// Another enrollment operation is currently underway.
+//
+  MENROLL_E_ENROLLMENT_IN_PROGRESS    = HRESULT($80180009);
+  {$EXTERNALSYM MENROLL_E_ENROLLMENT_IN_PROGRESS}
+
+//
+// MessageId: MENROLL_E_DEVICE_ALREADY_ENROLLED
+//
+// MessageText:
+//
+// The device is already enrolled.
+//
+  MENROLL_E_DEVICE_ALREADY_ENROLLED   = HRESULT($8018000A);
+  {$EXTERNALSYM MENROLL_E_DEVICE_ALREADY_ENROLLED}
+
+//
+// MessageId: MENROLL_E_DISCOVERY_SEC_CERT_DATE_INVALID
+//
+// MessageText:
+//
+// During discovery the security certificate date was invalid.
+//
+  MENROLL_E_DISCOVERY_SEC_CERT_DATE_INVALID = HRESULT($8018000D);
+  {$EXTERNALSYM MENROLL_E_DISCOVERY_SEC_CERT_DATE_INVALID}
+
+//
+// MessageId: MENROLL_E_PASSWORD_NEEDED
+//
+// MessageText:
+//
+// A password is needed, but was not supplied.
+//
+  MENROLL_E_PASSWORD_NEEDED           = HRESULT($8018000E);
+  {$EXTERNALSYM MENROLL_E_PASSWORD_NEEDED}
+
+//
+// MessageId: MENROLL_E_WAB_ERROR
+//
+// MessageText:
+//
+// An error occurred during WAB enrollment.
+//
+  MENROLL_E_WAB_ERROR                 = HRESULT($8018000F);
+  {$EXTERNALSYM MENROLL_E_WAB_ERROR}
+
+//
+// MessageId: MENROLL_E_CONNECTIVITY
+//
+// MessageText:
+//
+// A network error occurred, such as DNS or a network timeout.
+//
+  MENROLL_E_CONNECTIVITY              = HRESULT($80180010);
+  {$EXTERNALSYM MENROLL_E_CONNECTIVITY}
+
+//
+// MessageId: MENROLL_S_ENROLLMENT_SUSPENDED
+//
+// MessageText:
+//
+// Enrollment was suspended.
+//
+  MENROLL_S_ENROLLMENT_SUSPENDED      = HRESULT($00180011);
+  {$EXTERNALSYM MENROLL_S_ENROLLMENT_SUSPENDED}
+
+//
+// MessageId: MENROLL_E_INVALIDSSLCERT
+//
+// MessageText:
+//
+// The SSL cert was not valid.
+//
+  MENROLL_E_INVALIDSSLCERT            = HRESULT($80180012);
+  {$EXTERNALSYM MENROLL_E_INVALIDSSLCERT}
+
+//
+// MessageId: MENROLL_E_DEVICEAPREACHED
+//
+// MessageText:
+//
+// The account has too many devices enrolled. Delete or unenroll old ones to fix this error.
+//
+  MENROLL_E_DEVICEAPREACHED           = HRESULT($80180013);
+  {$EXTERNALSYM MENROLL_E_DEVICEAPREACHED}
+
+//
+// MessageId: MENROLL_E_DEVICENOTSUPPORTED
+//
+// MessageText:
+//
+// A specific platform or version is not supported.
+//
+  MENROLL_E_DEVICENOTSUPPORTED        = HRESULT($80180014);
+  {$EXTERNALSYM MENROLL_E_DEVICENOTSUPPORTED}
+
+//
+// MessageId: MENROLL_E_NOT_SUPPORTED
+//
+// MessageText:
+//
+// Mobile device management is generally not supported for this device.
+//
+  MENROLL_E_NOT_SUPPORTED             = HRESULT($80180015);
+  {$EXTERNALSYM MENROLL_E_NOT_SUPPORTED}
+
+//
+// MessageId: MENROLL_E_NOTELIGIBLETORENEW
+//
+// MessageText:
+//
+// The device is attempting to renew, but the server rejected the request. Check renew schedule on the device.
+//
+  MENROLL_E_NOTELIGIBLETORENEW        = HRESULT($80180016);
+  {$EXTERNALSYM MENROLL_E_NOTELIGIBLETORENEW}
+
+//
+// MessageId: MENROLL_E_INMAINTENANCE
+//
+// MessageText:
+//
+// Account is in maintenance; retry later.
+//
+  MENROLL_E_INMAINTENANCE             = HRESULT($80180017);
+  {$EXTERNALSYM MENROLL_E_INMAINTENANCE}
+
+//
+// MessageId: MENROLL_E_USER_LICENSE
+//
+// MessageText:
+//
+// The license of the user is in bad state blocking enrollment.
+//
+  MENROLL_E_USER_LICENSE              = HRESULT($80180018);
+  {$EXTERNALSYM MENROLL_E_USER_LICENSE}
+
+//
+// MessageId: MENROLL_E_ENROLLMENTDATAINVALID
+//
+// MessageText:
+//
+// The server rejected the Enrollment Data.
+//
+  MENROLL_E_ENROLLMENTDATAINVALID     = HRESULT($80180019);
+  {$EXTERNALSYM MENROLL_E_ENROLLMENTDATAINVALID}
+
+//
+// MessageId: MENROLL_E_INSECUREREDIRECT
+//
+// MessageText:
+//
+// The server requested HTTP rather than HTTPS but it was not accepted.
+//
+  MENROLL_E_INSECUREREDIRECT          = HRESULT($8018001A);
+  {$EXTERNALSYM MENROLL_E_INSECUREREDIRECT}
+
+//
+// MessageId: MENROLL_E_PLATFORM_WRONG_STATE
+//
+// MessageText:
+//
+// An invalid operation was attempted, such as trying to enroll the same device twice or unenroll an unknown device.
+//
+  MENROLL_E_PLATFORM_WRONG_STATE      = HRESULT($8018001B);
+  {$EXTERNALSYM MENROLL_E_PLATFORM_WRONG_STATE}
+
+//
+// MessageId: MENROLL_E_PLATFORM_LICENSE_ERROR
+//
+// MessageText:
+//
+// The version of Windows installed on the client does not support this enrollment type.
+//
+  MENROLL_E_PLATFORM_LICENSE_ERROR    = HRESULT($8018001C);
+  {$EXTERNALSYM MENROLL_E_PLATFORM_LICENSE_ERROR}
+
+//
+// MessageId: MENROLL_E_PLATFORM_UNKNOWN_ERROR
+//
+// MessageText:
+//
+// An error occurred on the client.
+//
+  MENROLL_E_PLATFORM_UNKNOWN_ERROR    = HRESULT($8018001D);
+  {$EXTERNALSYM MENROLL_E_PLATFORM_UNKNOWN_ERROR}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_CERTSTORE
+//
+// MessageText:
+//
+// Provisioning failed in the certificate store CSP.
+//
+  MENROLL_E_PROV_CSP_CERTSTORE        = HRESULT($8018001E);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_CERTSTORE}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_W7
+//
+// MessageText:
+//
+// Provisioning failed in a W7/DMAcc CSP.
+//
+  MENROLL_E_PROV_CSP_W7               = HRESULT($8018001F);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_W7}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_DMCLIENT
+//
+// MessageText:
+//
+// Provisioning failed in the DM client CSP.
+//
+  MENROLL_E_PROV_CSP_DMCLIENT         = HRESULT($80180020);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_DMCLIENT}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_PFW
+//
+// MessageText:
+//
+// Provisioning failed in the Passport for Work CSP.
+//
+  MENROLL_E_PROV_CSP_PFW              = HRESULT($80180021);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_PFW}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_MISC
+//
+// MessageText:
+//
+// Provisioning failed in an unspecified CSP.
+//
+  MENROLL_E_PROV_CSP_MISC             = HRESULT($80180022);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_MISC}
+
+//
+// MessageId: MENROLL_E_PROV_UNKNOWN
+//
+// MessageText:
+//
+// Provisioning failed, but a specific CSP is not indicated.
+//
+  MENROLL_E_PROV_UNKNOWN              = HRESULT($80180023);
+  {$EXTERNALSYM MENROLL_E_PROV_UNKNOWN}
+
+//
+// MessageId: MENROLL_E_PROV_SSLCERTNOTFOUND
+//
+// MessageText:
+//
+// When attempting to bind the public cert/private key, the public cert was not found either: when attempting to bind the public cert/private key, or when looking into provisioning payload.
+//
+  MENROLL_E_PROV_SSLCERTNOTFOUND      = HRESULT($80180024);
+  {$EXTERNALSYM MENROLL_E_PROV_SSLCERTNOTFOUND}
+
+//
+// MessageId: MENROLL_E_PROV_CSP_APPMGMT
+//
+// MessageText:
+//
+// Provisioning failed in the EnterpriseAppManagement CSP.
+//
+  MENROLL_E_PROV_CSP_APPMGMT          = HRESULT($80180025);
+  {$EXTERNALSYM MENROLL_E_PROV_CSP_APPMGMT}
+
+//
+// MessageId: MENROLL_E_DEVICE_MANAGEMENT_BLOCKED
+//
+// MessageText:
+//
+// Mobile Device Management (MDM) was blocked, possibly by Group Policy or the SetManagedExternally function.
+//
+  MENROLL_E_DEVICE_MANAGEMENT_BLOCKED = HRESULT($80180026);
+  {$EXTERNALSYM MENROLL_E_DEVICE_MANAGEMENT_BLOCKED}
+
+//
+// MessageId: MENROLL_E_CERTPOLICY_PRIVATEKEYCREATION_FAILED
+//
+// MessageText:
+//
+// Failed to create the private key.
+//
+  MENROLL_E_CERTPOLICY_PRIVATEKEYCREATION_FAILED = HRESULT($80180027);
+  {$EXTERNALSYM MENROLL_E_CERTPOLICY_PRIVATEKEYCREATION_FAILED}
+
+//
+// MessageId: MENROLL_E_CERTAUTH_FAILED_TO_FIND_CERT
+//
+// MessageText:
+//
+// Certificate Authentication was requested, but failed to find a certificate to use.
+//
+  MENROLL_E_CERTAUTH_FAILED_TO_FIND_CERT= HRESULT($80180028);
+  {$EXTERNALSYM MENROLL_E_CERTAUTH_FAILED_TO_FIND_CERT}
+
+//
+// MessageId: MENROLL_E_EMPTY_MESSAGE
+//
+// MessageText:
+//
+// The server responded with HTTP 200, but the message was empty.
+//
+  MENROLL_E_EMPTY_MESSAGE             = HRESULT($80180029);
+  {$EXTERNALSYM MENROLL_E_EMPTY_MESSAGE}
+
+//
+// MessageId: MENROLL_E_USER_CANCELLED
+//
+// MessageText:
+//
+// The user canceled the operation.
+//
+  MENROLL_E_USER_CANCELLED            = HRESULT($80180030);
+  {$EXTERNALSYM MENROLL_E_USER_CANCELLED}
+
+//
+// MessageId: MENROLL_E_MDM_NOT_CONFIGURED
+//
+// MessageText:
+//
+// Mobile Device Management (MDM) is not configured.
+//
+  MENROLL_E_MDM_NOT_CONFIGURED        = HRESULT($80180031);
+  {$EXTERNALSYM MENROLL_E_MDM_NOT_CONFIGURED}
+
 
 //
 // FACILITY_WER
@@ -46327,6 +47428,16 @@ const
   {$EXTERNALSYM ERROR_FLT_REGISTRATION_BUSY}
 
 //
+// MessageId: ERROR_FLT_WCOS_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The filter is not allowed to attach because it has not declared compability with WCOS.
+//
+  ERROR_FLT_WCOS_NOT_SUPPORTED        = HRESULT($801F0024);
+  {$EXTERNALSYM ERROR_FLT_WCOS_NOT_SUPPORTED}
+
+//
 // ===============================
 // Facility Graphics Error Messages
 // ===============================
@@ -46334,16 +47445,16 @@ const
 //
 // The following are the subranges within the Graphics facility
 //
-// 0x0000 - 0x0fff     Display Driver Loader driver & Video Port errors (displdr.sys, videoprt.sys)
-// 0x1000 - 0x1fff     Monitor Class Function driver errors             (monitor.sys)
-// 0x2000 - 0x2fff     Windows Graphics Kernel Subsystem errors         (dxgkrnl.sys)
-// 0x3000 - 0x3fff               Desktop Window Manager errors
-//   0x2000 - 0x20ff      Common errors
-//   0x2100 - 0x21ff      Video Memory Manager (VidMM) subsystem errors
-//   0x2200 - 0x22ff      Video GPU Scheduler (VidSch) subsystem errors
-//   0x2300 - 0x23ff      Video Display Mode Management (VidDMM) subsystem errors
+//   $0000 - $0fff     Display Driver Loader driver & Video Port errors (displdr.sys, videoprt.sys)
+//   $1000 - $1fff     Monitor Class Function driver errors             (monitor.sys)
+//   $2000 - $2fff     Windows Graphics Kernel Subsystem errors         (dxgkrnl.sys)
+//   $3000 - $3fff     Desktop Window Manager errors
+//   $2000 - $20ff     Common errors
+//   $2100 - $21ff     Video Memory Manager (VidMM) subsystem errors
+//   $2200 - $22ff     Video GPU Scheduler (VidSch) subsystem errors
+//   $2300 - $23ff     Video Display Mode Management (VidDMM) subsystem errors
 //
-// Display Driver Loader driver & Video Port errors {0x0000..0x0fff}
+// Display Driver Loader driver & Video Port errors {$0000..$0fff}
 //
 //
 // MessageId: ERROR_HUNG_DISPLAY_DRIVER_THREAD
@@ -46358,7 +47469,7 @@ const
   {$EXTERNALSYM ERROR_HUNG_DISPLAY_DRIVER_THREAD}
 
 //
-// Desktop Window Manager errors {0x3000..0x3fff}
+// Desktop Window Manager errors {$3000..$3fff}
 //
 //
 // MessageId: DWM_E_COMPOSITIONDISABLED
@@ -46448,7 +47559,7 @@ const
   DWM_S_GDI_REDIRECTION_SURFACE_BLT_VIA_GDI= HRESULT($00263008);
 
 //
-// Monitor class function driver errors {0x1000..0x1fff}
+// Monitor class function driver errors {$1000..$1fff}
 //
 //
 // MessageId: ERROR_MONITOR_NO_DESCRIPTOR
@@ -46545,11 +47656,11 @@ const
   {$EXTERNALSYM ERROR_MONITOR_INVALID_MANUFACTURE_DATE}
 
 //
-// Windows Graphics Kernel Subsystem errors {0x2000..0x2fff}
+// Windows Graphics Kernel Subsystem errors {$2000..$2fff}
 //
 // TODO: Add DXG Win32 errors here
 //
-// Common errors {0x2000..0x20ff}
+// Common errors {$2000..$20ff}
 //
 //
 // MessageId: ERROR_GRAPHICS_NOT_EXCLUSIVE_MODE_OWNER
@@ -46955,7 +48066,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_ALLOCATION_CONTENT_LOST}
 
 //
-// Video GPU Scheduler (VidSch) subsystem errors {0x2200..0x22ff}
+// Video GPU Scheduler (VidSch) subsystem errors {$2200..$22ff}
 //
 //
 // MessageId: ERROR_GRAPHICS_GPU_EXCEPTION_ON_DEVICE
@@ -46978,7 +48089,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_SKIP_ALLOCATION_PREPARATION}
 
 //
-// Video Present Network Management (VidPNMgr) subsystem errors {0x2300..0x23ff}
+// Video Present Network Management (VidPNMgr) subsystem errors {$2300..$23ff}
 //
 //
 // MessageId: ERROR_GRAPHICS_INVALID_VIDPN_TOPOLOGY
@@ -47877,7 +48988,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_CLIENTVIDPN_NOT_SET}
 
 //
-// Port specific status codes {0x2400..0x24ff}
+// Port specific status codes {$2400..$24ff}
 //
 //
 // MessageId: ERROR_GRAPHICS_SPECIFIED_CHILD_ALREADY_CONNECTED
@@ -48040,7 +49151,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_DEPENDABLE_CHILD_STATUS}
 
 //
-// OPM, UAB and PVP specific error codes {0x2500..0x257f}
+// OPM, UAB and PVP specific error codes {$2500..$257f}
 //
 //
 // MessageId: ERROR_GRAPHICS_OPM_NOT_SUPPORTED
@@ -48299,7 +49410,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_OPM_INVALID_CONFIGURATION_REQUEST}
 
 //
-// Monitor Configuration API error codes {0x2580..0x25DF}
+// Monitor Configuration API error codes {$2580..$25DF}
 //
 //
 // MessageId: ERROR_GRAPHICS_I2C_NOT_SUPPORTED
@@ -48451,7 +49562,7 @@ const
 //
 // MessageText:
 //
-// The monitor's VCP Version (0xDF) VCP code returned an invalid version value.
+// The monitor's VCP Version ($DF) VCP code returned an invalid version value.
 //
   ERROR_GRAPHICS_MCA_INVALID_VCP_VERSION = HRESULT($C02625D9);
   {$EXTERNALSYM ERROR_GRAPHICS_MCA_INVALID_VCP_VERSION}
@@ -48471,7 +49582,7 @@ const
 //
 // MessageText:
 //
-// The MCCS version in a monitor's mccs_ver capability does not match the MCCS version the monitor reports when the VCP Version (0xDF) VCP code is used.
+// The MCCS version in a monitor's mccs_ver capability does not match the MCCS version the monitor reports when the VCP Version ($DF) VCP code is used.
 //
   ERROR_GRAPHICS_MCA_MCCS_VERSION_MISMATCH= HRESULT($C02625DB);
 
@@ -48506,7 +49617,7 @@ const
   {$EXTERNALSYM ERROR_GRAPHICS_MCA_UNSUPPORTED_COLOR_TEMPERATURE}
 
 //
-// OPM, UAB, PVP and DDC/CI shared error codes {0x25E0..0x25ff}
+// OPM, UAB, PVP and DDC/CI shared error codes {$25E0..$25ff}
 //
 //
 // MessageId: ERROR_GRAPHICS_ONLY_CONSOLE_SESSION_SUPPORTED
@@ -50500,7 +51611,7 @@ const
   {$EXTERNALSYM TPM_20_E_SENSITIVE}
 
 //
-// TPM vendor specific hardware errors {0x0400..0x04ff}
+// TPM vendor specific hardware errors {$0400..$04ff}
 //
 //
 // MessageId: TPM_E_COMMAND_BLOCKED
@@ -50553,7 +51664,7 @@ const
   {$EXTERNALSYM TPM_E_EMBEDDED_COMMAND_UNSUPPORTED}
 
 //
-// TPM non-fatal hardware errors {0x0800..0x08ff}
+// TPM non-fatal hardware errors {$0800..$08ff}
 //
 //
 // MessageId: TPM_E_RETRY
@@ -50736,7 +51847,7 @@ const
   {$EXTERNALSYM TPM_20_E_NV_UNAVAILABLE}
 
 //
-// TPM Base Services error codes {0x4000..0x40ff}
+// TPM Base Services error codes {$4000..$40ff}
 //
 //
 // MessageId: TBS_E_INTERNAL_ERROR
@@ -50959,7 +52070,7 @@ const
   {$EXTERNALSYM TBS_E_PROVISIONING_INCOMPLETE}
 
 //
-// TPM API error codes {0x0100..0x01ff}
+// TPM API error codes {$0100..$01ff}
 //
 //
 // MessageId: TPMAPI_E_INVALID_STATE
@@ -51715,7 +52826,7 @@ const
   {$EXTERNALSYM TBSIMP_E_NO_EVENT_LOG}
 
 //
-// TPM Physical Presence implementation error codes {0x0300..0x03ff}
+// TPM Physical Presence implementation error codes {$0300..$03ff}
 //
 //
 // MessageId: TPM_E_PPI_ACPI_FAILURE
@@ -51768,7 +52879,7 @@ const
   {$EXTERNALSYM TPM_E_PPI_BLOCKED_IN_BIOS}
 
 //
-// Platform Crypto Provider (PCPTPM12.dll and future platform crypto providers)  error codes {0x0400..0x04ff}
+// Platform Crypto Provider (PCPTPM12.dll and future platform crypto providers)  error codes {$0400..$04ff}
 //
 //
 // MessageId: TPM_E_PCP_ERROR_MASK
@@ -52121,7 +53232,7 @@ const
   {$EXTERNALSYM TPM_E_PCP_UNSUPPORTED_PSS_SALT}
 
 //
-// Misc error codes in TPM code {0x0500..0x05ff}
+// Misc error codes in TPM code {$0500..$05ff}
 //
 //
 // MessageId: TPM_E_ZERO_EXHAUST_ENABLED
@@ -52134,7 +53245,7 @@ const
   {$EXTERNALSYM TPM_E_ZERO_EXHAUST_ENABLED}
 
 //
-// Error codes in TPM task and core provisioning code {0x0600..0x06ff}
+// Error codes in TPM task and core provisioning code {$0600..$06ff}
 //
 //
 // MessageId: TPM_E_PROVISIONING_INCOMPLETE
@@ -54666,6 +55777,66 @@ const
   FVE_E_AAD_ENDPOINT_BUSY             = HRESULT($803100E1);
   {$EXTERNALSYM FVE_E_AAD_ENDPOINT_BUSY}
 
+//
+// MessageId: FVE_E_INVALID_NBP_CERT
+//
+// MessageText:
+//
+// An invalid certificate has been found in the Network Boot Protector certificate store.
+//
+  FVE_E_INVALID_NBP_CERT              = HRESULT($803100E2);
+  {$EXTERNALSYM FVE_E_INVALID_NBP_CERT}
+
+//
+// MessageId: FVE_E_EDRIVE_BAND_ENUMERATION_FAILED
+//
+// MessageText:
+//
+// BitLocker can't enable encryption on this hardware encrypting drive volume because the drive bands couldn't be enumerated.
+//
+  FVE_E_EDRIVE_BAND_ENUMERATION_FAILED = HRESULT($803100E3);
+  {$EXTERNALSYM FVE_E_EDRIVE_BAND_ENUMERATION_FAILED}
+
+//
+// MessageId: FVE_E_POLICY_ON_RDV_EXCLUSION_LIST
+//
+// MessageText:
+//
+// This removable data drive has been excluded from device encryption by BitLocker Drive Encryption policy.
+//
+  FVE_E_POLICY_ON_RDV_EXCLUSION_LIST = HRESULT($803100E4);
+  {$EXTERNALSYM FVE_E_POLICY_ON_RDV_EXCLUSION_LIST}
+
+//
+// MessageId: FVE_E_PREDICTED_TPM_PROTECTOR_NOT_SUPPORTED
+//
+// MessageText:
+//
+// Adding BitLocker predicted TPM based protector is not supported.
+//
+  FVE_E_PREDICTED_TPM_PROTECTOR_NOT_SUPPORTED = HRESULT($803100E5);
+  {$EXTERNALSYM FVE_E_PREDICTED_TPM_PROTECTOR_NOT_SUPPORTED}
+
+//
+// MessageId: FVE_E_SETUP_TPM_CALLBACK_NOT_SUPPORTED
+//
+// MessageText:
+//
+// Registeration for TPM callback is not supported.
+//
+  FVE_E_SETUP_TPM_CALLBACK_NOT_SUPPORTED = HRESULT($803100E6);
+  {$EXTERNALSYM FVE_E_SETUP_TPM_CALLBACK_NOT_SUPPORTED}
+
+//
+// MessageId: FVE_E_TPM_CONTEXT_SETUP_NOT_SUPPORTED
+//
+// MessageText:
+//
+// Creating new TPM context is not supported.
+//
+  FVE_E_TPM_CONTEXT_SETUP_NOT_SUPPORTED = HRESULT($803100E7);
+  {$EXTERNALSYM FVE_E_TPM_CONTEXT_SETUP_NOT_SUPPORTED}
+
 
 //
 // =======================================================
@@ -56766,6 +57937,16 @@ const
   {$EXTERNALSYM ERROR_HV_NESTED_VM_EXIT}
 
 //
+// MessageId: ERROR_HV_MSR_ACCESS_FAILED
+//
+// MessageText:
+//
+// The requested access to the model specific register failed.
+//
+  ERROR_HV_MSR_ACCESS_FAILED          = _NDIS_ERROR_TYPEDEF_($C0350080);
+  {$EXTERNALSYM ERROR_HV_MSR_ACCESS_FAILED}
+
+//
 // MessageId: ERROR_HV_NOT_PRESENT
 //
 // MessageText:
@@ -57202,7 +58383,7 @@ const
   {$EXTERNALSYM ERROR_VID_VTL_ACCESS_DENIED}
 
 //
-// Host compute service errors (0x0100-0x01ff)
+// Host compute service errors ($0100-$01ff)
 //
 //
 // MessageId: ERROR_VMCOMPUTE_TERMINATED_DURING_START
@@ -57405,7 +58586,7 @@ const
   {$EXTERNALSYM ERROR_VMCOMPUTE_WINDOWS_INSIDER_REQUIRED}
 
 //
-// Host Compute System error codes (0x0100-0x01ff HRESULT codes)
+// Host Compute System error codes ($0100-$01ff HRESULT codes)
 //
 //
 // MessageId: HCS_E_TERMINATED_DURING_START
@@ -57707,9 +58888,19 @@ const
   HCS_E_PROCESS_ALREADY_STOPPED       = HRESULT($8037011F);
   {$EXTERNALSYM HCS_E_PROCESS_ALREADY_STOPPED}
 
+//
+// MessageId: HCS_E_SYSTEM_NOT_CONFIGURED_FOR_OPERATION
+//
+// MessageText:
+//
+// The virtual machine or container is not configured to perform the operation.
+//
+  HCS_E_SYSTEM_NOT_CONFIGURED_FOR_OPERATION = HRESULT($80370120);
+  {$EXTERNALSYM HCS_E_SYSTEM_NOT_CONFIGURED_FOR_OPERATION}
+
 
 //
-// Virtual networking errors (0x0200-0x02ff)
+// Virtual networking errors ($0200-$02ff)
 //
 //
 // MessageId: ERROR_VNET_VIRTUAL_SWITCH_NAME_NOT_FOUND
@@ -57735,7 +58926,7 @@ const
   {$EXTERNALSYM ERROR_VID_REMOTE_NODE_PARENT_GPA_PAGES_USED}
 
 //
-// User-mode Hypervisor API error codes (0x0300-0x03ff)
+// User-mode Hypervisor API error codes ($0300-$03ff)
 //
 //
 // MessageId: WHV_E_UNKNOWN_CAPABILITY
@@ -57870,6 +59061,121 @@ const
 //
   ERROR_VSMB_SAVED_STATE_CORRUPT      = _NDIS_ERROR_TYPEDEF_($C0370401);
   {$EXTERNALSYM ERROR_VSMB_SAVED_STATE_CORRUPT}
+
+//
+// VmSavedStateDumpProvider error codes ($0500-$05ff)
+//
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_PARTITION_STATE_NOT_FOUND
+//
+// MessageText:
+//
+// Partition state blob not found. Make sure the virtual machine is saved for this content to be included in the saved state file(s).
+//
+  VM_SAVED_STATE_DUMP_E_PARTITION_STATE_NOT_FOUND = HRESULT($C0370500);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_PARTITION_STATE_NOT_FOUND}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_GUEST_MEMORY_NOT_FOUND
+//
+// MessageText:
+//
+// Guest memory not found. Make sure the virtual machine is saved for this content to be included in the saved state file(s).
+//
+  VM_SAVED_STATE_DUMP_E_GUEST_MEMORY_NOT_FOUND = HRESULT($C0370501);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_GUEST_MEMORY_NOT_FOUND}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_NO_VP_FOUND_IN_PARTITION_STATE
+//
+// MessageText:
+//
+// No virtual processor information found in the saved partition blob. Make sure the virtual machine is saved successfully for this content to be included in the partition state.
+//
+  VM_SAVED_STATE_DUMP_E_NO_VP_FOUND_IN_PARTITION_STATE = HRESULT($C0370502);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_NO_VP_FOUND_IN_PARTITION_STATE}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_NESTED_VIRTUALIZATION_NOT_SUPPORTED
+//
+// MessageText:
+//
+// A virtual processor has been detected to have nested virtualization enabled. Nested Virtualization is not supported yet by VmSavedStateDumpProvider.
+//
+  VM_SAVED_STATE_DUMP_E_NESTED_VIRTUALIZATION_NOT_SUPPORTED = HRESULT($C0370503);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_NESTED_VIRTUALIZATION_NOT_SUPPORTED}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_WINDOWS_KERNEL_IMAGE_NOT_FOUND
+//
+// MessageText:
+//
+// The Windows kernel image address could not be found in the virtual machine saved state.
+//
+  VM_SAVED_STATE_DUMP_E_WINDOWS_KERNEL_IMAGE_NOT_FOUND = HRESULT($C0370504);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_WINDOWS_KERNEL_IMAGE_NOT_FOUND}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_VA_NOT_MAPPED
+//
+// MessageText:
+//
+// The given virtual address is not mapped to a physical address.
+//
+  VM_SAVED_STATE_DUMP_E_VA_NOT_MAPPED = HRESULT($C0370505);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_VA_NOT_MAPPED}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_INVALID_VP_STATE
+//
+// MessageText:
+//
+// The virtual processor is not in the correct state for the operation.
+//
+  VM_SAVED_STATE_DUMP_E_INVALID_VP_STATE = HRESULT($C0370506);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_INVALID_VP_STATE}
+
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_PDPTE_NOT_PRESENT
+//
+// MessageText:
+//
+// Failed to read Page Directory Page Table entry (pdpte) for a virtual address.
+//
+  VM_SAVED_STATE_DUMP_E_PDPTE_NOT_PRESENT = HRESULT($C0370506);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_PDPTE_NOT_PRESENT}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_PDE_NOT_PRESENT
+//
+// MessageText:
+//
+// Failed to read Page Directory entry (pde) for a virtual address.
+//
+  VM_SAVED_STATE_DUMP_E_PDE_NOT_PRESENT = HRESULT($C0370507);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_PDE_NOT_PRESENT}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_PTE_NOT_PRESENT
+//
+// MessageText:
+//
+// Failed to read Page Table entry (pte) for a virtual address.
+//
+  VM_SAVED_STATE_DUMP_E_PTE_NOT_PRESENT = HRESULT($C0370508);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_PTE_NOT_PRESENT}
+
+//
+// MessageId: VM_SAVED_STATE_DUMP_E_VP_VTL_NOT_ENABLED
+//
+// MessageText:
+//
+// The active virtual trust level is not enabled on the specified virtual processor.
+//
+  VM_SAVED_STATE_DUMP_E_VP_VTL_NOT_ENABLED = HRESULT($C0370509);
+  {$EXTERNALSYM VM_SAVED_STATE_DUMP_E_VP_VTL_NOT_ENABLED}
 
 
 //
@@ -59841,7 +61147,7 @@ const
   {$EXTERNALSYM HCN_E_ENDPOINT_NOT_LOCAL}
 
 //
-// MessageId: HCN_INTERFACEPARAMETERS_ALREADY_APPLIED
+// MessageId: HCN_INTERFACEPARAMETERS_ALREADY_APPLIEDSTATEREPOSITORY_TRANSACTION_IN_PROGRESS
 //
 // MessageText:
 //
@@ -62241,6 +63547,16 @@ const
   STATEREPOSITORY_E_CACHE_NOT_INIITALIZED = HRESULT($80670015);
   {$EXTERNALSYM STATEREPOSITORY_E_CACHE_NOT_INIITALIZED}
 
+//
+// MessageId: STATEREPOSITORY_E_DEPENDENCY_NOT_RESOLVED
+//
+// MessageText:
+//
+// Package dependency criteria could not be resolved.
+//
+  STATEREPOSITORY_E_DEPENDENCY_NOT_RESOLVED = HRESULT($80670016);
+  {$EXTERNALSYM STATEREPOSITORY_E_DEPENDENCY_NOT_RESOLVED}
+
 
 //
 // Spaceport errors
@@ -62448,6 +63764,147 @@ const
   {$EXTERNALSYM ERROR_SPACES_ENTRY_INVALID}
 
 //
+// MessageId: ERROR_SPACES_UPDATE_COLUMN_STATE
+//
+// MessageText:
+//
+// A column's state needs to be updated.
+//
+  ERROR_SPACES_UPDATE_COLUMN_STATE    = HRESULT($80E70015);
+  {$EXTERNALSYM ERROR_SPACES_UPDATE_COLUMN_STATE}
+
+//
+// MessageId: ERROR_SPACES_MAP_REQUIRED
+//
+// MessageText:
+//
+// An extent needs to be allocated.
+//
+  ERROR_SPACES_MAP_REQUIRED           = HRESULT($80E70016);
+  {$EXTERNALSYM ERROR_SPACES_MAP_REQUIRED}
+
+//
+// MessageId: ERROR_SPACES_UNSUPPORTED_VERSION
+//
+// MessageText:
+//
+// The metadata version is unsupported.
+//
+  ERROR_SPACES_UNSUPPORTED_VERSION    = HRESULT($80E70017);
+  {$EXTERNALSYM ERROR_SPACES_UNSUPPORTED_VERSION}
+
+//
+// MessageId: ERROR_SPACES_CORRUPT_METADATA
+//
+// MessageText:
+//
+// The metadata read was corrupt.
+//
+  ERROR_SPACES_CORRUPT_METADATA       = HRESULT($80E70018);
+  {$EXTERNALSYM ERROR_SPACES_CORRUPT_METADATA}
+
+//
+// MessageId: ERROR_SPACES_DRT_FULL
+//
+// MessageText:
+//
+// The DRT is full.
+//
+  ERROR_SPACES_DRT_FULL               = HRESULT($80E70019);
+  {$EXTERNALSYM ERROR_SPACES_DRT_FULL}
+
+//
+// MessageId: ERROR_SPACES_INCONSISTENCY
+//
+// MessageText:
+//
+// An inconsistency was found.
+//
+  ERROR_SPACES_INCONSISTENCY          = HRESULT($80E7001A);
+  {$EXTERNALSYM ERROR_SPACES_INCONSISTENCY}
+
+//
+// MessageId: ERROR_SPACES_LOG_NOT_READY
+//
+// MessageText:
+//
+// The log is not ready.
+//
+  ERROR_SPACES_LOG_NOT_READY          = HRESULT($80E7001B);
+  {$EXTERNALSYM ERROR_SPACES_LOG_NOT_READY}
+
+//
+// MessageId: ERROR_SPACES_NO_REDUNDANCY
+//
+// MessageText:
+//
+// No good copy of data was available.
+//
+  ERROR_SPACES_NO_REDUNDANCY          = HRESULT($80E7001C);
+  {$EXTERNALSYM ERROR_SPACES_NO_REDUNDANCY}
+
+//
+// MessageId: ERROR_SPACES_DRIVE_NOT_READY
+//
+// MessageText:
+//
+// The drive is not ready.
+//
+  ERROR_SPACES_DRIVE_NOT_READY        = HRESULT($80E7001D);
+  {$EXTERNALSYM ERROR_SPACES_DRIVE_NOT_READY}
+
+//
+// MessageId: ERROR_SPACES_DRIVE_SPLIT
+//
+// MessageText:
+//
+// The data on this drive is stale.
+//
+  ERROR_SPACES_DRIVE_SPLIT            = HRESULT($80E7001E);
+  {$EXTERNALSYM ERROR_SPACES_DRIVE_SPLIT}
+
+//
+// MessageId: ERROR_SPACES_DRIVE_LOST_DATA
+//
+// MessageText:
+//
+// The data on this drive has been lost.
+//
+  ERROR_SPACES_DRIVE_LOST_DATA        = HRESULT($80E7001F);
+  {$EXTERNALSYM ERROR_SPACES_DRIVE_LOST_DATA}
+
+//
+// MessageId: ERROR_SPACES_MARK_DIRTY
+//
+// MessageText:
+//
+// A slab needs to be marked dirty.
+//
+  ERROR_SPACES_MARK_DIRTY             = HRESULT($80E70020);
+  {$EXTERNALSYM ERROR_SPACES_MARK_DIRTY}
+
+//
+// MessageId: ERROR_SPACES_FLUSH_METADATA
+//
+// MessageText:
+//
+// The cache metadata needs to be written and flushed.
+//
+  ERROR_SPACES_FLUSH_METADATA         = HRESULT($80E70025);
+  {$EXTERNALSYM ERROR_SPACES_FLUSH_METADATA}
+
+//
+// MessageId: ERROR_SPACES_CACHE_FULL
+//
+// MessageText:
+//
+// The cache is full.
+//
+  ERROR_SPACES_CACHE_FULL             = HRESULT($80E70026);
+  {$EXTERNALSYM ERROR_SPACES_CACHE_FULL}
+
+
+//
 // Volsnap errors
 //
 // Success
@@ -62470,6 +63927,16 @@ const
 //
   ERROR_VOLSNAP_ACTIVATION_TIMEOUT    = HRESULT($80820002);
   {$EXTERNALSYM ERROR_VOLSNAP_ACTIVATION_TIMEOUT}
+
+//
+// MessageId: ERROR_VOLSNAP_NO_BYPASSIO_WITH_SNAPSHOT
+//
+// MessageText:
+//
+// BypassIO cannot be enabled while a volume snapshot exists.
+//
+  ERROR_VOLSNAP_NO_BYPASSIO_WITH_SNAPSHOT = HRESULT($80820003);
+  {$EXTERNALSYM ERROR_VOLSNAP_NO_BYPASSIO_WITH_SNAPSHOT}
 
 //
 // Tiering errors
@@ -62578,9 +64045,9 @@ const
 //
 // Embedded Security Core
 //
-// Reserved id values 0x0001 - 0x00FF
-//                    0x8xxx
-//                    0x4xxx
+// Reserved id values $0001 - $00FF
+//                    $8xxx
+//                    $4xxx
 //
 // MessageId: ERROR_SECCORE_INVALID_COMMAND
 //
@@ -63074,6 +64541,21 @@ const
 
 
 //
+// Presentation error codes
+//
+
+//
+// MessageId: PRESENTATION_ERROR_LOST
+//
+// MessageText:
+//
+// The presentation manager has been lost and can no longer be used. The application should destroy this presentation manager and create a new presentation manager to use.
+//
+  PRESENTATION_ERROR_LOST             = HRESULT($88810001);
+  {$EXTERNALSYM PRESENTATION_ERROR_LOST}
+
+
+//
 // DXGI errors that are internal to the Desktop Window Manager
 //
 
@@ -63294,6 +64776,16 @@ const
 //
   D3D12_ERROR_DRIVER_VERSION_MISMATCH = HRESULT($887E0002);
   {$EXTERNALSYM D3D12_ERROR_DRIVER_VERSION_MISMATCH}
+
+//
+// MessageId: D3D12_ERROR_INVALID_REDIST
+//
+// MessageText:
+//
+// The D3D12 SDK version configuration of the host exe is invalid.
+//
+  D3D12_ERROR_INVALID_REDIST          = HRESULT($887E0003);
+  {$EXTERNALSYM D3D12_ERROR_INVALID_REDIST}
 
 
 //
@@ -66993,6 +68485,319 @@ const
   ERROR_DBG_START_SERVER_FAILURE_LOCKDOWN = HRESULT($80B00004);
   {$EXTERNALSYM ERROR_DBG_START_SERVER_FAILURE_LOCKDOWN}
 
+
+//
+// HSP Services Error Messages
+//
+// The following are subranges within the HSP Services facility.
+//
+// $0000 - $0fff     HSP Hardware errors
+// $1000 - $10ff     HSP Base Services errors
+//
+// HSP Hardware errors {$0000..$0fff}
+//
+//
+// MessageId: HSP_E_ERROR_MASK
+//
+// MessageText:
+//
+// This is an error mask to convert HSP hardware errors to Win errors.
+//
+  HSP_E_ERROR_MASK                    = HRESULT($81280000);
+  {$EXTERNALSYM HSP_E_ERROR_MASK}
+
+//
+// MessageId: HSP_E_INTERNAL_ERROR
+//
+// MessageText:
+//
+// Catastrophic internal failure in the HSP hardware.
+//
+  HSP_E_INTERNAL_ERROR                = HRESULT($81280FFF);
+  {$EXTERNALSYM HSP_E_INTERNAL_ERROR}
+
+//
+// HSP Base Services errors {0x1000..0x10ff}
+//
+//
+// MessageId: HSP_BS_ERROR_MASK
+//
+// MessageText:
+//
+// This is an error mask to convert HSP base services errors to Win errors.
+//
+  HSP_BS_ERROR_MASK                   = HRESULT($81281000);
+  {$EXTERNALSYM HSP_BS_ERROR_MASK}
+
+//
+// MessageId: HSP_BS_INTERNAL_ERROR
+//
+// MessageText:
+//
+// Catastrophic internal failure in the HSP base services.
+//
+  HSP_BS_INTERNAL_ERROR               = HRESULT($812810FF);
+  {$EXTERNALSYM HSP_BS_INTERNAL_ERROR}
+
+//
+// HSP Software Error Messages
+//
+// The following are subranges within the HSP Software facility.
+//
+// $0000 - $00ff     HSP driver errors (hsp.sys)
+// $0100 - $01ff     HSP base class errors (hspbase.dll)
+// $0200 - $02ff     HSP Key Storage Provider errors (hspksp.dll)
+//
+// HSP driver errors {$0000..$000ff}
+//
+//
+// MessageId: HSP_DRV_ERROR_MASK
+//
+// MessageText:
+//
+// This is an error mask to convert HSP driver errors to Win errors.
+//
+  HSP_DRV_ERROR_MASK                  = HRESULT($81290000);
+  {$EXTERNALSYM HSP_DRV_ERROR_MASK}
+
+//
+// MessageId: HSP_DRV_INTERNAL_ERROR
+//
+// MessageText:
+//
+// Catastrophic internal failure in the HSP driver.
+//
+  HSP_DRV_INTERNAL_ERROR              = HRESULT($812900FF);
+  {$EXTERNALSYM HSP_DRV_INTERNAL_ERROR}
+
+//
+// HSP base class errors {0x0100..0x001ff}
+//
+//
+// MessageId: HSP_BASE_ERROR_MASK
+//
+// MessageText:
+//
+// This is an error mask to convert HSP base class errors to Win errors.
+//
+  HSP_BASE_ERROR_MASK                 = HRESULT($81290100);
+  {$EXTERNALSYM HSP_BASE_ERROR_MASK}
+
+//
+// MessageId: HSP_BASE_INTERNAL_ERROR
+//
+// MessageText:
+//
+// Catastrophic internal failure in the HSP base class.
+//
+  HSP_BASE_INTERNAL_ERROR             = HRESULT($812901FF);
+  {$EXTERNALSYM HSP_BASE_INTERNAL_ERROR}
+
+//
+// HSP Key Storage Provider errors {0x0200..0x002ff}
+//
+//
+// MessageId: HSP_KSP_ERROR_MASK
+//
+// MessageText:
+//
+// This is an error mask to convert HSP KSP errors to Win errors.
+//
+  HSP_KSP_ERROR_MASK                  = HRESULT($81290200);
+  {$EXTERNALSYM HSP_KSP_ERROR_MASK}
+
+//
+// MessageId: HSP_KSP_DEVICE_NOT_READY
+//
+// MessageText:
+//
+// The Pluton processor is currently not ready for use.
+//
+  HSP_KSP_DEVICE_NOT_READY            = HRESULT($81290201);
+  {$EXTERNALSYM HSP_KSP_DEVICE_NOT_READY}
+
+//
+// MessageId: HSP_KSP_INVALID_PROVIDER_HANDLE
+//
+// MessageText:
+//
+// The handle to the HSP KSP is invalid.
+//
+  HSP_KSP_INVALID_PROVIDER_HANDLE     = HRESULT($81290202);
+  {$EXTERNALSYM HSP_KSP_INVALID_PROVIDER_HANDLE}
+
+//
+// MessageId: HSP_KSP_INVALID_KEY_HANDLE
+//
+// MessageText:
+//
+// The handle to a key stored by the HSP KSP is invalid.
+//
+  HSP_KSP_INVALID_KEY_HANDLE          = HRESULT($81290203);
+  {$EXTERNALSYM HSP_KSP_INVALID_KEY_HANDLE}
+
+//
+// MessageId: HSP_KSP_INVALID_PARAMETER
+//
+// MessageText:
+//
+// A parameter to the HSP KSP was invalid.
+//
+  HSP_KSP_INVALID_PARAMETER           = HRESULT($81290204);
+  {$EXTERNALSYM HSP_KSP_INVALID_PARAMETER}
+
+//
+// MessageId: HSP_KSP_BUFFER_TOO_SMALL
+//
+// MessageText:
+//
+// The supplied buffer is too small.
+//
+  HSP_KSP_BUFFER_TOO_SMALL            = HRESULT($81290205);
+  {$EXTERNALSYM HSP_KSP_BUFFER_TOO_SMALL}
+
+//
+// MessageId: HSP_KSP_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The requested operation is not supported.
+//
+  HSP_KSP_NOT_SUPPORTED               = HRESULT($81290206);
+  {$EXTERNALSYM HSP_KSP_NOT_SUPPORTED}
+
+//
+// MessageId: HSP_KSP_INVALID_DATA
+//
+// MessageText:
+//
+// The provided data is invalid.
+//
+  HSP_KSP_INVALID_DATA                = HRESULT($81290207);
+  {$EXTERNALSYM HSP_KSP_INVALID_DATA}
+
+//
+// MessageId: HSP_KSP_INVALID_FLAGS
+//
+// MessageText:
+//
+// The provided flags are invalid.
+//
+  HSP_KSP_INVALID_FLAGS               = HRESULT($81290208);
+  {$EXTERNALSYM HSP_KSP_INVALID_FLAGS}
+
+//
+// MessageId: HSP_KSP_ALGORITHM_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The algorithm identifier is not supported.
+//
+  HSP_KSP_ALGORITHM_NOT_SUPPORTED     = HRESULT($81290209);
+  {$EXTERNALSYM HSP_KSP_ALGORITHM_NOT_SUPPORTED}
+
+//
+// MessageId: HSP_KSP_KEY_ALREADY_FINALIZED
+//
+// MessageText:
+//
+// The key has already been finalized.
+//
+  HSP_KSP_KEY_ALREADY_FINALIZED       = HRESULT($8129020A);
+  {$EXTERNALSYM HSP_KSP_KEY_ALREADY_FINALIZED}
+
+//
+// MessageId: HSP_KSP_KEY_NOT_FINALIZED
+//
+// MessageText:
+//
+// The key has not been finalized.
+//
+  HSP_KSP_KEY_NOT_FINALIZED           = HRESULT($8129020B);
+  {$EXTERNALSYM HSP_KSP_KEY_NOT_FINALIZED}
+
+//
+// MessageId: HSP_KSP_INVALID_KEY_TYPE
+//
+// MessageText:
+//
+// The key does not support the requested operation.
+//
+  HSP_KSP_INVALID_KEY_TYPE            = HRESULT($8129020C);
+  {$EXTERNALSYM HSP_KSP_INVALID_KEY_TYPE}
+
+//
+// MessageId: HSP_KSP_NO_MEMORY
+//
+// MessageText:
+//
+// There is not enough memory for the operation.
+//
+  HSP_KSP_NO_MEMORY                   = HRESULT($81290210);
+  {$EXTERNALSYM HSP_KSP_NO_MEMORY}
+
+//
+// MessageId: HSP_KSP_PARAMETER_NOT_SET
+//
+// MessageText:
+//
+// The parameter has not been set and has no default value.
+//
+  HSP_KSP_PARAMETER_NOT_SET           = HRESULT($81290211);
+  {$EXTERNALSYM HSP_KSP_PARAMETER_NOT_SET}
+
+//
+// MessageId: HSP_KSP_KEY_EXISTS
+//
+// MessageText:
+//
+// Key object already exists.
+//
+  HSP_KSP_KEY_EXISTS                  = HRESULT($81290215);
+  {$EXTERNALSYM HSP_KSP_KEY_EXISTS}
+
+//
+// MessageId: HSP_KSP_KEY_MISSING
+//
+// MessageText:
+//
+// The requsted key object does not exist.
+//
+  HSP_KSP_KEY_MISSING                 = HRESULT($81290216);
+  {$EXTERNALSYM HSP_KSP_KEY_MISSING}
+
+//
+// MessageId: HSP_KSP_KEY_LOAD_FAIL
+//
+// MessageText:
+//
+// Failed to load the requested key.
+//
+  HSP_KSP_KEY_LOAD_FAIL               = HRESULT($81290217);
+  {$EXTERNALSYM HSP_KSP_KEY_LOAD_FAIL}
+
+//
+// MessageId: HSP_KSP_NO_MORE_ITEMS
+//
+// MessageText:
+//
+// No more data is available.
+//
+  HSP_KSP_NO_MORE_ITEMS               = HRESULT($81290218);
+  {$EXTERNALSYM HSP_KSP_NO_MORE_ITEMS}
+
+//
+// MessageId: HSP_KSP_INTERNAL_ERROR
+//
+// MessageText:
+//
+// Catastrophic internal failure in the HSP KSP.
+//
+  HSP_KSP_INTERNAL_ERROR              = HRESULT($812902FF);
+  {$EXTERNALSYM HSP_KSP_INTERNAL_ERROR}
+
+
+
 //
 //Sdbus
 //
@@ -67279,6 +69084,16 @@ const
 //
   ERROR_SMB_BAD_CLUSTER_DIALECT       = HRESULT($C05D0001);
   {$EXTERNALSYM ERROR_SMB_BAD_CLUSTER_DIALECT}
+
+//
+// MessageId: ERROR_SMB_NO_SIGNING_ALGORITHM_OVERLAP
+//
+// MessageText:
+//
+// Failed to negotiate a signing hash function.
+//
+  ERROR_SMB_NO_SIGNING_ALGORITHM_OVERLAP = HRESULT($C05D0002);
+  {$EXTERNALSYM ERROR_SMB_NO_SIGNING_ALGORITHM_OVERLAP}
 
 //
 // WININET.DLL errors - propagated as HRESULT's using FACILITY=WIN32
@@ -69759,6 +71574,16 @@ const
   UTC_E_SETREGKEYACTION_TYPE_NOT_APPROVED = HRESULT($87C5105C);
   {$EXTERNALSYM UTC_E_SETREGKEYACTION_TYPE_NOT_APPROVED}
 
+//
+// MessageId: UTC_E_TRACE_THROTTLED
+//
+// MessageText:
+//
+// An operation which requires a running un-throttled trace failed due to the trace being throttled.
+//
+  UTC_E_TRACE_THROTTLED               = HRESULT($87C5105D);
+  {$EXTERNALSYM UTC_E_TRACE_THROTTLED}
+
 
 
 //
@@ -69839,6 +71664,136 @@ const
   ERROR_QUIC_USER_CANCELED            = HRESULT($80410002);
   {$EXTERNALSYM ERROR_QUIC_USER_CANCELED}
 
+//
+// MessageId: ERROR_QUIC_INTERNAL_ERROR
+//
+// MessageText:
+//
+// The QUIC connection encountered an internal error.
+//
+  ERROR_QUIC_INTERNAL_ERROR           = HRESULT($80410003);
+  {$EXTERNALSYM ERROR_QUIC_INTERNAL_ERROR}
+
+//
+// MessageId: ERROR_QUIC_PROTOCOL_VIOLATION
+//
+// MessageText:
+//
+// The QUIC connection encountered a protocol violation.
+//
+  ERROR_QUIC_PROTOCOL_VIOLATION       = HRESULT($80410004);
+  {$EXTERNALSYM ERROR_QUIC_PROTOCOL_VIOLATION}
+
+//
+// MessageId: ERROR_QUIC_CONNECTION_IDLE
+//
+// MessageText:
+//
+// The QUIC connection was idle.
+//
+  ERROR_QUIC_CONNECTION_IDLE          = HRESULT($80410005);
+  {$EXTERNALSYM ERROR_QUIC_CONNECTION_IDLE}
+
+//
+// MessageId: ERROR_QUIC_CONNECTION_TIMEOUT
+//
+// MessageText:
+//
+// The QUIC connection timed out while trying to contact the peer.
+//
+  ERROR_QUIC_CONNECTION_TIMEOUT       = HRESULT($80410006);
+  {$EXTERNALSYM ERROR_QUIC_CONNECTION_TIMEOUT}
+
+//
+// MessageId: ERROR_QUIC_ALPN_NEG_FAILURE
+//
+// MessageText:
+//
+// The QUIC connection failed to negotiate a compatible ALPN.
+//
+  ERROR_QUIC_ALPN_NEG_FAILURE         = HRESULT($80410007);
+  {$EXTERNALSYM ERROR_QUIC_ALPN_NEG_FAILURE}
+
+
+//
+// IORING Error codes
+//
+
+//
+// MessageId: IORING_E_REQUIRED_FLAG_NOT_SUPPORTED
+//
+// MessageText:
+//
+// One or more of the required flags provided is unknown by the implementation.
+//
+  IORING_E_REQUIRED_FLAG_NOT_SUPPORTED = HRESULT($80460001);
+  {$EXTERNALSYM IORING_E_REQUIRED_FLAG_NOT_SUPPORTED}
+
+//
+// MessageId: IORING_E_SUBMISSION_QUEUE_FULL
+//
+// MessageText:
+//
+// The submission queue is full.
+//
+  IORING_E_SUBMISSION_QUEUE_FULL      = HRESULT($80460002);
+  {$EXTERNALSYM IORING_E_SUBMISSION_QUEUE_FULL}
+
+//
+// MessageId: IORING_E_VERSION_NOT_SUPPORTED
+//
+// MessageText:
+//
+// The version specified is not known or supported.
+//
+  IORING_E_VERSION_NOT_SUPPORTED      = HRESULT($80460003);
+  {$EXTERNALSYM IORING_E_VERSION_NOT_SUPPORTED}
+
+//
+// MessageId: IORING_E_SUBMISSION_QUEUE_TOO_BIG
+//
+// MessageText:
+//
+// The submission queue size specified for the IoRing is too big.
+//
+  IORING_E_SUBMISSION_QUEUE_TOO_BIG   = HRESULT($80460004);
+  {$EXTERNALSYM IORING_E_SUBMISSION_QUEUE_TOO_BIG}
+
+//
+// MessageId: IORING_E_COMPLETION_QUEUE_TOO_BIG
+//
+// MessageText:
+//
+// The completion queue size specified for the IoRing is too big.
+//
+  IORING_E_COMPLETION_QUEUE_TOO_BIG   = HRESULT($80460005);
+  {$EXTERNALSYM IORING_E_COMPLETION_QUEUE_TOO_BIG}
+
+//
+// MessageId: IORING_E_SUBMIT_IN_PROGRESS
+//
+// MessageText:
+//
+// A submit operation is already in progress for this IoRing on another thread.
+//
+  IORING_E_SUBMIT_IN_PROGRESS         = HRESULT($80460006);
+  {$EXTERNALSYM IORING_E_SUBMIT_IN_PROGRESS}
+
+//
+// MessageId: IORING_E_CORRUPT
+//
+// MessageText:
+//
+// The shared ring buffers of the IoRing are corrupt.
+//
+  IORING_E_CORRUPT                    = HRESULT($80460007);
+  {$EXTERNALSYM IORING_E_CORRUPT}
+
+
+
+  // Additional Prototypes for ALL interfaces
+
+  // End of Additional Prototypes
 
 
 implementation
@@ -69968,6 +71923,7 @@ begin
     Result := x;
 end;
 
+  // Implement Additional functions here.
 
 end.
 

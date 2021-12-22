@@ -10,7 +10,7 @@
 // Release date: 13-02-2016
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Variant and PropVariant helpers.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 8.1 or later.
 // 
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
 // Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //

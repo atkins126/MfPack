@@ -10,7 +10,7 @@
 // Release date: 04-08-2016
 // Language: ENU
 //
-// Version: 3.0.1
+// Version: 3.1.0
 // Description: An extended Peakmeter component based on the Mf Peakmeter Sample.
 //
 // Company: FactoryX
@@ -21,18 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: To install the visual components, choose Install in the Project Manager.
 //          Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34               q
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -398,7 +398,7 @@ begin
   hr := pDevice.Activate(IID_IAudioMeterInformation,
                          CLSCTX_ALL,
                          Nil,
-                         pMeterInfo);
+                         Pointer(pMeterInfo));
   if FAILED(hr) then
     goto done;
 

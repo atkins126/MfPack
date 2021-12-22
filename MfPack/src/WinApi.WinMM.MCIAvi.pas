@@ -10,7 +10,7 @@
 // Release date: 17-05-2020
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Multimedia Systems Media Control Interface
 //              AVI driver external header file
 //
@@ -22,24 +22,24 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Depends on MMSYSTEM.H and WINDOWS.h
-//        	Version:	1.00
-//        	Date:		16-JUL-1992
+//          Version: 1.00
+//          Date: 16-JUL-1992
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
 //==============================================================================
-// Source: mciavi.h
+// Source: MciAvi.h
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //
@@ -66,7 +66,17 @@
 //==============================================================================
 unit WinApi.WinMM.MCIAvi;
 
+  {$MINENUMSIZE 4}
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
+  {$WEAKPACKAGEUNIT}
+
 interface
+
+  (*$HPPEMIT '#include <mciavi.h>' *)
 
 uses
   WinApi.WinMM.MCIApi;

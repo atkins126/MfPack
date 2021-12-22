@@ -21,7 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Pay close attention for supported platforms (ie Vista or Win 7/8/8.1/10).
@@ -32,7 +32,7 @@
 //          Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX301
 // Known Issues: -
 //
 // Compiler version: 23 up to 33

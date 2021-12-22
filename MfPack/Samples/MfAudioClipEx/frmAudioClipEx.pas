@@ -10,7 +10,7 @@
 // Release date: 21-12-2019
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description:
 //   This application demonstrates using the Media Foundation
 //   source reader to extract decoded audio from an audio/video file.
@@ -31,7 +31,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
@@ -41,8 +41,8 @@
 // Known Issues: The IMFSourceReader.ReadSample method eats a lot of CPU cycles and
 //               power on low latency file reading.
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -124,6 +124,7 @@ type
     Bevel1: TBevel;
     butExtract: TButton;
     butCancel: TButton;
+    butClose: TButton;
     procedure Exit1Click(Sender: TObject);
     procedure Open1Click(Sender: TObject);
     procedure Extractto1Click(Sender: TObject);
@@ -138,6 +139,7 @@ type
     procedure butCancelClick(Sender: TObject);
     procedure tbPriorityChange(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure butCloseClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -161,7 +163,6 @@ implementation
 
 procedure TAudioClipExFrm.Reset();
 begin
-  MfAudioClip.Free;
   tbPriority.Position := 10;
   butExtract.Enabled := False;
   butCancel.Enabled := False;
@@ -173,6 +174,8 @@ begin
   lblProgress.Caption := '';
   wSourceFile := Nil;
   wTargetFile := Nil;
+  if Assigned(MfAudioClip) then
+    FreeAndNil(MfAudioClip);
 end;
 
 
@@ -186,15 +189,30 @@ end;
 procedure TAudioClipExFrm.butExtractClick(Sender: TObject);
 var
   iClipLen: Integer;
+  hr: HResult;
 
 begin
+  hr := S_OK;
+
+  if (wSourceFile = Nil) or (wTargetFile = Nil) then
+    exit;
+
+  // Delete existing target
+  if FileExists(wTargetFile) then
+    DeleteFile(wTargetFile);
 
   if not Assigned(MfAudioClip) then
-    Exit;
+    MfAudioClip := TAudioClipClass.Create(Self.Handle,
+                                          wSourceFile,
+                                          hr);
+
+  if Failed(hr) then
+     Exit;
 
   if TryStrToInt(edClipDuration.Text, iClipLen) then
     begin
       butExtract.Enabled := False;
+      butClose.Enabled := False;
       MfAudioClip.Flushed := False;
       MfAudioClip.wcSourceFile := wSourceFile;
       MfAudioClip.wcTargetFile := wTargetFile;
@@ -215,6 +233,11 @@ begin
     end;
 end;
 
+
+procedure TAudioClipExFrm.butCloseClick(Sender: TObject);
+begin
+  Close();
+end;
 
 procedure TAudioClipExFrm.butCancelClick(Sender: TObject);
 begin
@@ -269,7 +292,7 @@ begin
       // If choosen the source as target, change it to wav
       if wSourceFile = Savedialog1.FileName then
         Savedialog1.FileName := ChangeFileExt(wSourceFile, '.wav');
-      // delete excisting target
+      // Delete existing target
       if FileExists(Savedialog1.FileName) then
         DeleteFile(Savedialog1.FileName);
 
@@ -277,6 +300,7 @@ begin
       wTargetFile := PWideChar(Savedialog1.FileName);
       butExtract.Enabled := True;
       butCancel.Enabled := True;
+      butClose.Enabled := False;
     end;
 end;
 
@@ -380,16 +404,16 @@ begin
         if Succeeded(HResult(Msg.lParam)) then
           begin
             lblProgress.Caption := 'Clip succesfully extracted.';
-
           end
         else
-          if HResult(Msg.lParam) = MF_E_NOTACCEPTING then
+          if HResult(Msg.lParam) = E_ABORT then  //$80004004
             lblProgress.Caption := 'Clip extraction aborted.'
         else
           lblProgress.Caption := 'Clip extraction failed!';
 
-        butExtract.Enabled := True;
+        butExtract.Enabled := False;
         butCancel.Enabled := False;
+        butClose.Enabled := True;
       end;
 end;
 

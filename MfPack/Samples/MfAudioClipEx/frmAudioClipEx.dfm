@@ -22,8 +22,8 @@ object AudioClipExFrm: TAudioClipExFrm
   PixelsPerInch = 96
   TextHeight = 13
   object lblGetSourceFile: TLabel
-    Left = 14
-    Top = 5
+    Left = 17
+    Top = 8
     Width = 63
     Height = 21
     Cursor = crHandPoint
@@ -148,8 +148,7 @@ object AudioClipExFrm: TAudioClipExFrm
     Height = 43
     Align = alBottom
     Shape = bsTopLine
-    ExplicitTop = 177
-    ExplicitWidth = 531
+    ExplicitTop = 178
   end
   object edClipDuration: TEdit
     Left = 86
@@ -177,8 +176,8 @@ object AudioClipExFrm: TAudioClipExFrm
     OnChange = tbPriorityChange
   end
   object prbProgress: TProgressBar
-    Left = 77
-    Top = 151
+    Left = 76
+    Top = 157
     Width = 448
     Height = 15
     ParentCustomHint = False
@@ -192,7 +191,7 @@ object AudioClipExFrm: TAudioClipExFrm
     Top = 188
     Width = 82
     Height = 26
-    Caption = 'Extract'
+    Caption = 'E&xtract'
     Enabled = False
     TabOrder = 3
     OnClick = butExtractClick
@@ -202,10 +201,20 @@ object AudioClipExFrm: TAudioClipExFrm
     Top = 188
     Width = 82
     Height = 26
-    Caption = 'Cancel'
+    Caption = '&Cancel'
     Enabled = False
     TabOrder = 4
     OnClick = butCancelClick
+  end
+  object butClose: TButton
+    Left = 183
+    Top = 188
+    Width = 82
+    Height = 26
+    Caption = 'C&lose'
+    Enabled = False
+    TabOrder = 5
+    OnClick = butCloseClick
   end
   object MainMenu1: TMainMenu
     Left = 207

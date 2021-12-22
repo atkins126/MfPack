@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.0.1
+// Revision Version: 3.1.0
 // Description: Requires Windows Vista or later.
 //              MfApi.pas is the unit containing the APIs for using the MF platform.
 //
@@ -22,9 +22,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
-// 10/10/2020 Tony                Fixed some issues, see updt 101020
-// 26/01/2021 Tony                Fixed MFT Register functions.
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
@@ -48,11 +46,11 @@
 //          Fields with a Common Type Specification.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -322,8 +320,8 @@ const
   //    Due to asynchronous nature of timers, application might still get a
   //    timer callback after MFCancelWorkItem has returned.
 
-  {$EXTERNALSYM MFCancelWorkItem}
   function MFCancelWorkItem(Key: MFWORKITEM_KEY): HResult; stdcall;
+  {$EXTERNALSYM MFCancelWorkItem}
   // Attempts to cancel an asynchronous operation that was scheduled with
   // MFScheduleWorkItem or MFScheduleWorkItemEx.
   // Parameters
@@ -336,7 +334,7 @@ const
   // Remarks
   //    Because work items are asynchronous, the work-item callback might still be
   //    invoked after MFCancelWorkItem is called.
-
+  //
   ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -413,7 +411,7 @@ type
 type
   PMfasyncWorkqueueType = ^MFASYNC_WORKQUEUE_TYPE;
   PMFASYNC_WORKQUEUE_TYPE = ^MFASYNC_WORKQUEUE_TYPE;
-  MFASYNC_WORKQUEUE_TYPE  = Dword;
+  MFASYNC_WORKQUEUE_TYPE  = DWord;
   {$EXTERNALSYM MFASYNC_WORKQUEUE_TYPE}
 const
   MF_STANDARD_WORKQUEUE      = 0;  // MF_STANDARD_WORKQUEUE: Work queue in a thread without Window
@@ -1098,7 +1096,7 @@ type
   PMF_TOPOSTATUS = ^MF_TOPOSTATUS;
   MF_TOPOSTATUS = (
 
-    MF_TOPOSTATUS_INVALID       = 0,      // MF_TOPOSTATUS_INVALID: Invalid value; will not be sent
+    MF_TOPOSTATUS_INVALID         = 0,    // MF_TOPOSTATUS_INVALID: Invalid value; will not be sent
 
 
     MF_TOPOSTATUS_READY           = 100,  // MF_TOPOSTATUS_READY: The topology has been put in place and is
@@ -1934,6 +1932,14 @@ const
   // $04 - Vertical Scanline
   MF_CAPTURE_METADATA_SCAN_DIRECTION                :  TGUID = '{6496a3ba-1907-49e6-b0c3-123795f380a9}'; // Type: UINT32
   {$EXTERNALSYM MF_CAPTURE_METADATA_SCAN_DIRECTION}
+  // Reports the current Digital Window as a DigitalWindowSetting structure.
+  MF_CAPTURE_METADATA_DIGITALWINDOW                 :  TGUID = '{276F72A2-59C8-4F69-97B4-068B8C0EC044}'; // Type: BLOB
+  {$EXTERNALSYM MF_CAPTURE_METADATA_DIGITALWINDOW}
+
+  // Reports the background segmentation mask BackgroundSegmentationMask structure.
+  // Refer to the KSCAMERA_METADATA_BACKGROUNDSEGMENTATIONMASK struct in ksmedia.h
+  MF_CAPTURE_METADATA_FRAME_BACKGROUND_MASK         :  TGUID = '{03F14DD3-75DD-433A-A8E2-1E3F5F2A50A0}'; // Type: BLOB
+  {$EXTERNALSYM MF_CAPTURE_METADATA_FRAME_BACKGROUND_MASK}
 
 
   MFCAPTURE_METADATA_SCAN_RIGHT_LEFT   =      $00000001;
@@ -1945,6 +1951,17 @@ const
 
 
 type
+
+  // Digital Window Region
+  PDigitalWindowSetting = ^tagDigitalWindowSetting;
+  tagDigitalWindowSetting = record
+    OriginX: Double;
+    OriginY: Double;
+    WindowSize: Double;
+  end;
+  {$EXTERNALSYM tagDigitalWindowSetting}
+  DigitalWindowSetting = tagDigitalWindowSetting;
+  {$EXTERNALSYM DigitalWindowSetting}
 
   PFaceRectInfoBlobHeader = ^FaceRectInfoBlobHeader;
   tagFaceRectInfoBlobHeader = record
@@ -2422,6 +2439,7 @@ const
 
 
   function MFGetPluginControl(out ppPluginControl: IMFPluginControl): HResult; stdcall;
+  {$EXTERNALSYM MFGetPluginControl}
   // Get the plugin control API
 
 
@@ -2525,9 +2543,11 @@ type
   // This function is an alias for function MAKEFOURCC defined in WinApi.MmReg.pas and WinApi.MediaFoundationApi.MfMetLib.pas
   tCh4 = array [0..3] of AnsiChar;
   function FCC(ch4: TCh4): DWord; inline;
+  {$EXTERNALSYM FCC}
 
   // Tony
   function DEFINE_MEDIATYPE_GUID(const format: DWord): TGuid; inline;
+  {$EXTERNALSYM DEFINE_MEDIATYPE_GUID}
   // Parameters
   // name
   //    The name of the GUID constant to be defined.
@@ -2683,6 +2703,12 @@ const
                                D3: $0010;
                                D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
   {$EXTERNALSYM MFVideoFormat_NV12}
+
+  MFVideoFormat_NV21: TGUID = (D1: Ord('N') or (Ord('V') shl 8) or (Ord('2') shl 16) or (Ord('1') shl 24);
+                               D2: $0000;
+                               D3: $0010;
+                               D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
+  {$EXTERNALSYM MFVideoFormat_NV21}
 
   MFVideoFormat_YV12: TGUID = (D1: Ord('Y') or (Ord('V') shl 8) or (Ord('1') shl 16) or (Ord('2') shl 24);
                                D2: $0000;
@@ -2976,6 +3002,28 @@ const
                                         D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
   {$EXTERNALSYM MFVideoFormat_A16B16G16R16F}
 
+{if (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3}
+   MFVideoFormat_VP10         : TGUID = (D1: Ord('V') or (Ord('P') shl 8) or (Ord('1') shl 16) or (Ord('0') shl 24);  // = D3DFMT_A16B16G16R16F = 113
+                                         D2: $0000;
+                                         D3: $0010;
+                                         D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
+
+   MFVideoFormat_AV1          : TGUID = (D1: Ord('A') or (Ord('V') shl 8) or (Ord('0') shl 16) or (Ord('1') shl 24);  // = D3DFMT_A16B16G16R16F = 113
+                                         D2: $0000;
+                                         D3: $0010;
+                                         D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
+
+{endif}
+
+{if NTDDI_VERSION >= NTDDI_WIN10_FE}
+   FVideoFormat_Theora        : TGUID = (D1: Ord('t') or (Ord('h') shl 8) or (Ord('e') shl 16) or (Ord('o') shl 24);
+                                         D2: $0000;
+                                         D3: $0010;
+                                         D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));  // {6F656874-0000-0010-8000-00AA00389B71}
+
+{endif NTDDI_VERSION >= NTDDI_WIN10_FE }
+
+
 
   //
   // MFSample Perception Date Type-specific attribute GUIDs should be in sync with KSCameraProfileSensorType
@@ -3198,6 +3246,26 @@ const
   {$EXTERNALSYM MFAudioFormat_Dolby_DDPlus}
   // == MEDIASUBTYPE_DOLBY_DDPLUS defined in wmcodecdsp.h
 
+  // AC-4 bitstream versions 0 and 1.
+  // This audio media type is normally used as an alternate media type (the primary being MFAudioFormat_Dolby_AC4)
+  // to allow a MFT to register support for only version 0 and 1 of the AC-4 bistream.
+  MFAudioFormat_Dolby_AC4_V1   :  TGUID = '{36b7927c-3d87-4a2a-9196-a21ad9e935e6}';
+
+  // AC-4 bitstream version 2. (Supports Immersive Stereo.)
+  // This audio media type is normally used as an alternate media type (the primary being MFAudioFormat_Dolby_AC4)
+  // to allow a MFT to register support for only version 2 of the AC-4 bistream.
+  MFAudioFormat_Dolby_AC4_V2   :  TGUID = '{7998b2a0-17dd-49b6-8dfa-9b278552a2ac}';
+
+  // This format is used for AC-4 streams that use ac4_syncframe and the optional crc
+  // at the end of each frame. The frames might not be aligned with IMFSample boundaries.
+  MFAudioFormat_Dolby_AC4_V1_ES:  TGUID = '{36b7927c-3d87-4a2a-9196-a21ad9e935e6}';
+
+  // {7e58c9f9-b070-45f4-8ccd-a99a0417c1ac}
+  // This format is used for AC-4 version 2 bit streams (may include Immersive Stereo) that use ac4_syncframe
+  // and the optional crc at the end of each frame. The frames might not be aligned with IMFSample boundaries.
+  MFAudioFormat_Dolby_AC4_V2_ES:  TGUID = '{7e58c9f9-b070-45f4-8ccd-a99a0417c1ac}';
+
+
   MFAudioFormat_Vorbis          :  TGUID = '{8D2FD10B-5841-4a6b-8905-588FEC1ADED9}';
   {$EXTERNALSYM MFAudioFormat_Vorbis}
   // {8D2FD10B-5841-4a6b-8905-588FEC1ADED9}
@@ -3300,14 +3368,11 @@ const
   // Binary Data MediaTypes
   //
 
-  //#ifndef DEFINE_BINARY_MEDIATYPMF_DEVICESTREAM_ATTRIBUTE_SECURE_CAPABILITYE_GUID
-  //#define DEFINE_BINARY_MEDIATYPE_GUID(name, format) \
-  //    DEFINE_GUID(name,                       \
-  //    format, 0xbf10, 0x48b4, 0xbc, 0x18, 0x59, 0x3d, 0xc1, 0xdb, 0x95, 0xf);
-  //#endif
+  MFBinaryFormat_Base             : TGUID = '{00000000-bf10-48b4-bc18-593dc1db950f}';
+  {$EXTERNALSYM MFBinaryFormat_Base}
 
-  //DEFINE_BINARY_MEDIATYPE_GUID(MFBinaryFormat_Base, 0x00000000);
-  //DEFINE_BINARY_MEDIATYPE_GUID(MFBinaryFormat_GPMD, 'gpmd');
+  MFBinaryFormat_GPMD             : TGUID = '{67706d64-bf10-48b4-bc18-593dc1db950f}';
+  {$EXTERNALSYM MFBinaryFormat_GPMD}
 
 
 //////////////////////  Media Type Attributes GUIDs ////////////////////////////
@@ -4515,6 +4580,11 @@ const
   FORMAT_MFVideoFormat                          : TGUID = '{aed4ab2d-7326-43cb-9464-c879cab9c43d}';
   {$EXTERNALSYM FORMAT_MFVideoFormat}
 
+{if WINVER >= _WIN32_WINNT_FE}
+  // {2C8FA20C-82BB-4782-90A0-98A2A5BD8EF8}
+  MFMediaType_Metadata                          : TGUID = '{2C8FA20C-82BB-4782-90A0-98A2A5BD8EF8}';
+{endif WINVER >= _WIN32_WINNT_FE}
+
 
 //////////////////////////////////  Media Type functions ///////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -4590,11 +4660,10 @@ const
                                              const pSubtype: TGUID): HResult; stdcall;
   {$EXTERNALSYM MFInitMediaTypeFromMPEG2VideoInfo}
 
-
-  function MFCalculateBitmapImageSize(pBMIH: BITMAPINFOHEADER;
-                                      const cbBufSize: UINT32;
-                                      out pcbImageSize: UINT32;
-                                      out pbKnown: Boolean): HResult; stdcall;
+  function MFCalculateBitmapImageSize({in} pBMIH: PBITMAPINFOHEADER;
+                                      {In} const cbBufSize: UINT32;
+                                      {Out} pcbImageSize: UINT32;
+                                      {Out_opt} pbKnown: PBOOL = Nil): HResult; stdcall;
   {$EXTERNALSYM MFCalculateBitmapImageSize}
 
   //////////////////////////////////////////////////////////////////////////////
@@ -4839,7 +4908,7 @@ const
   // These depend on BITMAPINFOHEADER being defined
   //===============================================
 
-  function MFCreateVideoMediaTypeFromBitMapInfoHeader(pbmihBitMapInfoHeader: BITMAPINFOHEADER;
+  function MFCreateVideoMediaTypeFromBitMapInfoHeader({in} pbmihBitMapInfoHeader: BITMAPINFOHEADER;
                                                       dwPixelAspectRatioX: DWORD;
                                                       dwPixelAspectRatioY: DWORD;
                                                       InterlaceMode: MFVideoInterlaceMode;
@@ -4847,10 +4916,9 @@ const
                                                       qwFramesPerSecondNumerator: QWORD;
                                                       qwFramesPerSecondDenominator: QWORD;
                                                       dwMaxBitRate: DWORD;
-                                                      out ppIVideoMediaType: IMFVideoMediaType): HRESULT; stdcall;
+                                                      out ppIVideoMediaType: PIMFVideoMediaType): HRESULT; stdcall;
   {$EXTERNALSYM MFCreateVideoMediaTypeFromBitMapInfoHeader}
-  // This function is not implemented.
-  //
+
   // Parameters
   // pbmihBitMapInfoHeader
   //    Reserved.
@@ -4941,7 +5009,7 @@ const
   //=============================================
 
 
-  function MFCreateVideoMediaTypeFromBitMapInfoHeaderEx(pbmihBitMapInfoHeader: BITMAPINFOHEADER;
+  function MFCreateVideoMediaTypeFromBitMapInfoHeaderEx({in} zpbmihBitMapInfoHeader: BITMAPINFOHEADER;
                                                         cbBitMapInfoHeader: UINT32;
                                                         dwPixelAspectRatioX: DWORD;
                                                         dwPixelAspectRatioY: DWORD;

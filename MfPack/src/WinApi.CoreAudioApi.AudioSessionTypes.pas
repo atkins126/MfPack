@@ -10,7 +10,7 @@
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Type definitions used by the audio session manager RPC/COM interfaces.
 //
 // Organisation: FactoryX
@@ -21,7 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Pay close attention for supported platforms (ie Vista or Win 7/8/8.1/10).
@@ -33,11 +33,11 @@
 //          Requires Windows Vista or later.
 // 
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -112,6 +112,9 @@ type
   // Speech                  - Speech recognition
   // Media                   - Music, Streaming audio
   // Movie                   - Video with audio
+  // FarFieldSpeech          - Capture of far field speech
+  // UniformSpeech           - Uniform, device agnostic speech processing
+  // VoiceTyping             - Dictation, typing by voice
   // Other                   - All other streams (default)
   //
   // IMPORTANT NOTES:
@@ -137,7 +140,12 @@ type
     AudioCategory_GameChat                = 8,
     AudioCategory_Speech                  = 9,
     AudioCategory_Movie                   = 10,
-    AudioCategory_Media                   = 11
+    AudioCategory_Media                   = 11,
+{if NTDDI_VERSION >= NTDDI_WIN10_FE}
+    AudioCategory_FarFieldSpeech          = 12,
+    AudioCategory_UniformSpeech           = 13,
+    AudioCategory_VoiceTyping             = 14
+{endif}
   );
   {$EXTERNALSYM _AUDIO_STREAM_CATEGORY}
   AUDIO_STREAM_CATEGORY = _AUDIO_STREAM_CATEGORY;

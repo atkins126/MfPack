@@ -10,7 +10,7 @@
 // Release date: 04-06-2016
 // Language: ENU
 //
-// Version: 2.6.5
+// Version: 3.0.2
 // Description: Media Type Debugging Code Methods
 //
 // Company: FactoryX
@@ -22,21 +22,19 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/05/2020                     Kraftwerk release. (WIN10 May 2020 update, version 2004)
-//                                #1 Autobahn
-// 10/08/2020 All                 #2 => #2b The Model
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks:
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 // Todo: -
 // =============================================================================
-// Source: MSDN - Media Type Debugging Code
+// Source: MS Docs - Media Type Debugging Code
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //==============================================================================

@@ -9,7 +9,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Version: 3.0.0
+// Version: 3.1.0
 // Description: Requires Windows 7 or later.
 //              This unit is used as fullscreen layer, if not using the EVR's
 //              fullscreen option which is deprecated.
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
-// Related objects: MfPack Samples 2.6.4
-// Related projects: MfPackX264
+// Related objects: MfPack Samples 3.1.0
+// Related projects: MfPackX310
 // Known Issues: -
-// Compiler version: 23 up to 33
+// Compiler version: 23 up to 34
 // TODO: -
-// SDK version: 10.0.19041.0
+// SDK version: 10.0.22000.0
 // =============================================================================
 // Source: -
 //

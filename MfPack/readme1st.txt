@@ -1,13 +1,12 @@
-MfPack X 3.0.0 
-Enigma release #3.
+MfPack X 3.1.0
 
 NOTES: 
- - This release is updated for compiler version 17 up to 33.
- - SDK version 10.0.19041.0 (May 2020 Win10 update (2004))
- - Requires Windows 8 or later.
+ - This release is updated for compiler version 17 up to 34.
+ - SDK version 10.0.22000.0
+ - Requires Windows 10 or later.
 
 First release date: 04-06-2012
-Final release date: 02-01-2021
+Final release date: 28-10-2021
 
 Copyright © FactoryX. All rights reserved.
 

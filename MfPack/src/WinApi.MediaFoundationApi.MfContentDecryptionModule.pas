@@ -10,7 +10,7 @@
 // Release date: 28-07-2020
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Definitions for kernel mode code OPM communication.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: NTDDI_VERSION >= NTDDI_WIN10_VB
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -208,7 +208,7 @@ type
 
     // Creates an IMFTrustedInput object that implements the decryption of content.
     // ContentInitData will only be used if initData from
-    // IMFContentDecryptionModuleSession::RequestAccess is not provided or incomplete.
+    // IMFContentDecryptionModuleSession.GenerateRequest is not provided or incomplete.
     // Initialization Data should be structured in PSSH Box Format. For more details, see
     // https://www.w3.org/TR/eme-initdata-cenc/#common-system
     function CreateTrustedInput(contentInitData: PByte;

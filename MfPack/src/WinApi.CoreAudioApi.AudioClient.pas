@@ -5,12 +5,12 @@
 // Project: MfPack - CoreAudio - WASAPI
 // Project location: https://sourceforge.net/projects/MFPack
 //                   https://github.com/FactoryXCode/MfPack
-// Module: MfPack.AudioClient.pas
+// Module: WinApi.CoreAudioApi.AudioClient.pas
 // Kind: Pascal / Delphi unit
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.0.1
+// Revision Version: 3.1.0
 // Description: AudioClient API interface definition.
 //
 // Organisation: FactoryX
@@ -21,18 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
-// 08/12/2020 Tony                Added updates from SDK 10.0.19041.0 (IAudioClient 2 & 3)
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -69,8 +68,8 @@ uses
   WinApi.WinApiTypes,
   WinApi.WinError,
   WinApi.WinMM.MMReg,  // for WAVEFORMATEX
-  WinApi.AudioMediaType,
   {CoreAudioApi}
+  WinApi.CoreAudioApi.AudioMediaType,
   WinApi.CoreAudioApi.AudioSessionTypes;
 
 
@@ -246,6 +245,13 @@ type
   {$EXTERNALSYM AudioClient3ActivationParams}
   TAudioClient3ActivationParams = AudioClient3ActivationParams;
 
+  //
+  PAUDIO_DUCKING_OPTIONS = ^AUDIO_DUCKING_OPTIONS;
+  {$EXTERNALSYM AUDIO_DUCKING_OPTIONS}
+  AUDIO_DUCKING_OPTIONS                             = (
+    AUDIO_DUCKING_OPTIONS_DEFAULT                   = $00,
+    AUDIO_DUCKING_OPTIONS_DO_NOT_DUCK_OTHER_STREAMS = $01
+  );
 
 
   // Interfaces ////////////////////////////////////////////////////////////////
@@ -481,7 +487,7 @@ type
 
     function IsFormatSupported(const ShareMode: AUDCLNT_SHAREMODE;
                                const pFormat: PWaveFormatEx;
-                               {out} ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to Nil.
+                               const ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to Nil.
                                ): HResult; stdcall;
     // Description:
     //
@@ -518,8 +524,8 @@ type
     //     S_OK                         if format is supported.
     //     S_FALSE                      if input format is not supported but ppClosestMatch is.
     //     E_POINTER                    if ppClosestMatch is Nil & AUDCLNT_SHAREMODE_SHARED.
-    //     E_INVALIDTYPE                if type isn't supported. NOTE: This error is wrongly documented as AUDCLNT_E_INVALIDTYPE.
-    //     AUDCLNT_E_DEVICE_INVALIDATED if WAS device was removed. NOTE: This error is wrongly documented as AUDCLNT_E_DEVICEINVALIDATED.
+    //     AUDCLNT_E_UNSUPPORTED_FORMAT if the offload connector is used and input format is not a compressed format.
+    //     AUDCLNT_E_DEVICE_INVALIDATED if WAS device was removed.
     //
     // Remarks:
     //
@@ -630,7 +636,7 @@ type
     //
     //    S_OK if successful, failure otherwise.
     //    AUDCLNT_E_NOT_INITIALIZED if client hasn't been successfully initialized.
-    //    AUDCLNT_E_STOPPED if client is already stopped.
+    //    S_FALSE if client is already stopped.
     //    AUDCLNT_E_DEVICE_INVALIDATED, if WAS device format was changed or device was removed.
     //
     // Remarks:
@@ -711,13 +717,16 @@ type
     //
     //  The services supported via the method are:
     //
-    //  IAudioRenderClient
-    //  IAudioCaptureClient
-    //  IAudioClock
-    //  IAudioSessionControl
-    //  ISimpleAudioVolume
-    //  IChannelAudioVolume
+    //    IAudioRenderClient
+    //    IAudioCaptureClient
+    //    IAudioClock
+    //    IAudioSessionControl
+    //    ISimpleAudioVolume
+    //    IChannelAudioVolume
+    //    IAudioClientDuckingControl
+    //    IAudioEffectsManager
     //
+
   end;
   IID_IAudioClient = IAudioClient;
   {$EXTERNALSYM IID_IAudioClient}
@@ -755,7 +764,7 @@ type
     // Remarks:
     //
 
-    function SetClientProperties(pProperties: AudioClientProperties): HResult; stdcall;
+    function SetClientProperties(const pProperties: AudioClientProperties): HResult; stdcall;
     // Description:
     //
     //  This method is called to set an audio stream's properties, before a call to IAudioClient.Initialize takes place.
@@ -962,11 +971,11 @@ type
     // Return Values:
     //
     //     S_OK if successful, error otherwise.
-    //     AUDCLNT_E_BUFFERTOOLARGE, if NumFramesRequested > (GetBufferSize() - GetCurrentPadding())
-    //     AUDCLNT_E_OUTOFORDER, if called while a previous IAudioRenderClient::GetBuffer() is still
+    //     AUDCLNT_E_BUFFER_TOO_LARGE, if NumFramesRequested > (GetBufferSize() - GetCurrentPadding())
+    //     AUDCLNT_E_OUT_OF_ORDER, if called while a previous IAudioRenderClient.GetBuffer() is still
     //     in effect.
-    //     AUDCLNT_E_DEVICEINVALIDATED, if WAS device format was changed or device was removed,
-    //     E_POINTER, if ppData is NULL.
+    //     AUDCLNT_E_DEVICE_INVALIDATED, if WAS device format was changed or device was removed,
+    //     E_POINTER, if ppData is Nil.
     //
     // Remarks:
     //
@@ -988,7 +997,7 @@ type
     // 'pFormat' in the annotation below refers to the WAVEFORMATEX structure used to initialize IAudioClient.
     //
     function GetBuffer(const NumFramesRequested: UINT;
-                       out ppData: PByte): HResult; stdcall;    // modified by Jacob C
+                       {out} ppData: PByte): HResult; stdcall;    // modified by Jacob C
 
     //-------------------------------------------------------------------------
     // Description:
@@ -1016,8 +1025,8 @@ type
     //      S_OK if successful, error otherwise.
     //      E_FAIL, if FramesWritten > count requested in previous GetBuffer() call.
     //      E_INVALIDARG, if invalid flag was used.
-    //      AUDCLNT_E_OUTOFORDER, if previous IAudioRenderClient streaming call wasn't GetBuffer().
-    //      AUDCLNT_E_DEVICEINVALIDATED, if WAS device format was changed or device was removed.
+    //      AUDCLNT_E_OUT_OF_ORDER, if previous IAudioRenderClient streaming call wasn't GetBuffer().
+    //      AUDCLNT_E_DEVICE_INVALIDATED, if WAS device format was changed or device was removed.
     //
     // Remarks:
     //      Please note: This function is a "finalizer".  As such,
@@ -1076,7 +1085,7 @@ type
     // Return values:
     //
     //      S_OK if successful, error otherwise.
-    //      AUDCLNT_E_OUTOFORDER, if called while a previous IAudioCaptureClient::GetBuffer()
+    //      AUDCLNT_E_OUT_OF_ORDER, if called while a previous IAudioCaptureClient::GetBuffer()
     //      is still in effect.
     //      AUDCLNT_S_BUFFEREMPTY, if called when there's no available capture data. Note that
     //      this is a success code that the content of pFrameCount will be 0 in this case.
@@ -1128,7 +1137,7 @@ type
     //
     //      S_OK if successful, error otherwise.
     //      E_INVALIDARG, if NumFramesRead <> [ value in buffer or 0 ].
-    //      AUDCLNT_E_OUTOFORDER, if previous IAudioCaptureClient streaming call wasn't GetBuffer().
+    //      AUDCLNT_E_OUT_OF_ORDER, if previous IAudioCaptureClient streaming call wasn't GetBuffer().
     //      AUDCLNT_E_DEVICE_INVALIDATED, if WAS device format was changed or device was removed.
     //
     // Remarks:
@@ -1153,7 +1162,7 @@ type
     //
     //    S_OK if successful, failure otherwise.
     //    AUDCLNT_E_DEVICE_INVALIDATED, if WAS device format was changed or device was removed.
-    //    E_POINTER, if pNumFramesInNextPacket is NULL.
+    //    E_POINTER, if pNumFramesInNextPacket is Nil.
     //
     // Remarks:
     //
@@ -1447,6 +1456,89 @@ type
   end;
   IID_ISimpleAudioVolume = ISimpleAudioVolume;
   {$EXTERNALSYM IID_ISimpleAudioVolume}
+
+
+
+  // Interface IAudioClientDuckingControl
+  // ====================================
+  // Description: IAudioClientDuckingControl interface
+  // Use IAudioClient.GetService to obtain this interface.
+  //
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioClientDuckingControl);'}
+  {$EXTERNALSYM IAudioClientDuckingControl}
+  IAudioClientDuckingControl = interface(IUnknown)
+  ['{C789D381-A28C-4168-B28F-D3A837924DC3}']
+    function SetDuckingOptionsForCurrentStream({in} options: AUDIO_DUCKING_OPTIONS): HResult; stdcall;
+    // Description:
+    //
+    // Set the AUDIO_DUCKING_OPTIONS_DO_NOT_DUCK_OTHER_STREAMS flag to disable any
+    // ducking that may be caused by the current stream.
+    // Specifying AUDIO_DUCKING_OPTIONS_DEFAULT lets Windows control if
+    // this stream should cause any other streams to be ducked.
+    //
+    // Return values:
+    //
+    // S_OK Successful completion.
+    //
+
+  end;
+  IID_IAudioClientDuckingControl = IAudioClientDuckingControl;
+  {$EXTERNALSYM IID_IAudioClientDuckingControl}
+
+
+  AUDIO_EFFECT_STATE = (
+                        AUDIO_EFFECT_STATE_OFF = 0,
+                        AUDIO_EFFECT_STATE_ON
+                       );
+ {$EXTERNALSYM AUDIO_EFFECT_STATE}
+
+
+  PAUDIO_EFFECT = ^AUDIO_EFFECT;
+  {$EXTERNALSYM AUDIO_EFFECT}
+  AUDIO_EFFECT = record
+    id: TGUID;
+    canSetState: BOOL;
+    state: AUDIO_EFFECT_STATE;
+  end;
+
+
+
+  // Interface IAudioEffectsChangedNotificationClient
+  // ================================================
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioEffectsChangedNotificationClient);'}
+  {$EXTERNALSYM IAudioEffectsChangedNotificationClient}
+  IAudioEffectsChangedNotificationClient = interface(IUnknown)
+  ['{A5DED44F-3C5D-4B2B-BD1E-5DC1EE20BBF6}']
+    function OnAudioEffectsChanged(): HRESULT; stdcall;
+  end;
+  IID_IAudioEffectsChangedNotificationClient = IAudioEffectsChangedNotificationClient;
+  {$EXTERNALSYM IID_IAudioEffectsChangedNotificationClient}
+
+
+  // Interface IAudioEffectsManager
+  // ==============================
+  // Use IAudioClient.GetService to obtain this interface.
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioEffectsChangedNotificationClient);'}
+  {$EXTERNALSYM IAudioEffectsChangedNotificationClient}
+  IAudioEffectsManager = interface(IUnknown)
+  ['{4460B3AE-4B44-4527-8676-7548A8ACD260}']
+
+    function RegisterAudioEffectsChangedNotificationCallback(client: IAudioEffectsChangedNotificationClient): HRESULT; stdcall;
+
+    function UnregisterAudioEffectsChangedNotificationCallback(client: IAudioEffectsChangedNotificationClient): HRESULT; stdcall;
+
+    function GetAudioEffects({out} effects: PAUDIO_EFFECT;
+                             {out} numEffects: UINT32): HRESULT; stdcall;
+
+    function SetAudioEffectState(effectId: TGUID;
+                                 state: AUDIO_EFFECT_STATE): HRESULT; stdcall;
+
+  end;
+  IID_IAudioEffectsManager = IAudioEffectsManager;
+  {$EXTERNALSYM IID_IAudioEffectsManager}
 
 
   // Interface IAudioStreamVolume
@@ -1801,7 +1893,7 @@ const
 
   // error codes
 
-  // FACILITY_AUDCLNT = $889 (2185), defined in WinApi.WinError.pas
+  // FACILITY_AUDCLNT = 2185, defined in WinApi.WinError.pas
 
   // Since XE2 you have to hardcode this.
 
@@ -1877,24 +1969,28 @@ const
   {$EXTERNALSYM AUDCLNT_E_HEADTRACKING_ENABLED}
   AUDCLNT_E_HEADTRACKING_UNSUPPORTED      = $88890040;  //AUDCLNT_ERR($040)
   {$EXTERNALSYM AUDCLNT_E_HEADTRACKING_UNSUPPORTED}
+  AUDCLNT_E_EFFECT_NOT_AVAILABLE          = $88890041;  //AUDCLNT_ERR($041)
+  {$EXTERNALSYM AUDCLNT_E_EFFECT_NOT_AVAILABLE}
+  AUDCLNT_E_EFFECT_STATE_READ_ONLY        = $88890042;  //AUDCLNT_ERR($042)
+  {$EXTERNALSYM AUDCLNT_E_EFFECT_STATE_READ_ONLY}
 
-  AUDCLNT_S_BUFFER_EMPTY                  = $88900001;  //AUDCLNT_SUCCESS($001);
+  AUDCLNT_S_BUFFER_EMPTY                  = $88890001;  //AUDCLNT_SUCCESS($001)
   {$EXTERNALSYM AUDCLNT_S_BUFFER_EMPTY}
-  AUDCLNT_S_THREAD_ALREADY_REGISTERED     = $88900002;  //AUDCLNT_SUCCESS($002);
+  AUDCLNT_S_THREAD_ALREADY_REGISTERED     = $88890002;  //AUDCLNT_SUCCESS($002)
   {$EXTERNALSYM AUDCLNT_S_THREAD_ALREADY_REGISTERED}
-  AUDCLNT_S_POSITION_STALLED              = $88900003;  //AUDCLNT_SUCCESS($003);
+  AUDCLNT_S_POSITION_STALLED              = $88890003;  //AUDCLNT_SUCCESS($003)
   {$EXTERNALSYM AUDCLNT_S_POSITION_STALLED}
 
   {See: IAudioSessionControl2 interface}
-  AUDCLNT_S_NO_SINGLE_PROCESS             = $8890000D;  //AUDCLNT_SUCCESS($00D);
+  AUDCLNT_S_NO_SINGLE_PROCESS             = $8889000D;  //AUDCLNT_SUCCESS($00D)
   {$EXTERNALSYM AUDCLNT_S_NO_SINGLE_PROCESS}
 
 
   // Additional Prototypes for ALL interfaces
 
   // Remarks: HRESULTs are signed 4-byte integers.
-  //          AUDCLNT_ERR is a macro that returns an integer of the format $8889000 + x.
-  //          Example: AUDCLNT_ERR($001) will result in $88890001.
+  //          AUDCLNT_ERR is a macro that returns an integer of the format $8890000 + x.
+  //          Example: AUDCLNT_ERR($001) will result in $88900001.
   function AUDCLNT_ERR(n: LongInt): HRESULT;
   function AUDCLNT_SUCCESS(n: LongInt): HRESULT;
 

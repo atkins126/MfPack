@@ -10,7 +10,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Version: 3.0.1
+// Version: 3.1.0
 // Description: Floating form that projects TimedText.
 //
 //
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -390,6 +390,7 @@ begin
                                      LOGPIXELSX);
   Result.LogPixelsY := GetDeviceCaps(dc,
                                      LOGPIXELSY);
+  ReleaseDc(Handle, dc);
 end;
 
 
@@ -420,8 +421,10 @@ begin
       label1.Caption := 'Position : ' + IntToStr(MfPlayerX.Position) +
                         '   Start : ' + IntToStr(fTimedText.Track.Start) +
                         '   Stop : ' + IntToStr(fTimedText.Track.Stop);
-      label2.Caption := 'TrackID: ' + IntToStr(fTimedText.TrackIndex) +
-                        '   First textline: ' + fTimedText.Track.TrackText[0].TextLine;
+
+      if (length(fTimedText.Track.TrackText) > 0) then
+        label2.Caption := 'TrackID: ' + IntToStr(fTimedText.TrackIndex) +
+                          '   First textline: ' + fTimedText.Track.TrackText[0].TextLine;
 
 
       // Keep the starting of a subtitle within a range, because the clock jitter makes the timer a bit inacurate.

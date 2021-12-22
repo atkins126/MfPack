@@ -10,7 +10,7 @@
 // Release date: 04-10-2020
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: WasApi threaded capture class.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Note that this sample requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -61,18 +61,24 @@ unit WasapiChat;
 interface
 
 uses
+  {Winapi}
   WinApi.Windows,
   WinApi.Messages,
   WinApi.WinApiTypes,
   WinApi.ComBaseApi,
-  WinApi.WinMM.MMReg,
-  WinApi.WinMM.MMSysCom,
-  WinApi.CoreAudioApi.MMDeviceAPI,
-  WinApi.CoreAudioApi.AudioClient,
-  WinApi.MediaFoundationApi.MfUtils,
-  WinApi.CoreAudioApi.AudioSessionTypes,
+  {System}
   System.Classes,
   System.SysUtils,
+  {WinMM}
+  WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMSysCom,
+  {CoreAudioApi}
+  WinApi.CoreAudioApi.MMDeviceAPI,
+  WinApi.CoreAudioApi.AudioClient,
+  WinApi.CoreAudioApi.AudioSessionTypes,
+  {MediaFoundationApi}
+  WinApi.MediaFoundationApi.MfUtils,
+  {Application}
   ChatTransport;
 
 type
@@ -308,7 +314,7 @@ begin
   SafeRelease(_AudioClient);
   SafeRelease(_RenderClient);
   SafeRelease(_CaptureClient);
-  //DeAllocateHWnd(hwndWasApiChat);
+  DeAllocateHWnd(hwndWasApiChat);
 end;
 
 destructor CWasapiChat.Destroy();
@@ -333,11 +339,12 @@ var
 begin
   Result := True;
   hThreadId := 0;
+  PData := Nil;
 
   hr := _ChatEndpoint.Activate(IID_IAudioClient,
                                CLSCTX_INPROC_SERVER,
                                Nil,
-                               _AudioClient);
+                               Pointer(_AudioClient));
   if FAILED(hr) then
     begin
       MessageBox(_AppWindow,

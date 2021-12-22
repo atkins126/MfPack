@@ -10,7 +10,7 @@
 // Release date: 30-04-2019
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 //
 // Description: Direct2D: Hardware-accelerated, immediate-mode, 2-D graphics API that
 //              provides high performance and high-quality rendering for 2-D geometry,
@@ -24,17 +24,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -1878,7 +1878,7 @@ type
     function GetDC(mode: D2D1_DC_INITIALIZE_MODE;
                    out hdc: HDC): HResult; stdcall;
 
-    function ReleaseDC(update: TRECT): HResult; stdcall;
+    function ReleaseDC(update: PRECT): HResult; stdcall;
 
   end;
   IID_ID2D1GdiInteropRenderTarget = ID2D1GdiInteropRenderTarget;
@@ -1895,7 +1895,7 @@ type
   ['{1c51bc64-de61-46fd-9899-63a5d8f03950}']
 
     function BindDC(hDC: HDC;
-                    pSubRect: TRECT): HResult; stdcall;
+                    pSubRect: PRECT): HResult; stdcall;
 
   end;
   IID_ID2D1DCRenderTarget = ID2D1DCRenderTarget;

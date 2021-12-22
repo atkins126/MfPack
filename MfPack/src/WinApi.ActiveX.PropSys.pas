@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description:
 //
 // Organisation: FactoryX
@@ -22,17 +22,18 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/09/2021 All                 Updated to 10.0.20348.0
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -373,6 +374,7 @@ type
   // Interface IPropertyStore
   // ========================
   //
+  PIPropertyStore = ^IPropertyStore;
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IPropertyStore);'}
   {$EXTERNALSYM IPropertyStore}
    IPropertyStore = interface(IUnknown)

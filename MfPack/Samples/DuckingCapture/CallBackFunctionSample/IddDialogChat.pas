@@ -10,14 +10,14 @@
 // Release date: 04-10-2020
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Ducking Capture dialog that defines the entry point for the application.
 //
 //              WIN32 APPLICATION : Ducking Capture Sample Project Overview
 //              ================================================================
 //
 //              This sample implements a simple "Chat" that demonstrates to the "ducking"
-//              feature in Windows 7. It simply captures samples from the sound card and
+//              feature in Windows 7 and higher. It simply captures samples from the sound card and
 //              discards them.
 //
 // Organisation: FactoryX
@@ -28,17 +28,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Note that this sample requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -68,17 +68,22 @@ unit IddDialogChat;
 interface
 
 uses
+  {Winapi}
   Winapi.Windows,
   Winapi.Messages,
+  {System}
   System.SysUtils,
   System.Classes,
+  {WinMM}
   WinApi.WinMM.MMeApi,
   WinApi.WinMM.MMSysCom,
+  {Vcl}
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  {Application}
   ChatTransport;
 
 // Global Variables:
@@ -109,6 +114,7 @@ type
     procedure btnChatStopClick(Sender: TObject);
     procedure cbxChatTransportChange(Sender: TObject);
     procedure rbtCaptureClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
 
@@ -311,6 +317,18 @@ begin
 
   //  Simulate a "stop" event to get the UI in sync.
   SyncUIState(ChatStateNotPlaying);
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  if Assigned(g_CurrentChat) then
+    begin
+      g_CurrentChat.StopChat();
+      g_CurrentChat.Shutdown();
+      g_CurrentChat.Free;
+      g_CurrentChat := nil;
+    end;
+  Close;
 end;
 
 //

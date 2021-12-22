@@ -10,18 +10,18 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.0.1
+// Revision Version: 3.1.0
 // Description: -
 //
 // Organisation: FactoryX
 // Initiator(s): Tony (maXcomX), Peter (OzShips)
-// Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships), (Ciaran), (topPlay)
+// Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships), Ciaran, (topPlay)
 //
 //------------------------------------------------------------------------------
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later (See: Remarks).
@@ -30,11 +30,11 @@
 //                   IUnknown(Pointer), IUnknown(Object), IUnknown(Nil) etc.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -326,7 +326,7 @@ type
   // The MF Source Reader provides a simple programming model that allows
   // applications to easily access multimedia content from files or devices.
   //
-  // NOTE:  THIS, AS IS IN HEADERSEQUENCE DIFFERS FROM MSDN!
+  // NOTE:  THIS, AS IS IN HEADERSEQUENCE DIFFERS FROM Microsoft Docs!
   //
   PIMFSourceReader = ^IMFSourceReader;
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFSourceReader);'}
@@ -664,7 +664,7 @@ type
                                                out ppSourceReader: IMFSourceReader): HResult; stdcall;
   {$EXTERNALSYM MFCreateSourceReaderFromMediaSource}
 
-  function MFCreateSinkWriterFromURL(pwszOutputURL: LPCWSTR;
+  function MFCreateSinkWriterFromURL(const pwszOutputURL: WideString;
                                      pByteStream: IMFByteStream;
                                      pAttributes: IMFAttributes;
                                      out ppSinkWriter: IMFSinkWriter): HResult; stdcall;

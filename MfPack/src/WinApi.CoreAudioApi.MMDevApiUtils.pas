@@ -10,7 +10,7 @@
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.0.1
+// Revision Version: 3.1.0
 // Description: MMDevApiUtils, Device api helper routines >= Win 8
 //
 // Organisation: FactoryX
@@ -21,8 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
-// 18/01/2021 Tony                Corrected some pointer issues.
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Pay close attention for supported platforms (ie Vista or Win 7/8/8.1/10).
@@ -33,11 +32,11 @@
 //          Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX301
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -161,7 +160,7 @@ type
 
     constructor Create(flow: eDataFlow;
                        role: eRole;
-                       pAudioEvents: IAudioSessionEvents);
+                       AudioEvents: IAudioSessionEvents);
 
     destructor Destroy; override;
 
@@ -273,7 +272,7 @@ implementation
 // Constructor
 constructor TAudioVolumeEvents.Create(flow: EDataFlow;
                                       role: ERole; 
-                                      pAudioEvents: IAudioSessionEvents);
+                                      AudioEvents: IAudioSessionEvents);
 var
   pEnumerator: IMMDeviceEnumerator;
   pDevice: IMMDevice;
@@ -284,7 +283,7 @@ begin
   hrStatus := S_OK;
   pManager := Nil;
   pControl := Nil;
-  pAudioEvents := pAudioEvents;
+  pAudioEvents := AudioEvents;
 
 try
 

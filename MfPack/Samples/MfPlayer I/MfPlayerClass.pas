@@ -10,7 +10,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Version: 3.0.0
+// Version: 3.1.0
 // Description: This is the basic class of MfPlayer,
 //              containing the necessary methodes to play a mediafile
 //              For indepth information see the included examples (CPlayer)
@@ -25,18 +25,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //          This sample shows how to implement the TInterfacedObject.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -845,6 +845,8 @@ begin
   if Assigned(m_pSession) then
     begin
       hr := m_pSession.ClearTopologies();
+      if Failed(hr) then
+        raise Exception.Create('Error ' + SysErrorMessage(hr));
       hr := m_pSession.Shutdown();
     end;
 
@@ -1290,7 +1292,6 @@ var
   rcd: LPRECT; //NRECT is a Normalised RECT (In C++ defined as RECT)
 
 begin
-
   hr := S_OK;
   // release any previous instance of the m_pVideoDisplay interface
   SafeRelease(m_pVideoDisplay);
@@ -1316,7 +1317,7 @@ try
           if Winapi.Windows.GetClientRect(m_hwndVideo, rc) then
             begin
               CopyTRectToLPRect(rc, rcD);
-              hr := m_pVideoDisplay.SetAspectRatioMode(DWord(MFVideoARMode_PreservePicture));
+              hr := m_pVideoDisplay.SetAspectRatioMode(MFVideoARMode_PreservePicture);
               if FAILED(hr) then
                 raise Exception.Create('SetAspectRatioMode failed!');
               hr := m_pVideoDisplay.SetVideoPosition(nil, rcd);
@@ -1335,6 +1336,7 @@ except
   Raise;
 end;
 finally
+  rcd := Nil;
   Result := hr;
 end;
 end;
@@ -1672,6 +1674,7 @@ begin
 
       // Start repaint again
       SetRedraw();
+      rcpdest := Nil;
       Result := hr;
     end;
 end;

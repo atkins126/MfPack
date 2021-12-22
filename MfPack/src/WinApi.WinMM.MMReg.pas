@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.0.0
+// Revision Version: 3.1.0
 // Description: Multimedia Registration
 //
 // Organisation: FactoryX
@@ -21,18 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Delphi : The IUnknown entries of functions should be casted like this:
 //          IUnknown(Pointer), IUnknown(Object), IUnknown(Nil) etc.
 // 
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -59,16 +59,6 @@
 // =============================================================================
 unit WinApi.WinMM.MMReg;
 
-  {$HPPEMIT '#include "mmreg.h"'}
-
-interface
-
-uses
-  {WinApi}
-  WinApi.Windows,
-  WinApi.WinMM.MMiscApi,
-  WinApi.WinMM.MMeApi;
-
   {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
@@ -77,6 +67,17 @@ uses
   {$ELSE}
     {$ALIGN 8} // Win64
   {$ENDIF}
+
+interface
+
+  {$HPPEMIT '#include "mmreg.h"'}
+
+uses
+  {WinApi}
+  WinApi.Windows,
+  WinApi.WinMM.MMiscApi,
+  WinApi.WinMM.MMeApi;
+
 
 
 // Define the following to skip definitions

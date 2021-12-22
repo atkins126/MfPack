@@ -9,7 +9,7 @@
 // Release date: 08-03-2019
 // Language: ENU
 //
-// Version: 3.0.1
+// Version: 3.1.0
 //
 // Description: Manages the Direct3D device.
 //
@@ -21,18 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
-// 27/01/2021 Tony                Fixed procedure TransformImage_NV12.
+// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX300
+// Related projects: MfPackX310
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 34
+// SDK version: 10.0.22000.0
 //
 // Todo: -
 //
@@ -435,11 +434,11 @@ label
 
 begin
 
-  subtype:= GUID_NULL;
-  PAR:= Default(MFRatio);
+  subtype := GUID_NULL;
+  PAR := Default(MFRatio);
 
   // Find the video subtype.
-  hr:= pType.GetGUID(MF_MT_SUBTYPE,
+  hr := pType.GetGUID(MF_MT_SUBTYPE,
                      subtype);
 
   if FAILED(hr) then
@@ -448,7 +447,7 @@ begin
   // Choose a conversion function.
   // (This also validates the format type.)
 
-  hr:= SetConversionFunction(subtype);
+  hr := SetConversionFunction(subtype);
 
   if FAILED(hr) then
     goto done;
