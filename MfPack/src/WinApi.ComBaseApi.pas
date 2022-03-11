@@ -10,7 +10,7 @@
 // Release date: 08-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.0
+// Revision Version: 3.1.1
 // Description: Base Component Object Model defintions.
 //
 // Organisation: FactoryX
@@ -26,7 +26,7 @@
 //
 // Remarks:
 // Related objects: -
-// Related projects: MfPackX310
+// Related projects: MfPackX311
 // Known Issues: -
 //
 // Compiler version: 23 up to 34
@@ -290,7 +290,7 @@ const
 
   function CoGetDefaultContext(aptType: APTTYPE;
                                const riid: TGUID;
-                               out ppv: PPointer): HResult; stdcall;
+                               out ppv): HResult; stdcall;
   {$EXTERNALSYM CoGetDefaultContext}
 
   // definition for Win7 new APIs

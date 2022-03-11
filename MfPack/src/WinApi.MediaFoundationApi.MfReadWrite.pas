@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.0
+// Revision Version: 3.1.1
 // Description: -
 //
 // Organisation: FactoryX
@@ -30,7 +30,7 @@
 //                   IUnknown(Pointer), IUnknown(Object), IUnknown(Nil) etc.
 //
 // Related objects: -
-// Related projects: MfPackX310
+// Related projects: MfPackX311
 // Known Issues: -
 //
 // Compiler version: 23 up to 34
@@ -296,13 +296,13 @@ type
                                    pwszURL: LPCWSTR;
                                    pAttributes: IMFAttributes;
                                    const riid: REFIID;
-                                   out ppvObject): HResult; stdcall;
+                                   out ppvObject: Pointer {LPVOID}): HResult; stdcall;
 
     function CreateInstanceFromObject(const clsid: REFCLSID;
                                       punkObject: IUnknown;
                                       pAttributes: IMFAttributes;
                                       const riid: REFIID;
-                                      out ppvObject): HResult; stdcall;
+                                      out ppvObject: Pointer {LPVOID}): HResult; stdcall;
 
   end;
   IID_IMFReadWriteClassFactory = IMFReadWriteClassFactory;
@@ -404,7 +404,7 @@ type
     function GetServiceForStream(dwStreamIndex: DWORD;
                                  const guidService: REFGUID;
                                  const riid: REFIID;
-                                 out ppvObject): HResult; stdcall;
+                                 out ppvObject: Pointer {LPVOID}): HResult; stdcall;
 
     function GetPresentationAttribute(const dwStreamIndex: DWORD;
                                       const guidAttribute: REFGUID;
@@ -555,7 +555,7 @@ type
     function GetServiceForStream(dwStreamIndex: DWord;
                                  const guidService: REFGUID;
                                  const riid: REFIID;
-                                 out ppvObject): HResult; stdcall;
+                                 out ppvObject: Pointer {LPVOID}): HResult; stdcall;
 
     function GetStatistics(dwStreamIndex: DWord;
                            out pStats: MF_SINK_WRITER_STATISTICS): HResult; stdcall;
