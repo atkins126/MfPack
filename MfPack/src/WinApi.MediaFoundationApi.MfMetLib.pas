@@ -797,6 +797,14 @@ const
   function MfpBoolToStr(const B: Boolean): string; inline;
 
 
+
+// Misc
+// ====
+
+
+
+
+
 implementation
 
 const
@@ -2284,7 +2292,7 @@ begin
   if (SUCCEEDED(hr)) then
     begin
       hr := pMediaType.GetGUID(MF_MT_SUBTYPE,
-                              guidSubtype);
+                               guidSubtype);
     end;
 
   // Check whether the stream is compressed.
@@ -3513,7 +3521,7 @@ end;
 
 
 
-//
+// Creates a compatible video format with a different subtype.
 function CloneVideoMediaType(var pSrcMediaType: IMFMediaType;
                              guidSubType: REFGUID;
                              out ppNewMediaType: IMFMediaType): HRESULT;
@@ -3524,7 +3532,6 @@ label
   done;
 
 begin
-  ppNewMediaType := Nil;
 
   hr := MFCreateMediaType(ppNewMediaType);
   if (FAILED(hr)) then

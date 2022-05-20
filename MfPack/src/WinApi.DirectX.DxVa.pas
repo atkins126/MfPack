@@ -16,7 +16,7 @@
 //
 // Organisation: FactoryX
 // Initiator(s): Tony (maXcomX), Peter (OzShips)
-// Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships)
+// Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships), Ciaran (Ciaran3)
 //
 //------------------------------------------------------------------------------
 // CHANGE LOG
@@ -1835,8 +1835,8 @@ type
     SampleFormat: DWORD;
     SampleFlags: DWORD;
     lpDDSSrcSurface: DWORD;         // 32 bit pointer size
-    rcSrc: TRect; // RECT
-    rcDst: TRect; // RECT
+    rcSrc: TRect; 
+    rcDst: TRect;
     Palette: array[0..15] of DXVA_AYUVsample2;
     // Pad: DWORD;
     // 4 bytes of padding added by the compiler to align the struct to 8 bytes.
@@ -1850,10 +1850,14 @@ type
   _DXVA_DeinterlaceBltEx32 = record
     Size: DWORD;
     BackgroundColor: DXVA_AYUVsample2;
-    rcTarget: TRect; // RECT
+    rcTarget: TRect;
     rtTarget: REFERENCE_TIME;
     NumSourceSurfaces: DWORD;
-    Alpha: FLOAT;
+    {$IFDEF WIN32}
+    Alpha: Float32;
+    {$ELSE}
+    Alpha: Float64;
+    {$ENDIF}
     Source: array[0..MAX_DEINTERLACE_SURFACES - 1] of DXVA_VideoSample32;
     DestinationFormat: DWORD;
     DestinationFlags: DWORD;
