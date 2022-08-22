@@ -1,6 +1,6 @@
-// FactoryX
+﻿// FactoryX
 //
-// Copyright: � FactoryX. All rights reserved.
+// Copyright: © FactoryX. All rights reserved.
 //
 // Project: MfPack - MediaFoundation
 // Project location: https://sourceforge.net/projects/MFPack
@@ -10,7 +10,7 @@
 // Release date: 29-03-2022
 // Language: ENU
 //
-// Revision Version: 3.1.1
+// Revision Version: 3.1.2
 //
 // Description:
 //   This unit shows how to get a videoframe from a camera in A-sync mode.
@@ -23,16 +23,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
+// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX311/Samples/CameraFrameCapture
+// Related projects: MfPackX312/Samples/CameraFrameCapture
 //
-// Compiler version: 23 up to 34
-// SDK version: 10.0.22000.0
+// Compiler version: 23 up to 35
+// SDK version: 10.0.22621.0
 //
 // Todo: -
 //
@@ -206,40 +206,48 @@ begin
     if SUCCEEDED(Result) then
       begin
         CritSec.Lock();
+
         try
           bEndOfStream := (dwStreamFlags = MF_SOURCE_READERF_ENDOFSTREAM);
 
           if (dwStreamFlags = MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED) then
-            NotifyMediaFormatChanged()
-          else if not Assigned(pSample) and (FramesSkipped < MaxFramesToSkip) and not bEndOfStream then
-            begin
-              ReadNextSample();
-              HandleFrameSkipped();
-            end
-          else if Assigned(pSample) then
-            begin
-              FCalculatingMax := SecondsBetween(Now, FMaxCalcStartTime) <= 10;
-              if FCalculatingMax then
-                begin
-                  // Exclude the time taken to read the first sample
-                  if FSampleReadCount = 0 then
-                    FMaxCalcStartTime := Now();
-                  inc(FSampleReadCount);
-                  ReadNextSample();
-                end
-              else
-                begin
-                  if BurstEnabled then
-                    ReadNextSample();
+            NotifyMediaFormatChanged
+          else
+            if not Assigned(pSample) and (FramesSkipped < MaxFramesToSkip) and not bEndOfStream then
+              begin
+                ReadNextSample();
+                HandleFrameSkipped();
+              end
+          else
+            if Assigned(pSample) then
+              begin
+                FCalculatingMax := SecondsBetween(Now,
+                                                  FMaxCalcStartTime) <= 10;
+                if FCalculatingMax then
+                  begin
+                    // Exclude the time taken to read the first sample
+                    if (FSampleReadCount = 0) then
+                      FMaxCalcStartTime := Now();
 
-                  ProcessSample(pSample);
-                end;
-             FFindingSample := False;
-            end;
+                    inc(FSampleReadCount);
+                    ReadNextSample();
+                  end
+                else
+                  begin
+                    if BurstEnabled then
+                      ReadNextSample();
+
+                    ProcessSample(pSample);
+                  end;
+
+                FFindingSample := False;
+              end;
         finally
           CritSec.Unlock();
         end;
+
       end;
+
   finally
     SafeRelease(pSample);
   end;
@@ -369,7 +377,13 @@ begin
   oSampleReply := PSampleReply(AMessage.LPARAM);
 
   if FCancelBurst then
-    SafeRelease(oSampleReply.oSample)
+  begin
+    if Assigned(oSampleReply.oSample) then
+    begin
+      oSampleReply.oSample.RemoveAllBuffers;
+      SafeRelease(oSampleReply.oSample);
+    end;
+  end
   else
     ReturnDataFromSample(oSampleReply.oSample)
 end;
@@ -388,7 +402,6 @@ end;
 
 procedure TCameraCaptureAsync.RequestFrame();
 begin
-  inherited;
   FCancelBurst := False;
   ResetFramesSkipped();
   ReadNextSample();
@@ -403,15 +416,20 @@ begin
   Result := Assigned(SourceReader);
 
   if Result then
-    begin
-      StartTimer();
-      FFindingSample := True;
-      oResult := SourceReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                         0);
-      Result := SUCCEEDED(oResult);
-      if not Result then
-        HandleSampleReadError(oResult);
-    end;
+  begin
+    StartTimer;
+    FFindingSample := True;
+    oResult := SourceReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                                       0,
+                                       nil,
+                                       nil,
+                                       nil,
+                                       nil);
+    Result := SUCCEEDED(oResult);
+
+    if not Result then
+      HandleSampleReadError(oResult);
+  end;
 end;
 
 

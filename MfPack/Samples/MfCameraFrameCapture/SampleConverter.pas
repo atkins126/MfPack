@@ -1,6 +1,6 @@
-// FactoryX
+﻿// FactoryX
 //
-// Copyright: � FactoryX. All rights reserved.
+// Copyright: © FactoryX. All rights reserved.
 //
 // Project: MfPack - MediaFoundation
 // Project location: https://sourceforge.net/projects/MFPack
@@ -10,7 +10,7 @@
 // Release date: 29-03-2022
 // Language: ENU
 //
-// Revision Version: 3.1.1
+// Revision Version: 3.1.2
 //
 // Description:
 //   This unit returns a BMP memory stream from an IMFSample.
@@ -23,17 +23,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
-// 22/03/2022 Ciaran              Added support for sample conversion using color converter
+// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX311/Samples/CameraFrameCapture
+// Related projects: MfPackX312/Samples/CameraFrameCapture
 //
-// Compiler version: 23 up to 34
-// SDK version: 10.0.22000.0
+// Compiler version: 23 up to 35
+// SDK version: 10.0.22621.0
 //
 // Todo: -
 //
@@ -88,9 +87,9 @@ type
     FOutputType: IMFMediaType;
     FTransform: IMFTransform;
     FOnLog: TLogEvent;
-    FSupportedInputs: TArray<TGUID>;
-    FTopDownFormats: TArray<TGUID>;
-
+    FSupportedInputs : TArray<TGUID>;
+    FTopDownFormats : TArray<TGUID>;
+    
   private
     function ConvertSampleToRGB(const AInputSample: IMFSample;
                                 out AConvertedSample: IMFSample): Boolean;
@@ -107,7 +106,7 @@ type
     procedure FreeConverter();
     procedure NotifyBeginStreaming();
     procedure SetSupportedInputs();
-
+    
   public
     constructor Create();
     destructor Destroy(); override;
@@ -181,7 +180,8 @@ end;
 
 function TSampleConverter.IsInputSupported(const AInputFormat: TGUID): Boolean;
 begin
-  Result := IndexOf(AInputFormat, FSupportedInputs) > -1;
+  Result := IndexOf(AInputFormat, 
+                    FSupportedInputs) > -1;
 end;
 
 
@@ -255,7 +255,7 @@ begin
 end;
 
 
-function TSampleConverter.GetBMPFileHeader: BITMAPFILEHEADER;
+function TSampleConverter.GetBMPFileHeader(): BITMAPFILEHEADER;
 begin
   Result.bfType := Ord('B') or (Ord('M') shl 8); // Type is "BM" for BitMap
   Result.bfSize := sizeof(Result.bfOffBits) + sizeof(RGBTRIPLE);
@@ -355,7 +355,7 @@ begin
 end;
 
 
-procedure TSampleConverter.NotifyBeginStreaming;
+procedure TSampleConverter.NotifyBeginStreaming();
 begin
   // This should speed up the first frame request.
   // See: https://docs.microsoft.com/en-us/windows/win32/medfound/mft-message-notify-begin-streaming

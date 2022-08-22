@@ -10,7 +10,7 @@
 // Release date: 29-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.1
+// Revision Version: 3.1.2
 // Description: -
 //
 // Organisation: FactoryX
@@ -21,7 +21,8 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/10/2021 All                 Bowie release  SDK 10.0.22000.0 (Windows 11)
+// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 09/08/2011 Tony                Fixed IMFAttributes.GetBlob
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or higher.
@@ -34,7 +35,7 @@
 //         Fields with a Common Type Specification.
 //
 // Related objects: -
-// Related projects: MfPackX311
+// Related projects: MfPackX312
 // Known Issues: -
 //
 // Compiler version: 23 up to 33
@@ -860,7 +861,7 @@ type
 
   PMFOffset = ^MFOffset;
   _MFOffset = record
-     fract: WORD;
+    fract: WORD;
     value: SHORT;
   end;
   {$EXTERNALSYM _MFOffset}
@@ -873,7 +874,7 @@ type
                         // This coordinate might have a fractional value.
     OffsetY: MFOffset;  // Contains the y-coordinate of the upper-left corner of the rectangle.
                         // This coordinate might have a fractional value.
-     Area: SIZE;        // A SIZE structure that contains the width and height of the rectangle.
+    Area: SIZE;         // A SIZE structure that contains the width and height of the rectangle.
   end;
   {$EXTERNALSYM _MFVideoArea}
   MFVideoArea = _MFVideoArea;
@@ -1124,9 +1125,9 @@ type
                          out pcbBlobSize: UINT32): HResult; stdcall;
 
     function GetBlob(const guidKey: TGUID;
-                     out pBuf: PUINT8;
-                     out cbBufSize: UINT32;
-                     out pcbBlobSize: PUINT32): HResult; stdcall;
+                     {out} pBuf: PUINT8;
+                     {in} cbBufSize: UINT32;
+                     {out} pcbBlobSize: PUINT32 = nil): HResult; stdcall;
     // Usage example:
     // var
     //    pArea: MFVideoArea;
@@ -1142,7 +1143,7 @@ type
 
     function GetUnknown(const guidKey: TGUID;
                         const riid: REFIID;
-                        out ppv): HResult; stdcall;
+                        out ppv: LPVOID): HResult; stdcall;
 
     function SetItem(const guidKey: TGUID;
                      const Value: PROPVARIANT): HResult; stdcall;
@@ -1758,7 +1759,7 @@ type
     //     Will contain the requested interface
     // </param>
     function ActivateObject(const riid: REFIID;
-                            out ppv: Pointer): HResult; stdcall;
+                            out ppv: LPVOID): HResult; stdcall;
 
     // <summary>
     //     Shuts down the internal represented object

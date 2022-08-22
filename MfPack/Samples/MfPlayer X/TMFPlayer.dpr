@@ -1,13 +1,18 @@
 program TMFPlayer;
 
 uses
-{$IFDEF MadExcept}
+
+  {$IFDEF FASTMM}
+  FastMM4,
+  {$ENDIF}
+  {$IFDEF madExcept}
   madExcept,
   madLinkDisAsm,
   madListHardware,
   madListProcesses,
   madListModules,
-{$ENDIF}
+  {$ENDIF}
+
   Vcl.Forms,
   frmMfPlayer in 'frmMfPlayer.pas' {frm_MfPlayer},
   dlgStreamSelect in 'dlgStreamSelect.pas' {dlgSelectStreams},
@@ -24,7 +29,7 @@ uses
 begin
 
    // Check for memoryleaks (debug mode (F9) only!)
-{$IFNDEF MadExcept}
+{$IFNDEF madExcept}
   {$IFDEF DEBUG}
     {$WARN SYMBOL_PLATFORM OFF}
     ReportMemoryLeaksOnShutdown := (DebugHook <> 0);
