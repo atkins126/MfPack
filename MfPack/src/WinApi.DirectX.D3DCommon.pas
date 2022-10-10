@@ -29,7 +29,7 @@
 //            New apps should use the latest Direct3D API
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX313
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -67,7 +67,8 @@ unit WinApi.DirectX.D3DCommon;
 interface
 
 uses
-  Winapi.Windows;
+  WinApi.Windows,
+  WinApi.WinApiTypes;
 
   {$WEAKPACKAGEUNIT ON}
   {$ALIGN ON}
@@ -89,14 +90,17 @@ uses
 
 type
 
-  D3D_DRIVER_TYPE = (D3D_DRIVER_TYPE_UNKNOWN	= 0,
-                     D3D_DRIVER_TYPE_HARDWARE	= (D3D_DRIVER_TYPE_UNKNOWN + 1),
-                     D3D_DRIVER_TYPE_REFERENCE	= (D3D_DRIVER_TYPE_HARDWARE + 1),
-                     D3D_DRIVER_TYPE_NULL	= (D3D_DRIVER_TYPE_REFERENCE + 1),
-                     D3D_DRIVER_TYPE_SOFTWARE	= (D3D_DRIVER_TYPE_NULL + 1),
-                     D3D_DRIVER_TYPE_WARP	= (D3D_DRIVER_TYPE_SOFTWARE + 1)
-                    );
+  PD3D_DRIVER_TYPE = ^D3D_DRIVER_TYPE;
+  D3D_DRIVER_TYPE = (
+    D3D_DRIVER_TYPE_UNKNOWN,
+    D3D_DRIVER_TYPE_HARDWARE,
+    D3D_DRIVER_TYPE_REFERENCE,
+    D3D_DRIVER_TYPE_NULL,
+    D3D_DRIVER_TYPE_SOFTWARE,
+    D3D_DRIVER_TYPE_WARP
+  );
   {$EXTERNALSYM D3D_DRIVER_TYPE}
+
 
 type
   PD3D_FEATURE_LEVEL = ^D3D_FEATURE_LEVEL;
@@ -631,6 +635,7 @@ const
   {$EXTERNALSYM D3D11_SRV_DIMENSION_BUFFEREX}
 
 const
+  // Bits in shaders indicating features they use which the runtime checks against current device support:
   D3D_SHADER_FEATURE_DOUBLES                                                        = $00001;
   {$EXTERNALSYM D3D_SHADER_FEATURE_DOUBLES}
   D3D_SHADER_FEATURE_COMPUTE_SHADERS_PLUS_RAW_AND_STRUCTURED_BUFFERS_VIA_SHADER_4_X = $00002;
@@ -676,6 +681,8 @@ const
   D3D_SHADER_FEATURE_SAMPLER_FEEDBACK                                               = $200000;
   {$EXTERNALSYM D3D_SHADER_FEATURE_SAMPLER_FEEDBACK}
 
+// Additional internal shader feature flags are listed in dxbcutils.h (not relevant/useful for public to see)
+// When adding entries here, make sure they don't conflict with what's there.
 
 type
   PD3D_INCLUDE_TYPE = ^_D3D_INCLUDE_TYPE;
@@ -752,6 +759,13 @@ type
   IID_ID3D10Blob = ID3D10Blob;
 
   {$EXTERNALSYM IID_ID3D10Blob}
+
+  LPD3DBLOB = ^ID3DBlob;
+  {$EXTERNALSYM LPD3DBLOB}
+  PID3DBlob = ^ID3DBlob;
+  ID3DBlob = ID3D10Blob;
+  {$EXTERNALSYM ID3DBlob}
+
 
   // ID3DDestructionNotifier interface
   //
@@ -1619,6 +1633,11 @@ const
 
 
   // Additional Prototypes for ALL interfaces
+
+  // Used by D3D11 and D3D12
+type
+  Fixed3FLOATArray = array [0..3] of FLOAT;
+  Fixed3UINTArray = array [0..3] of UINT;
 
   // End of Additional Prototypes
 

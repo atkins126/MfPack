@@ -11,7 +11,7 @@
   * Multimedia Device (MMDevice) API
 - Microsoft Media Foundation API (successor of DirectShow).
 - XAudio2 API (XBox game development)
-- Microsoft DirectX API's (D2D1, DirectComposition, DXGI, DirectWrite and DXVA)
+- Microsoft DirectX API's (D2D1, D3D9, D3D11, D3D12, DirectComposition, DXGI, DirectWrite and DXVA) Note that D3D11 and above are part of Media Foundation.
 - Windows Imaging Component (WIC) API.
 - MPEG2 API.
 - The COMPLETE Windows Media (WinMM) API.
@@ -23,7 +23,7 @@
 
 # MfPack 
 
-Version X 3.1.2 
+Version X 3.1.3 
 Delphi XE2 up to and including Delphi 12 
 SDK version: 10.0.22621.0 (Windows 11)
 
@@ -133,8 +133,14 @@ SDK version: 10.0.22621.0 (Windows 11)
 
 **MFFrameCapture sample**
 
-*Demonstrates how to cature an image (synchronous or A-synchronous) using the IMFSourceReader.*
+*Demonstrates how to capture an image (synchronous or A-synchronous) using the IMFSourceReader.*
 
 ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/MfFrameCapture.png)
+
+**CameraFrameCapture sample**
+*Demonstrates how to capture a still image or so called snapshot (A-synchronous) from a* 
+*capture device such as a webcam or camera using the IMFSourceReader.*
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/CameraFrameCaptureSample.png)
 
 **© FactoryX. All rights reserved.***
