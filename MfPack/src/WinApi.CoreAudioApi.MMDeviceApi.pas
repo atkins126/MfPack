@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.5
 // Description: -
 //
 // Organisation: FactoryX
@@ -33,7 +33,7 @@
 //          Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -49,26 +49,29 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit WinApi.CoreAudioApi.MMDeviceApi;
 
+  {$HPPEMIT '#include "mmdeviceapi.h"'}
+
 interface
 
-  {$HPPEMIT '#include "mmdeviceapi.h"'}
+// {$DEFINE USE_EMBARCADERO_DEF}
 
 uses
 
@@ -76,11 +79,15 @@ uses
   WinApi.WinError,
   WinApi.WinApiTypes,
   {ActiveX}
+  {$IFDEF USE_EMBARCADERO_DEF}
+  WinApi.PropSys,
+  WinApi.ActiveX,
+  {$ELSE}
   WinApi.ActiveX.PropIdl,
   WinApi.ActiveX.PropSys,
+  {$ENDIF}
   {CoreAudioApi}
   WinApi.CoreAudioApi.DeviceTopology;
-
 
   {$WEAKPACKAGEUNIT ON}
   {$ALIGN ON}
@@ -107,33 +114,33 @@ const
 
   // The DEVICE_STATE_XXX constants indicate the current state of an audio endpoint device.
 
-  DEVICE_STATE_ACTIVE                 = $00000001;  // The audio endpoint device is active.
-  {$EXTERNALSYM DEVICE_STATE_ACTIVE}                // That is, the audio adapter that connects to the endpoint device is present and enabled.
-                                                    // In addition, if the endpoint device plugs into a jack on the adapter,
-                                                    // then the endpoint device is plugged in.
+  DEVICE_STATE_ACTIVE                 = DWORD($00000001);  // The audio endpoint device is active.
+  {$EXTERNALSYM DEVICE_STATE_ACTIVE}                       // That is, the audio adapter that connects to the endpoint device is present and enabled.
+                                                           // In addition, if the endpoint device plugs into a jack on the adapter,
+                                                           // then the endpoint device is plugged in.
 
-  DEVICE_STATE_DISABLED               = $00000002;  // The audio endpoint device is disabled.
-  {$EXTERNALSYM DEVICE_STATE_DISABLED}              // The user has disabled the device in the Windows multimedia control panel,
-                                                    // Mmsys.cpl.
+  DEVICE_STATE_DISABLED               = DWORD($00000002);  // The audio endpoint device is disabled.
+  {$EXTERNALSYM DEVICE_STATE_DISABLED}                     // The user has disabled the device in the Windows multimedia control panel,
+                                                           // Mmsys.cpl.
 
-  DEVICE_STATE_NOTPRESENT             = $00000004;  // The audio endpoint device is not present because the audio adapter that connects to
-  {$EXTERNALSYM DEVICE_STATE_NOTPRESENT}            // the endpoint device has been removed from the system,
-                                                    // or the user has disabled the adapter device in Device Manager.
+  DEVICE_STATE_NOTPRESENT             = DWORD($00000004);  // The audio endpoint device is not present because the audio adapter that connects to
+  {$EXTERNALSYM DEVICE_STATE_NOTPRESENT}                   // the endpoint device has been removed from the system,
+                                                           // or the user has disabled the adapter device in Device Manager.
 
-  DEVICE_STATE_UNPLUGGED              = $00000008;  // The audio endpoint device is unplugged.
-  {$EXTERNALSYM DEVICE_STATE_UNPLUGGED}              // The audio adapter that contains the jack for the endpoint device is present and enabled,
-                                                    // but the endpoint device is not plugged into the jack.
-                                                    // Only a device with jack-presence detection can be in this state.
-                                                    // For more information about jack-presence detection, see Audio Endpoint Devices.
+  DEVICE_STATE_UNPLUGGED              = DWORD($00000008);  // The audio endpoint device is unplugged.
+  {$EXTERNALSYM DEVICE_STATE_UNPLUGGED}                    // The audio adapter that contains the jack for the endpoint device is present and enabled,
+                                                           // but the endpoint device is not plugged into the jack.
+                                                           // Only a device with jack-presence detection can be in this state.
+                                                           // For more information about jack-presence detection, see Audio Endpoint Devices.
 
-  DEVICE_STATEMASK_ALL                = $0000000F;  // Includes audio endpoint devices in all states—active, disabled, not present, and unplugged.
+  DEVICE_STATEMASK_ALL                = DWORD($0000000F);  // Includes audio endpoint devices in all states—active, disabled, not present, and unplugged.
   {$EXTERNALSYM DEVICE_STATEMASK_ALL}
 
 
-  ENDPOINT_SYSFX_ENABLED              = $00000000;  // System Effects are enabled.
+  ENDPOINT_SYSFX_ENABLED              = DWORD($00000000);  // System Effects are enabled.
   {$EXTERNALSYM ENDPOINT_SYSFX_ENABLED}
 
-  ENDPOINT_SYSFX_DISABLED             = $00000001;  // System Effects are disabled.
+  ENDPOINT_SYSFX_DISABLED             = DWORD($00000001);  // System Effects are disabled.
   {$EXTERNALSYM ENDPOINT_SYSFX_DISABLED}
 
 
@@ -257,7 +264,7 @@ const
 
 type
   // LPCGUID = PGUID;   // declared in WinApi.MediaFoundationApi.MfTypes, See: ComObj for TGuid specs
-  HANDLE = System.THandle;
+  // HANDLE = System.THandle;
 
   // Note:
   // Skip the auto wrapper MIDL recordnames generated for COM enumerations (__MIDL___MIDL_itf_name_xxx_xxx)
@@ -522,7 +529,7 @@ type
 
     function GetId(out ppstrId: PWideChar): HRESULT; stdcall;    //250815a, modified; issue reported by mbergstrand
 
-    function GetState(out pdwState: UINT): HRESULT; stdcall;
+    function GetState(out pdwState: DWord): HRESULT; stdcall;
     // Parameters
     // pdwState [out]
     //  Pointer to a DWORD variable into which the method writes the current state of the device.
@@ -611,13 +618,13 @@ type
   IAudioSystemEffectsPropertyStore = interface(IUnknown)
   ['{302AE7F9-D7E0-43E4-971B-1F8293613D2A}']
     function OpenDefaultPropertyStore(stgmAccess: DWORD;
-                                      {out} propStore: PIPropertyStore): HRESULT; stdcall;
+                                      out propStore: IPropertyStore): HRESULT; stdcall;
 
     function OpenUserPropertyStore(stgmAccess: DWORD;
-                                   {out} propStore: PIPropertyStore): HRESULT; stdcall;
+                                   out propStore: IPropertyStore): HRESULT; stdcall;
 
     function OpenVolatilePropertyStore(stgmAccess: DWORD;
-                                       {out} propStore: PIPropertyStore): HRESULT; stdcall;
+                                       out propStore: IPropertyStore): HRESULT; stdcall;
 
     function ResetUserPropertyStore(): HRESULT; stdcall;
 
@@ -663,9 +670,9 @@ type
                                      role: eRole;
                                      out ppEndpoint: IMMDevice): HRESULT; stdcall;
 
-    function GetDevice(pwstrId: PWChar;  // Pointer to a string containing the endpoint ID.
-                                         // The caller typically obtains this string from the IMMDevice.GetId method or
-                                         // from one of the methods in the IMMNotificationClient interface.
+    function GetDevice(pwstrId: LPCWSTR;  // Pointer to a string containing the endpoint ID.
+                                          // The caller typically obtains this string from the IMMDevice.GetId method or
+                                          // from one of the methods in the IMMNotificationClient interface.
                        out ppDevice: IMMDevice): HRESULT; stdcall;
 
     function RegisterEndpointNotificationCallback(pClient: IMMNotificationClient): HRESULT; stdcall;
@@ -712,6 +719,7 @@ type
   //
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IActivateAudioInterfaceCompletionHandler);'}
   {$EXTERNALSYM IActivateAudioInterfaceCompletionHandler}
+  PIActivateAudioInterfaceCompletionHandler = ^IActivateAudioInterfaceCompletionHandler;
   IActivateAudioInterfaceCompletionHandler = interface(IUnknown)
   ['{41D949AB-9862-444A-80F6-C261334DA5EB}']
 
@@ -749,16 +757,12 @@ type
   // * activation parameters specific to the interface being activated
   //   and asynchronously returns a pointer to the specified interface
   // ----------------------------------------------------------------------
-  function ActivateAudioInterfaceAsync(deviceInterfacePath: LPCWSTR;
-                                       const riid: REFIID;
-                                       {opt} activationParams: PROPVARIANT;
-                                       completionHandler: IActivateAudioInterfaceCompletionHandler;
-                                       out activationOperation: IActivateAudioInterfaceAsyncOperation): HResult; stdcall;
+  function ActivateAudioInterfaceAsync(const deviceInterfacePath: LPCWSTR;
+                                       const riid: TGUID;
+                                       const activationParams: {P}PROPVARIANT;
+                                       completionDelegate: IActivateAudioInterfaceCompletionHandler;
+                                       out activationOperation: IActivateAudioInterfaceAsyncOperation): HRESULT; stdcall;
   {$EXTERNALSYM ActivateAudioInterfaceAsync}
-
-
-
-
 
 type
 
@@ -770,9 +774,6 @@ type
     pPnpDevnode: IMMDevice;
   end;
   {$EXTERNALSYM AudioExtensionParams}
-
-
-
 
 
   // Additional Prototypes for ALL interfaces
@@ -787,7 +788,7 @@ const
   MMDeviceApiLib = 'Mmdevapi.dll';
 
 {$WARN SYMBOL_PLATFORM OFF}
-  function ActivateAudioInterfaceAsync; external MMDeviceApiLib name 'ActivateAudioInterfaceAsync' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
+  function ActivateAudioInterfaceAsync; external MMDeviceApiLib name 'ActivateAudioInterfaceAsync' {$IF COMPILERVERSION > 20.0} delayed; {$ENDIF}
 {$WARN SYMBOL_PLATFORM ON}
 
 end.

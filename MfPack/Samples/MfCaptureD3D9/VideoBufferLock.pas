@@ -9,10 +9,9 @@
 // Release date: 08-03-2018
 // Language: ENU
 //
-// Version: 3.1.1
+// Version: 3.1.4
 //
-// Description: Requires Windows 7 or later.
-//              Manages video preview.
+// Description: Manages automatic videobuffer lock.
 //
 // Intiator(s): Tony (maXcomX), Peter (OzShips)
 // Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships)
@@ -21,17 +20,19 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 07/02/2023 Tony                Fixed issues with OnReadSample and bufferlock.
+// 04/03/2023 Tony                Updated Device loss methods.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX313
 // Known Issues: -
 //
-// Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// Compiler version: 23 up to 33
+// SDK version: 10.0.19041.0
 //
 // Todo: -
 //
@@ -72,14 +73,6 @@ uses
   WinApi.MediaFoundationApi.MfObjects,
   WinApi.MediaFoundationApi.MfError;
 
-  {$MINENUMSIZE 4}
-  {$IFDEF WIN32}
-    {$ALIGN 1}
-  {$ELSE}
-    {$ALIGN 8} // Win64
-  {$ENDIF}
-
-
 
 //-------------------------------------------------------------------
 //  VideoBufferLock class
@@ -97,7 +90,7 @@ type
 
   public
     // Constructor & destructor
-    constructor Create(pBuffer: IMFMediaBuffer);
+    constructor Create(const pBuffer: IMFMediaBuffer);
     destructor Destroy(); override;
 
     procedure UnlockBuffer();
@@ -112,13 +105,14 @@ type
 implementation
 
 
-constructor TVideoBufferLock.Create(pBuffer: IMFMediaBuffer);
+constructor TVideoBufferLock.Create(const pBuffer: IMFMediaBuffer);
 var
   hr : HRESULT;
 
 begin
   inherited Create();
   m_bLocked := False;
+  m_p2DBuffer := Nil;
   m_pBuffer := pBuffer;
   // Query for the 2-D buffer interface. OK if this fails.
   // The IMFMediaBuffer is optimized to receive the IMF2DBuffer.
@@ -133,8 +127,8 @@ end;
 destructor TVideoBufferLock.Destroy();
 begin
   UnlockBuffer(); // Unlock the buffer
-  SafeRelease(m_pBuffer);
-  SafeRelease(m_p2DBuffer);
+  m_pBuffer := Nil;
+  m_p2DBuffer := Nil;
   inherited Destroy();
 end;
 

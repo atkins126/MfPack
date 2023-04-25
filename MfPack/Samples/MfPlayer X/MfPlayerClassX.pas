@@ -10,7 +10,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Version: 3.1.0
+// Version: 3.1.4
 // Description: This is the extended basic player class (version X),
 //              containing the necessary methodes to play a mediafile
 //              For indepth information see the included examples (CPlayer)
@@ -19,19 +19,22 @@
 //
 // Company: FactoryX
 // Intiator(s): Ramyses De Macedo Rodrigues, Tony (maXcomX), Peter (OzShips).
-// Contributor(s): Ramyses De Macedo Rodrigues, Tony Kalf (maXcomX), Peter Larson (ozships).
+// Contributor(s): Ramyses De Macedo Rodrigues,
+//                 Tony Kalf (maXcomX),
+//                 Peter Larson (ozships),
+//                 Jason Nelson (adaloveless)
 //
 //------------------------------------------------------------------------------
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -57,8 +60,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 
@@ -103,8 +108,8 @@ uses
   MfPCXConstants,
   LangTags,
   {MfComponents}
-  QueueTimer;  {if getting an error about a missing dcu, install MfComponents first or
-                add the searchpath to MfComponents in your project options}
+  UniThreadTimer;  {if getting an error about a missing dcu, install MfComponents first or
+                    add the searchpath to MfComponents in your project options}
 
 type
   TRedrawStatus = (rdStarted,
@@ -733,6 +738,18 @@ end;
 // The destructor
 destructor TMfPlayerX.Destroy();
 begin
+  // If you don't de-reference all the interfaces before closing everything,
+  // you will get an access violation
+  m_pSession := nil;
+  m_pSource := nil;
+  m_pVideoDisplay := nil;
+  m_pTopology := nil;
+  m_pTimeSource := nil;
+  m_pClockStateSink := nil;
+  m_pRateControl := nil;
+  m_pRateSupport := nil;
+  m_pSourcePD := nil;
+
   DeAllocateHWnd(m_hwndThis);
   // Shutdown the Media Foundation platform
   MFShutdown();
@@ -871,7 +888,7 @@ try
                                             timestamp);
       if FAILED(hr) then
         begin
-          hr := E_FAIL;
+          Result := E_FAIL;
           Exit;
         end;
       data := buffer;

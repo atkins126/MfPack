@@ -10,7 +10,7 @@
 // Release date: 14-01-2018
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Direct3D include file
 //
 // Organisation: FactoryX
@@ -27,7 +27,7 @@
 // Remarks: New apps should use the latest Direct3D API
 // 
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -42,21 +42,22 @@
 //==============================================================================
 //
 // LICENSE
-// 
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+//
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
-// 
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
-// 
+//
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.DirectX.D3D9;
 
@@ -73,15 +74,6 @@ uses
   WinApi.DirectX.D3DCommon,
   WinApi.DirectX.D3D9Types,
   WinApi.DirectX.D3D9Caps;
-
-  {$WEAKPACKAGEUNIT ON}
-  {$MINENUMSIZE 4}
-
-  {$IFDEF WIN32}
-    {$ALIGN 1}
-  {$ELSE}
-    {$ALIGN 8} // Win64
-  {$ENDIF}
 
 
 {$IFNDEF DIRECT3D_VERSION}
@@ -286,7 +278,7 @@ type
 
     function GetDeviceCaps(out pCaps: D3DCAPS9): HResult; stdcall;
 
-    function GetDisplayMode(iSwapChain: DWORD;
+    function GetDisplayMode(iSwapChain: UINT;
                             out pMode: D3DDISPLAYMODE): HResult; stdcall;
 
     function GetCreationParameters(out pParameters: D3DDEVICE_CREATION_PARAMETERS): HResult; stdcall;
@@ -307,9 +299,9 @@ type
     function GetSwapChain(iSwapChain: DWORD;
                           out pSwapChain: IDirect3DSwapChain9): HResult; stdcall;
 
-    function GetNumberOfSwapChains: DWORD; stdcall;
+    function GetNumberOfSwapChains(): DWORD; stdcall;
 
-    function Reset(const pPresentationParameters: D3DPRESENT_PARAMETERS): HResult; stdcall;
+    function Reset(var pPresentationParameters: D3DPRESENT_PARAMETERS): HResult; stdcall;
 
     function Present(pSourceRect: PRect;
                      pDestRect: PRect;
@@ -433,9 +425,9 @@ type
 
     function GetDepthStencilSurface(out ppZStencilSurface: IDirect3DSurface9): HResult; stdcall;
 
-    function BeginScene: HResult; stdcall;
+    function BeginScene(): HResult; stdcall;
 
-    function EndScene: HResult; stdcall;
+    function EndScene(): HResult; stdcall;
 
     function Clear(Count: DWORD;
                    pRects: PD3DRECT;
@@ -1171,7 +1163,7 @@ type
   ['{0cfbaf3a-9ff6-429a-99b3-a2796af8b89b}']
     //*** IDirect3DSurface9 methods ***//
     function GetContainer(const riid: TGuid;
-                          out ppContainer{: Pointer}): HResult; stdcall;
+                          out ppContainer {Void}): HResult; stdcall;
 
     function GetDesc(out pDesc: D3DSURFACE_DESC): HResult; stdcall;
 
@@ -1179,7 +1171,7 @@ type
                       pRect: PRect;
                       Flags: DWORD): HResult; stdcall;
 
-    function UnlockRect: HResult; stdcall;
+    function UnlockRect(): HResult; stdcall;
 
     function GetDC(out phdc: HDC): HResult; stdcall;
 

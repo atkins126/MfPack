@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Media Foundation basic control-layer interfaces.
 //
 // Organisation: FactoryX
@@ -27,7 +27,7 @@
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -42,20 +42,21 @@
 //==============================================================================
 //
 // LICENSE
-// 
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+//
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
-// 
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+//
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfIdl;
@@ -3237,14 +3238,18 @@ type
 
   // Interface IMFTopologyNodeAttributeEditor
   // ========================================
+  // IMFTopologyNodeAttributeEditor interface is exposed by pipeline to allow application to change
+  // properties on the toponode objects during playback.
+  // In the current implementation, the only supported property is MF_TOPONODE_MEDIASTOP.
+  // Pipeline will ignore all other properties.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFTopologyNodeAttributeEditor);'}
   {$EXTERNALSYM IMFTopologyNodeAttributeEditor}
   IMFTopologyNodeAttributeEditor = interface(IUnknown)
   ['{676aa6dd-238a-410d-bb99-65668d01605a}']
-
-    function UpdateNodeAttributes(TopoId: TOPOID;
-                                  cUpdates: DWORD;
-                                  pUpdates: MFTOPONODE_ATTRIBUTE_UPDATE): HResult; stdcall;
+    function UpdateNodeAttributes(TopoId: TOPOID; // Reserved.
+                                  cUpdates: DWORD; // The number of elements in the pUpdates array.
+                                  pUpdates: PMFTOPONODE_ATTRIBUTE_UPDATE  // Pointer to an array of MFTOPONODE_ATTRIBUTE_UPDATE structures. Each element of the array updates one attribute on a node.
+                                  ): HResult; stdcall;
   end;
   IID_IMFTopologyNodeAttributeEditor = IMFTopologyNodeAttributeEditor;
   {$EXTERNALSYM IID_IMFTopologyNodeAttributeEditor}
@@ -5989,8 +5994,8 @@ type
 
   // Enumerates a list of audio or video capture devices.
   function MFEnumDeviceSources(pAttributes: IMFAttributes;
-                               [ref] const pppSourceActivate: PIMFActivate; // Pointer to array of IMFActivate
-                               out pcSourceActivate: INT): HResult; stdcall;
+                               out pppSourceActivate: PIMFActivate; // Pointer to array of IMFActivate
+                               out pcSourceActivate: UINT32): HResult; stdcall;
   {$EXTERNALSYM MFEnumDeviceSources}
 
   // pAttributes [in]

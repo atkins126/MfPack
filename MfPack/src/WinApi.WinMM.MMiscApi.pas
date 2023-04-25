@@ -10,7 +10,7 @@
 // Release date: 15-09-2020
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: ApiSet Contract for api-ms-win-mm-misc-l1-1
 //              This header is used by Windows Multimedia.
 //              For more information, see: https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/
@@ -24,12 +24,13 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 12/03/2023 Tony                Updated mmio
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -45,19 +46,21 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 // =============================================================================
 unit WinApi.WinMM.MMiscApi;
 
@@ -378,7 +381,7 @@ type
   { a huge version of LPSTR }
 
   PHMMIO = ^HMMIO;
-  HMMIO = IntPtr;      { a handle to an open file }
+  HMMIO = IntPtr;      {a handle to an open file}
   {$EXTERNALSYM HMMIO}
 
 
@@ -596,48 +599,49 @@ const
   {$EXTERNALSYM mmioInstallIOProc}
 
   function mmioInstallIOProcA(fccIOProc: FOURCC;
-                              {_In_opt_} pIOProc: LPMMIOPROC;
+                              {_In_opt_} pIOProc: PMMIOPROC;
                               dwFlags: DWORD): LPMMIOPROC; stdcall;
   {$EXTERNALSYM mmioInstallIOProcA}
 
   function mmioInstallIOProcW(fccIOProc: FOURCC;
-                              {_In_opt_} pIOProc: LPMMIOPROC;
-                              dwFlags: DWORD): LPMMIOPROC; stdcall;
+                              {_In_opt_} pIOProc: PMMIOPROC;
+                              dwFlags: DWORD): PMMIOPROC; stdcall;
   {$EXTERNALSYM mmioInstallIOProcW}
 
-
-  function mmioOpen(pszFileName: PWideChar;
-                    pmmioinfo: LPCMMIOINFO;
-                    fdwOpen: DWORD): HMMIO; stdcall;
+  // This funtion is deprecated. Instead use CreateFile or CreateFile2.
+  function mmioOpen(szFileName: LPWSTR;
+                    lpmmioinfo: PMMIOInfo;
+                    dwOpenFlags: DWORD): HMMIO; stdcall;
   {$EXTERNALSYM mmioOpen}
 
-  function mmioOpenA(pszFileName: PAnsiChar;
-                    pmmioinfo: LPCMMIOINFO;
-                    fdwOpen: DWORD): HMMIO; stdcall;
+  function mmioOpenA(szFileName: LPSTR;
+                     szNewFileName: LPSTR;
+                     lpmmioinfo: PMMIOInfo;
+                     dwRenameFlags: DWORD): HMMIO; stdcall;
   {$EXTERNALSYM mmioOpenA}
 
-  function mmioOpenW(pszFileName: PWideChar;
-                     pmmioinfo: LPCMMIOINFO;
-                     fdwOpen: DWORD): HMMIO; stdcall;
+  function mmioOpenW(szFileName: LPWSTR;
+                     lpmmioinfo: PMMIOInfo;
+                     dwOpenFlags: DWORD): HMMIO; stdcall;
   {$EXTERNALSYM mmioOpenW}
 
 
-  function mmioRename(pszFileName: PWideChar;
-                      pszNewFileName: PWideChar;
-                      {_In_opt_} pmmioinfo: LPCMMIOINFO;
-                      fdwRename: DWORD): MMRESULT; stdcall;
+  function mmioRename(szFileName:LPWSTR;
+                      szNewFileName: LPWSTR;
+                      lpmmioinfo: PMMIOInfo;
+                      dwRenameFlags: DWORD): MMRESULT; stdcall;
   {$EXTERNALSYM mmioRename}
 
-  function mmioRenameA(pszFileName: PAnsiChar;
-                       pszNewFileName: PAnsiChar;
-                       {_In_opt_} pmmioinfo: LPCMMIOINFO;
-                       fdwRename: DWORD): MMRESULT; stdcall;
+  function mmioRenameA(szFileName: LPSTR;
+                       szNewFileName: LPSTR;
+                       lpmmioinfo: PMMIOInfo;
+                       dwRenameFlags: DWORD): MMRESULT; stdcall;
   {$EXTERNALSYM mmioRenameA}
 
-  function mmioRenameW(pszFileName: PWideChar;
-                       pszNewFileName: PWideChar;
-                       {_In_opt_} pmmioinfo: LPCMMIOINFO;
-                       fdwRename: DWORD): MMRESULT; stdcall;
+  function mmioRenameW(szFileName: LPWSTR;
+                       szNewFileName: LPWSTR;
+                       lpmmioinfo: PMMIOInfo;
+                       dwRenameFlags: DWORD): MMRESULT; stdcall;
   {$EXTERNALSYM mmioRenameW}
 
   function mmioClose(hmmio: HMMIO;
@@ -660,12 +664,12 @@ const
   {$EXTERNALSYM mmioSeek}
 
   function mmioGetInfo(hmmio: HMMIO;
-                       lpmmioinfo: LPMMIOINFO;
+                       lpmmioinfo: PMMIOINFO;
                        uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioGetInfo}
 
   function mmioSetInfo(hmmio: HMMIO;
-                       lpmmioinfo: LPMMIOINFO;
+                       lpmmioinfo: PMMIOINFO;
                        uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioSetInfo}
 
@@ -680,7 +684,7 @@ const
   {$EXTERNALSYM mmioFlush}
 
   function mmioAdvance(hmmio: HMMIO;
-                       lpmmioinfo: LPMMIOINFO; uFlags: UINT): MMRESULT; stdcall;
+                       lpmmioinfo: PMMIOINFO; uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioAdvance}
 
   function mmioSendMessage(hmmio: HMMIO;
@@ -691,17 +695,17 @@ const
 
   function mmioDescend(hmmio: HMMIO;
                        lpck: LPMMCKINFO;
-                       lpckParent: LPMMCKINFO;
+                       lpckParent: PMMCKINFO;
                        uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioDescend}
 
   function mmioAscend(hmmio: HMMIO;
-                      lpck: LPMMCKINFO;
+                      lpck: PMMCKINFO;
                       uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioAscend}
 
   function mmioCreateChunk(hmmio: HMMIO;
-                           lpck: LPMMCKINFO;
+                           lpck: PMMCKINFO;
                            uFlags: UINT): MMRESULT; stdcall;
   {$EXTERNALSYM mmioCreateChunk}
 
@@ -733,7 +737,8 @@ function mmioInstallIOProc; external MMiscApiLib name 'mmioInstallIOProcW';
 function mmioInstallIOProcA; external MMiscApiLib name 'mmioInstallIOProcA';
 function mmioInstallIOProcW; external MMiscApiLib name 'mmioInstallIOProcW';
 
-function mmioOpen; external MMiscApiLib name 'mmioOpenW';
+
+function mmioOpen; external MMiscApiLib name 'mmioOpenW'; // Deprecated
 function mmioOpenA; external MMiscApiLib name 'mmioOpenA';
 function mmioOpenW; external MMiscApiLib name 'mmioOpenW';
 

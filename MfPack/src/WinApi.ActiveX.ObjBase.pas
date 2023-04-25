@@ -10,7 +10,7 @@
 // Release date: 08-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Component object model definitions.
 //
 // Organisation: FactoryX
@@ -27,7 +27,7 @@
 // Remarks:
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -43,19 +43,21 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.ActiveX.ObjBase;
 
@@ -74,7 +76,6 @@ uses
   {ActiveX}
   WinApi.ActiveX.ObjIdl,
   WinApi.ActiveX.ObjIdlbase;
-
 
   {$MINENUMSIZE 4}
 
@@ -101,9 +102,10 @@ const
   COINIT_MULTITHREADED     = $0; // = combaseapi COINITBASE_MULTITHREADED
   {$EXTERNALSYM COINIT_MULTITHREADED}
   COINIT_APARTMENTTHREADED = $2;   // Apartment model
-
-  // These constants are only valid on Windows NT 4.0
   {$EXTERNALSYM COINIT_APARTMENTTHREADED}
+  
+  // These constants are only valid on Windows NT 4.0
+  // ================================================
   COINIT_DISABLE_OLE1DDE   = $4;   // Don't use DDE for Ole1 support.
   {$EXTERNALSYM COINIT_DISABLE_OLE1DDE}
   COINIT_SPEED_OVER_MEMORY = $8;   // Trade memory for speed.
@@ -200,7 +202,7 @@ type
                                  grfMode: DWORD;
                                  pwszName: PWideChar;
                                  dwCount: DWORD;
-                                 {in, out} var pResults: PMULTI_QI): HResult; stdcall;
+                                 {in, out} var pResults: MULTI_QI): HResult; stdcall;
   {$EXTERNALSYM CoGetInstanceFromFile}
 
   function CoGetInstanceFromIStorage({in, optional} pServerInfo: PCoServerInfo;
@@ -209,7 +211,7 @@ type
                                      dwClsCtx: DWORD;
                                      pstg: IUnknown; {IStorage}
                                      dwCount: DWORD;
-                                     {in, out} var rgmqResults: PMULTI_QI): HResult; stdcall;
+                                     {in, out} var rgmqResults: MULTI_QI): HResult; stdcall;
   {$EXTERNALSYM CoGetInstanceFromIStorage}
 
 
@@ -347,7 +349,7 @@ type
   {$EXTERNALSYM MonikerCommonPrefixWith}
 
   function CreateBindCtx(reserved: DWORD;
-                         out ppbc: PIBindCtx): HResult; stdcall;
+                         out ppbc: IBindCtx): HResult; stdcall;
   {$EXTERNALSYM CreateBindCtx}
 
   function CreateGenericComposite(pmkFirst: IMoniker;

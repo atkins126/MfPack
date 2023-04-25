@@ -9,7 +9,7 @@
 // Release date: 08-02-2018
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 //
 // Description: This is the basic class of MfSimpleCapture,
 //              containing the necessary methodes to capture media streams.
@@ -24,13 +24,14 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 03/03/2023                     Updated and fixed device notification issues.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -56,9 +57,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmSimpleCapture;
@@ -91,28 +93,14 @@ uses
   WinApi.ActiveX.ObjBase,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfApi,
+  WinApi.MediaFoundationApi.MfIdl,
   WinApi.MediaFoundationApi.MfPlay,
   WinApi.MediaFoundationApi.MfObjects,
   WinApi.MediaFoundationApi.MfUtils,
+  WinApi.MediaFoundationApi.MfMetLib,
   {Application}
   frmdlgChooseDevice,
   MfDeviceCaptureClass;
-
-type
-
-  //-------------------------------------------------------------------
-  // ChooseDeviceParam struct
-  //
-  // Contains an array of IMFActivate pointers. Each pointer represents
-  // a video capture device. This struct is passed to the dialog where
-  // the user selects a device.
-  //-------------------------------------------------------------------
-  ChooseDeviceParam = record
-    ppDevices: PIMFActivate;
-    count: UINT32;
-    selection: UINT32;
-  end;
-
 
 type
 
@@ -130,13 +118,15 @@ type
 
   private
     { Private declarations }
-
+    //p_hdevnotify: HDEVNOTIFY;
     bAppIsClosing: Boolean;
     bFullScreenMode: Boolean;
+    iSelectedDevice: Integer;
 
     // Quits the session and releases the capture engine
     procedure QuitSession();
     function GetFmCapture(): HRESULT;
+
     // Listen for WM_DEVICECHANGE messages.
     // The lParam message parameter is a pointer to a DEV_BROADCAST_HDR structure.
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
@@ -163,17 +153,31 @@ implementation
 procedure TFrm_SimpleCapture.QuitSession();
 begin
   if Assigned(MfDeviceCapture) then
-    if SUCCEEDED(MfDeviceCapture.ShutDownEngine()) then
-      begin
-        MfDeviceCapture.Free();
-        MfDeviceCapture := Nil;
-      end;
+    begin
+      if SUCCEEDED(MfDeviceCapture.ShutDownEngine()) then
+        FreeAndNil(MfDeviceCapture);
+    end;
 end;
 
 
 procedure TFrm_SimpleCapture.butGetDeviceClick(Sender: TObject);
+
 begin
-  Application.CreateForm(TdlgChooseDevice, dlgChooseDevice);
+
+  if not Assigned(dlgChooseDevice) then
+    Application.CreateForm(TdlgChooseDevice,
+                           dlgChooseDevice);
+
+  EnumCaptureDeviceSources(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+                           FDevicePropertiesArray);
+
+  if (dlgChooseDevice.ShowModal = 111) then
+    begin
+      iSelectedDevice := dlgChooseDevice.iSelectedDevice;
+      // Set the device
+      if FAILED(MfDeviceCapture.SetDevice(FDevicePropertiesArray[iSelectedDevice])) then
+        GetLastError();
+    end;
 end;
 
 
@@ -189,8 +193,9 @@ begin
   // Before closing the app, clean up.
   QuitSession();
   CoUninitialize;
-  CanClose:= True;
+  CanClose := True;
 end;
+
 
 procedure TFrm_SimpleCapture.FormCreate(Sender: TObject);
 var
@@ -200,7 +205,7 @@ begin
   bAppIsClosing := False;
   bFullScreenMode := False;
 
-  hr := CoInitializeEx(Nil,
+  hr := CoInitializeEx(nil,
                        COINIT_APARTMENTTHREADED);
 
   if SUCCEEDED(hr) then
@@ -216,17 +221,19 @@ var
 
 begin
   vHdc := 0;
-  BeginPaint(Self.Handle, ps);
+  BeginPaint(Self.Handle,
+             ps);
 
   try
-    if Assigned(MfDeviceCapture) AND (MfDeviceCapture.VideoDetected()) then
+    if Assigned(MfDeviceCapture) and (MfDeviceCapture.VideoDetected()) then
       MfDeviceCapture.UpdateVideo()
     else
       FillRect(vHdc,
                ps.rcPaint,
                HBRUSH(COLOR_APPWORKSPACE + 1));
   finally
-    EndPaint(Self.Handle, ps);
+    EndPaint(Self.Handle,
+             ps);
   end;
 end;
 
@@ -235,9 +242,10 @@ end;
 function TFrm_SimpleCapture.GetFmCapture(): HRESULT;
 begin
   Result:= E_FAIL;
+
   if not Assigned(MfDeviceCapture) then
     begin
-      MfDeviceCapture:= Nil;
+      FreeAndNil(MfDeviceCapture);
       // We want the video to be played on the VideoPanel, so, we use that handle.
       TMfCaptureEngine.CreateInstance(pnlVideo.Handle,       // The clipping window / control
                                       Frm_SimpleCapture.Handle,
@@ -248,6 +256,7 @@ begin
     end;
 end;
 
+
 // Message listener
 // Listen for WM_DEVICECHANGE messages. The lParam message parameter is a pointer to a DEV_BROADCAST_HDR structure.
 procedure TFrm_SimpleCapture.WMDeviceChange(var Msg: TMessage);
@@ -257,7 +266,7 @@ var
 begin
   hr := S_OK;
 
-  if Not Assigned(MfDeviceCapture) then
+  if not Assigned(MfDeviceCapture) then
     Exit;
 
   if (Msg.lParam <> 0) then
@@ -266,11 +275,16 @@ begin
 
   if (Failed(hr) or bDeviceLost) then
     begin
-      MfDeviceCapture.ShutDownEngine();
-      MessageDlg('Lost the capture device.',
+      QuitSession();
+      // Show dialog with info about which device is disconnected.
+      MessageDlg(Format('Lost capture device %s.', [FDevicePropertiesArray[iSelectedDevice].lpFriendlyName]),
                  mtError,
                  mbOKCancel,
                  0);
+
+      // Update DevicePropertiesArray.
+      EnumCaptureDeviceSources(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+                               FDevicePropertiesArray);
     end;
 end;
 

@@ -10,7 +10,7 @@
 // Release date: 29-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Common methods used by Media Foundation,
 //              Core Audio etc..
 //
@@ -24,12 +24,16 @@
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 // 13/08/2022 Tony                Implemented more functionality and updated methods.
+// 11/12/2022 Tony                Added some modifications.
+// 20/02/2023 Tony                Fixed some issues with SafeRelease/SaveDelete.
+// 11/03/2023 Tony                Added CreateFile2 function (fileapi.h). See:
+//                                https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -45,29 +49,39 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfUtils;
 
 interface
+
+// {$DEFINE USE_EMBARCADERO_DEF}
 
 uses
   {WinApi}
   WinApi.Windows,
   WinApi.WinApiTypes,
   WinApi.ComBaseApi,
+  {ActiveX}
+  {$IFDEF USE_EMBARCADERO_DEF}
+  WinApi.ActiveX,
+  {$ELSE}
+  WinApi.ActiveX.PropIdl,
+  {$ENDIF}
   {System}
   System.SysUtils,
   System.UITypes,
@@ -83,35 +97,20 @@ uses
   WinApi.MediaFoundationApi.MfError;
 
   {$WEAKPACKAGEUNIT ON}
-  {$ALIGN ON}
-  {$MINENUMSIZE 4}
-
-  {$IFDEF WIN32}
-    {$ALIGN 1}
-  {$ELSE}
-    {$ALIGN 8} // Win64
-  {$ENDIF}
-
   {$I 'WinApiTypes.inc'}
+  {$DEFINE IGNORE_COMPILERVERSION}
 
 type
 
   TPComObj = array of Pointer;
 
-  // Use for releasing interfaces.
   procedure SafeRelease(var IUnk);
+  // Use for releasing objects.
+  procedure SAFE_RELEASE(const [ref] IUnk);
 
-  {$IF COMPILERVERSION < 25.0}
-  // Use for releasing interfaces C++ style. Note: The object does NOT initiate a reference call.
-  procedure Safe_Release(var IUnk);
-  {$ENDIF}
+  procedure Cpp_FreeAndNil(var Obj: TObject);
 
-  // Identical methods, both can be called.
-  procedure FreeAndNil(const [ref] Obj: TObject); inline;
-  procedure SafeDelete(const [ref] Obj: TObject); inline;
-
-  //
-  procedure ReleaseActivateArray(ppDevArray: PIMFActivate);
+  procedure PropVariantClearSafe(var pv: PROPVARIANT); inline;
 
   // Compare GUIDS
   function InlineIsEqualGUID(rguid1: TGUID;
@@ -187,7 +186,11 @@ type
   // Time formatting
   // Converts 100-Nano second units (Hns unit) to time string format.
   function HnsTimeToStr(hns: MFTIME;
-                        ShowMilliSeconds: Boolean = True): string; inline;
+                        DelimiterFormat: string;
+                        ShowMilliSeconds: Boolean = True): string; overload; inline;
+
+  function HnsTimeToStr(hns: MFTIME;
+                        ShowMilliSeconds: Boolean = True): string; overload; inline;
 
   // Converts Milliseconds to a time string format
   function MSecToStr(wMsec: Int64;
@@ -222,8 +225,8 @@ type
   function GetOSArchitecture(): string;
 
 
-  // Colors
-  //=======
+  // Colors and pixelformats
+  //========================
 
   // Translates a HTML color name name to TColor
   // Example: 'Red' >> TColor($0000FF) = TColors.Red = clRed;
@@ -253,6 +256,15 @@ type
   procedure CopyRgbTriple(src: RGBTRIPLE;
                           out srd: RGBTRIPLE); inline;
 
+  // Copies RGBTRIPLE src to RGBQUAD srd
+  procedure CopyRgbTripleToRgbQuad(src: RGBTRIPLE;
+                                   out srd: RGBQUAD); inline;
+
+  // Copies RGBQUAD src to RGBTRIPLE srd
+  procedure CopyRgbQuadToRgbTriple(src: RGBQUAD;
+                                   out srd: RGBTRIPLE); inline;
+
+
   // copies a DWord (COLORREF) to RGBTRIPLE
   procedure CopyClrRefToRgbTriple(src: COLORREF;
                                   out srd: RGBTRIPLE); inline;
@@ -274,13 +286,15 @@ type
                              aCr: Integer;
                              aCb: Integer): RGBQUAD; inline;
 
+  function PixelFormatToStr(PixelFmt: TPixelFormat): string; inline;
+
 
   // External
   function StringFromCLSID(const rclsid: REFCLSID;
                            var lplpsz: POleStr): HResult; stdcall;
 
   // Simplified helper of StringToWideChar function
-  function StrToPWideChar(const source: string): PWideChar; inline;
+  function StrToPWideChar(source: string): PWideChar; inline;
 
 
   // MFVideoNormalizedRect methods
@@ -342,6 +356,9 @@ type
   procedure CopyPVNRectToTRect(rs: PMFVideoNormalizedRect;
                                out rd: TRect); inline;
 
+  // Copy a PMFVideoNormalizedRect to a PRect
+  procedure CopyPVNRectToPRect(rs: PMFVideoNormalizedRect;
+                               out rd: PRect); inline;
   // TRect methods //
 
   // Copy TRect values to another TRect
@@ -461,11 +478,31 @@ type
   function BoolToStr(const aBoolean: Boolean): string; inline;
 
 
+  // Since Win 10, use this function to create a file.
+  function CreateFile2(lpFileName: PWideChar;
+      {[in]}           dwDesiredAccess: DWORD;
+      {[in]}           dwShareMode: DWORD;
+      {[in]}           dwCreationDisposition: DWORD;
+      {[in, optional]} pCreateExParams: LPCREATEFILE2_EXTENDED_PARAMETERS): THandle; stdcall;
+
+
+  // Strings
+  function StringCbCat(pszDest: PChar;
+                       cbDest: SIZE_T;
+                       const pszSrc: string): HRESULT;
+
+  function StringCbCatA(pszDest: PAnsiChar;
+                        cbDest: SIZE_T;
+                        pszSrc: PAnsiChar): HRESULT; stdcall;
+
+  function StringCbCatW(pszDest: PWideChar;
+                        cbDest: SIZE_T;
+                        pszSrc: PWideChar): HRESULT; stdcall;
+
 implementation
 
 uses
-  TypInfo;
-
+  System.TypInfo;
 
 const
   Kernel32Lib = 'kernel32.dll';
@@ -499,79 +536,38 @@ const
 // SafeRelease
 // Many of the code (examples) in the documentation use the SafeRelease method to
 // release COM interfaced objects.
-// Version > Delphi XE3
-{$IF COMPILERVERSION > 24.0}
+// Note: The object does initiate a reference call.
 procedure SafeRelease(var IUnk);
-{$IF NOT DEFINED(AUTOREFCOUNT)}  // Note: The object does initiate a reference call.
 begin
-  if Assigned(IUnknown(IUnk)) then
-    Pointer(IUnknown(IUnk)) := nil;
-end;
-{$ELSE} // Note: Here the object does NOT initiate a reference call.
-begin
-  if IUnknown(IUnk) <> nil then
+  if (IUnknown(IUnk) <> nil) then
     IUnknown(IUnk) := nil;
 end;
-{$ENDIF}
-{$ENDIF}
 
-// Version < Delphi XE4
-{$IF COMPILERVERSION < 25.0}
-procedure SafeRelease(var IUnk);
-// Note: The object does initiate a reference call.
+
+// Note: Here the object does NOT initiate a reference call.
+procedure Safe_Release(const [ref] IUnk);
 begin
   if Assigned(IUnknown(IUnk)) then
-    Pointer(IUnknown(IUnk)) := nil;
+    IUnknown(Pointer(@IUnk)^):= nil;
 end;
 
-procedure Safe_Release(var IUnk);
-begin
-  if Assigned(IUnknown(IUnk)) then
-    Pointer(IUnknown(IUnk)) := nil;
-end;
-{$ENDIF}
 
-// From DS, same as SafeDelete
-procedure FreeAndNil(const [ref] Obj: TObject); inline;
-{$IF NOT DEFINED(AUTOREFCOUNT)}
-var
-  Temp: TObject;
-
+// Equivalent method of CPPFreeAndNil
+procedure Cpp_FreeAndNil(var Obj: TObject);
 begin
-  Temp := Obj;
-  TObject(Pointer(@Obj)^) := nil;
-  Temp.Free;
-end;
-{$ELSE}
-begin
+  Obj.Free();
   Obj := nil;
 end;
-{$ENDIF}
 
 
-// Frees an Object reference and sets this referencecount to zero.
-// This is actually the same method as FeeAndNil as used, for example, in DirectShow.
-procedure SafeDelete(const [ref] Obj: TObject); inline;
+procedure PropVariantClearSafe(var pv: PROPVARIANT);
 begin
-  FreeAndNil(Obj);
+  ZeroMemory(@pv,
+             SizeOf(pv));
 end;
 
 
-// Releases a IMFActivate pointer
-procedure ReleaseActivateArray(ppDevArray: PIMFActivate);
-var
-  i: Integer;
-  uiCount: UINT32;
-
-begin
-{$POINTERMATH ON}
-  ppDevArray[0].GetCount(uiCount);
-  for i := 0 to uiCount -1 do
-    SafeRelease(ppDevArray[i]);
-{$POINTERMATH OFF}
-  CoTaskMemFree(ppDevArray);
-end;
-
+////////////////////////////////////////////////////////////////////////////////
 
 
 {$WARN SYMBOL_PLATFORM OFF}
@@ -923,9 +919,22 @@ end;
 // Time formatting & conversion functions
 //=======================================
 
+function NanoSecondsToMilliSeconds(aNanoSec: Int64): Int64; inline;
+begin
+  Result :=  aNanoSec div 1000;
+end;
+
+
+function MilliSecondsToSeconds(aSec: Int64): Single; inline;
+begin
+  Result :=  aSec / 1000;
+end;
+
+
 // Converts Hns to a time string format
 function HnsTimeToStr(hns: MFTIME;
-                      ShowMilliSeconds: boolean = True): String; inline;
+                      DelimiterFormat: string;
+                      ShowMilliSeconds: Boolean = True): string; inline;
 var
   hours,
   mins,
@@ -933,6 +942,7 @@ var
   millisec: Word;
 
 begin
+
 try
   hours := hns div MFTIME(36000000000);
   hns := hns mod MFTIME(36000000000);
@@ -944,6 +954,45 @@ try
   hns := hns mod 10000000;
 
   millisec := hns div 10000;
+
+  if DelimiterFormat = '' then
+    DelimiterFormat := ':';
+
+  if ShowMilliSeconds then
+    Result := Format('%2.2d%s%2.2d%s%2.2d,%3.3d', [hours, DelimiterFormat, mins, DelimiterFormat, secs, DelimiterFormat, millisec])
+  else
+    Result := Format('%2.2d%s%2.2d%s%2.2d', [hours, DelimiterFormat, mins, DelimiterFormat, secs]);
+
+except
+  on exception do Result:= '00:00:00,000';
+end;
+end;
+
+
+
+function HnsTimeToStr(hns: MFTIME;
+                      ShowMilliSeconds: Boolean = True): string; inline;
+var
+  hours,
+  mins,
+  secs,
+  millisec: Word;
+
+begin
+
+
+try
+  hours := hns div MFTIME(36000000000);
+  hns := hns mod MFTIME(36000000000);
+
+  mins := hns div 600000000;
+  hns := hns mod 600000000;
+
+  secs := hns div 10000000;
+  hns := hns mod 10000000;
+
+  millisec := hns div 10000;
+
 
   if ShowMilliSeconds then
     Result := Format('%2.2d:%2.2d:%2.2d,%3.3d', [hours, mins, secs, millisec])
@@ -1178,9 +1227,9 @@ end;
 procedure CopyMFARGBToTColor(const argb: MFARGB;
                              out cColor: TColor); inline;
 begin
-  cColor := ((argb.rgbRed shl 16) or
+  cColor := ((argb.rgbRed shl 0) or
              (argb.rgbGreen shl 8) or
-             (argb.rgbBlue shl 0) or
+             (argb.rgbBlue shl 16) or
              (argb.rgbAlpha shl 24));
 end;
 
@@ -1206,6 +1255,26 @@ begin
 end;
 
 
+procedure CopyRgbTripleToRgbQuad(src: RGBTRIPLE;
+                                 out srd: RGBQUAD); inline;
+begin
+  srd.rgbBlue := src.rgbtBlue;
+  srd.rgbGreen := src.rgbtGreen;
+  srd.rgbRed := src.rgbtRed;
+  srd.rgbReserved := Byte(0);
+end;
+
+
+// Copies RGBQUAD src to RGBTRIPLE srd
+procedure CopyRgbQuadToRgbTriple(src: RGBQUAD;
+                                 out srd: RGBTRIPLE); inline;
+begin
+  srd.rgbtBlue := src.rgbBlue;
+  srd.rgbtGreen := src.rgbGreen;
+  srd.rgbtRed := src.rgbRed;
+end;
+
+
 // copies a DWord (COLORREF) to RGBTRIPLE
 procedure CopyClrRefToRgbTriple(src: COLORREF;
                                 out srd: RGBTRIPLE); inline;
@@ -1217,6 +1286,7 @@ end;
 
 
 // copies a RGBTRIPLE to DWord (COLORREF)
+// Note the Delphi RGBTriple has a reversed RGBA order (BGRA), the color calculation has to be reversed too.
 procedure CopyRgbTripleToClrRef(src: RGBTRIPLE;
                                 out srd: COLORREF); inline;
 begin
@@ -1228,13 +1298,14 @@ end;
 
 
 // copies a RGBQUAD to DWord (COLORREF)
+// Note the Delphi RGBQuad has a reversed RGB order (BGR), the color calculation has to be reversed too.
 procedure CopyRGBQuadToClrRef(src: RGBQUAD;
                               out srd: COLORREF); inline;
 begin
-  srd := ((src.rgbRed shl 16) or
-          (src.rgbGreen shl 8) or
-          (src.rgbBlue shl 0) or
-          (src.rgbReserved shl 24)); // this should always be 0!
+  srd := ((DWord(src.rgbRed) shl 16) or
+          (DWord(src.rgbGreen) shl 8) or
+          (DWord(src.rgbBlue) shl 0) or
+          (DWord(src.rgbReserved) shl 24)); // this should always be 0!
 end;
 
 
@@ -1270,7 +1341,23 @@ begin
 end;
 
 
-// inline functions
+function PixelFormatToStr(PixelFmt: TPixelFormat): string; inline;
+begin
+  case PixelFmt of
+    pfDevice : Result := 'pfDevice';
+    pf1bit   : Result := 'pf1bit';
+    pf4bit   : Result := 'pf4bit';
+    pf8bit   : Result := 'pf8bit';
+    pf15bit  : Result := 'pf15bit';
+    pf16bit  : Result := 'pf16bit';
+    pf24bit  : Result := 'pf24bit';
+    pf32bit  : Result := 'pf32bit';
+    pfCustom : Result := 'pfCustom';
+    else
+      Result := 'Unknown';
+  end;
+end;
+
 
 // MFVideoNormalizedRect structure
 // Defines a normalized rectangle, which is used to specify sub-rectangles in a
@@ -1283,7 +1370,9 @@ end;
 //  Any coordinates of N that fall outside the range [0...1] are mapped to positions
 //  outside the rectangle R.
 //
-// A normalized rectangle can be used to specify a region within a video rectangle without knowing the resolution or even the aspect ratio of the video. For example, the upper-left quadrant is defined as {0.0, 0.0, 0.5, 0.5}.
+// A normalized rectangle can be used to specify a region within a video rectangle,
+// without knowing the resolution or even the aspect ratio of the video.
+// For example, the upper-left quadrant is defined as {0.0, 0.0, 0.5, 0.5}.
 
 
 // Note: TRect/TRectF record methods are defined in Delphi
@@ -1424,6 +1513,17 @@ begin
   rd.Left := Trunc(rs^.Left);
   rd.Right := Trunc(rs^.Right);
 end;
+
+// Copy a PMFVideoNormalizedRect to a PRect
+procedure CopyPVNRectToPRect(rs: PMFVideoNormalizedRect;
+                             out rd: PRect); inline;
+begin
+  rd.Top := Trunc(rs.Top);
+  rd.Bottom := Trunc(rs.Bottom);
+  rd.Left := Trunc(rs.Left);
+  rd.Right := Trunc(rs.Right);
+end;
+
 
 // TRect methods ///////////////////////////////////////////////////////////////
 
@@ -1630,7 +1730,7 @@ end;
 
 
 // Simplified helper of StringToWideChar function
-function StrToPWideChar(const source: string): PWideChar; inline;
+function StrToPWideChar(source: string): PWideChar; inline;
 var
   pwResult: PWideChar;
 
@@ -1658,10 +1758,10 @@ function MAKEFOURCC(const ch0: AnsiChar;
                     const ch2: AnsiChar;
                     const ch3: AnsiChar): FOURCC; inline;
 begin
-  Result := DWORD(Ord(ch3)) or
-            (DWORD(Ord(ch2)) shl 8) or
-            (DWORD(Ord(ch1)) shl 16) or
-            (DWORD(Ord(ch0)) shl 24);
+  Result := DWORD(Ord(ch0)) or
+            (DWORD(Ord(ch1)) shl 8) or
+            (DWORD(Ord(ch2)) shl 16) or
+            (DWORD(Ord(ch3)) shl 24);
 end;
 
 
@@ -1670,12 +1770,12 @@ end;
 // Get FOURCC as string
 function GETFOURCC(frcc: FOURCC): WideString; inline;
 var
-    afc : array[0..3] of AnsiChar;
+  afc : array[0..3] of AnsiChar;
 begin
-  afc[3] := AnsiChar(ord(frcc));
-  afc[2] := AnsiChar(ord(frcc shr 8));
-  afc[1] := AnsiChar(ord(frcc shr 16));
-  afc[0] := AnsiChar(ord(frcc shr 24));
+  afc[0] := AnsiChar(ord(frcc));
+  afc[1] := AnsiChar(ord(frcc shr 8));
+  afc[2] := AnsiChar(ord(frcc shr 16));
+  afc[3] := AnsiChar(ord(frcc shr 24));
   Result := UpperCase(WideString(afc));
 end;
 
@@ -1827,5 +1927,31 @@ begin
   else
     Result := 'False';
 end;
+
+
+function CreateFile2; external Kernel32Lib name 'CreateFile2';
+
+
+
+// Strings
+function StringCbCat(pszDest: PChar;
+                     cbDest: SIZE_T;
+                     const pszSrc: string): HRESULT;
+begin
+  // choose the appropriate function based on the string type
+  {$IFDEF UNICODE}
+  Result := StringCbCatW(pszDest,
+                         cbDest,
+                         PWideChar(WideString(pszSrc)));
+  {$ELSE}
+  Result := StringCbCatA(pszDest,
+                         cbDest,
+                         PAnsiChar(AnsiString(pszSrc)));
+  {$ENDIF}
+
+end;
+
+function StringCbCatA; external Kernel32Lib name 'StringCbCatA';
+function StringCbCatW; external Kernel32Lib name 'StringCbCatW';
 
 end.

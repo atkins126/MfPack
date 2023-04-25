@@ -9,7 +9,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: Requires Windows 7 or later.
 //              This unit is used as fullscreen layer, if not using the EVR's
 //              fullscreen option which is deprecated.
@@ -22,13 +22,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
-// Related objects: MfPack Samples 3.1.0
-// Related projects: MfPackX312
+// Related objects: -
+// Related projects: MfPackX314
 // Known Issues: -
 // Compiler version: 23 up to 35
 // TODO: -
@@ -51,17 +51,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Groupname: FactoryX
-// The Initial Developers of the Original Code are: Tony Kalf (maXcomX)
-//                                                  Peter Larson (ozships)
-//                                                  Ramyses De Macedo Rodrigues
-// Contributor(s): Ramyses De Macedo Rodrigues,
-//                 Tony Kalf (maXcomX),
-//                 Peter Larson (ozships).
-//
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmFullScreenLayer;

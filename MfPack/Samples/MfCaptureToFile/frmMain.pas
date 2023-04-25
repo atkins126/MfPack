@@ -10,7 +10,7 @@
 // Release date: 01-02-2022
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: Application Mainform.
 //              This sample demonstrates how to capture video from camera to a file.
 //
@@ -22,13 +22,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-//
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -54,8 +54,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmMain;
@@ -204,7 +206,6 @@ begin
     end;
 
 
-
   if bDeviceLost then
     begin
       if MessageDlg('Capture device ' + sActiveDeviceFriendlyName + ' is removed or lost.'  + #13 +
@@ -248,7 +249,7 @@ var
 
 begin
 
-  if AMessage.WParam = DBT_DEVICEREMOVECOMPLETE then
+  if (AMessage.WParam = DBT_DEVICEREMOVECOMPLETE) then
     begin
       // Check for added/removed devices, regardless of whether
       // the application is capturing video at this time.
@@ -256,13 +257,15 @@ begin
 
       // Now check if the current video capture device was lost.
 
-      if PDEV_BROADCAST_HDR(AMessage.LParam).dbch_devicetype <> DBT_DEVTYP_DEVICEINTERFACE then
+      if (PDEV_BROADCAST_HDR(AMessage.LParam).dbch_devicetype <> DBT_DEVTYP_DEVICEINTERFACE) then
         Exit;
 
       // Get the symboliclink of the lost device and check.
       PDevBroadcastHeader := PDEV_BROADCAST_HDR(AMessage.LParam);
       pDevBroadCastIntf := PDEV_BROADCAST_DEVICEINTERFACE(PDevBroadcastHeader);
+
       // Note: Since Windows 8 the value of dbcc_name is no longer the devicename, but the symboliclink of the device.
+      // Dereference the struct's field dbcc_name (array [0..0] of WideChar) for a readable string.
       pwDevSymbolicLink := PChar(@pDevBroadCastIntf^.dbcc_name);
 
       hr := S_OK;
@@ -271,12 +274,15 @@ begin
       if Assigned(CaptureEngine) then
         if CaptureEngine.IsCapturing() = State_Capturing then
           begin
-            if StrIComp(PWideChar(CaptureEngine.DeviceSymbolicLink),
-                        PWideChar(pwDevSymbolicLink)) = 0 then
+            if (StrIComp(PWideChar(CaptureEngine.DeviceSymbolicLink),
+                         PWideChar(pwDevSymbolicLink)) = 0) then
               bDeviceLost := True;
 
-            if FAILED(hr) or bDeviceLost then
-              StopCapture();
+            if (FAILED(hr) or bDeviceLost) then
+              begin
+                StopCapture();
+                UpdateUI();
+              end;
           end;
     end;
 end;
@@ -288,7 +294,7 @@ begin
   if Assigned(CaptureEngine) then
     begin
       CaptureEngine.EndCaptureSession();
-      SafeDelete(CaptureEngine);
+      FreeAndnil(CaptureEngine);
     end;
 
   if Assigned(DeviceList) then
@@ -326,7 +332,7 @@ begin
   DeviceList := TDeviceList.Create;
 
   // Initialize the COM library
-  hr := CoInitializeEx(Nil,
+  hr := CoInitializeEx(nil,
                        COINIT_APARTMENTTHREADED or
                        COINIT_DISABLE_OLE1DDE);
 
@@ -441,7 +447,7 @@ begin
       cbDeviceList.Items.Append(WideCharToString(szFiendlyName));
 
       CoTaskMemFree(szFiendlyName);
-      szFiendlyName := Nil;
+      szFiendlyName := nil;
 
     if (DeviceList.Count > 0) then
       begin
@@ -578,7 +584,7 @@ var
 begin
   hr := CaptureEngine.EndCaptureSession();
 
-  Safe_Release(CaptureEngine);
+  CaptureEngine := nil;
 
   UpdateDeviceList();
 
@@ -592,7 +598,6 @@ begin
 {$ENDIF}
 
   Result := hr
-
 end;
 
 

@@ -9,7 +9,7 @@
 // Release date: 24-02-2012
 // Language: ENU
 //
-// Version: 3.0.1
+// Version: 3.1.4
 // Description: Universal threaded timer
 //              This timer can be used for a variety of tasks where you need a
 //              lightweight, precise and threadsave timer.
@@ -50,8 +50,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit UniThreadTimer;

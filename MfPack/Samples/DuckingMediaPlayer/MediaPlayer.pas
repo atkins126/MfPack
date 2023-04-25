@@ -10,7 +10,7 @@
 // Release date: 05-07-2020
 // Language: ENU
 //
-// Version: 3.1.1
+// Version: 3.1.3
 // Description: This sample implements a simple media player that responds to the "ducking"
 //              feature in Windows 7 and higher.
 //              It also implements a volume control which tracks
@@ -30,7 +30,7 @@
 // Remarks: Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -56,9 +56,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit MediaPlayer;
@@ -144,7 +145,7 @@ type
                                     ChangedChannel: UINT;
                                     const EventContext: TGUID): HResult; stdcall; { return S_OK; }
 
-    function OnGroupingParamChanged(NewGroupingParam: TGUID;
+    function OnGroupingParamChanged(const NewGroupingParam: TGUID;
                                     const EventContext: TGUID): HResult; stdcall; { return S_OK; }
 
     function OnStateChanged(NewState: AudioSessionState): HResult; stdcall; { return S_OK; }
@@ -915,7 +916,7 @@ begin
 end;
 
 
-function TCMediaPlayer.OnGroupingParamChanged(NewGroupingParam: TGUID;
+function TCMediaPlayer.OnGroupingParamChanged(const NewGroupingParam: TGUID;
                                               const EventContext: TGUID): HResult; stdcall; { return S_OK; }
 begin
   // to prevent "Return value might be undefined" compilerwarning

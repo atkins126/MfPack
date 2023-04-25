@@ -9,7 +9,7 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: This is the basic class of MfPlayer,
 //              containing the necessary methodes to play a mediafile
 //              For indepth information see the included examples (CPlayer)
@@ -24,13 +24,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -56,9 +56,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 
@@ -112,7 +113,7 @@ type
 
   public
     { Public declarations }
-    MfPlayer: TMfAsyncCallback;
+    MfPlayer: TMfPlayer;
 
   end;
 
@@ -149,7 +150,10 @@ end;
 procedure Tfrm_MfPlayer.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if Assigned(MfPlayer) then
-    MfPlayer.ShutDown();
+    begin
+      MfPlayer.Free;
+      MfPlayer := nil;
+    end;
 end;
 
 

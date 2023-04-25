@@ -10,7 +10,7 @@
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.5
 // Description: AudioClient API interface definition.
 //
 // Organisation: FactoryX
@@ -22,12 +22,15 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 12/03/2023 Tony                Updated to match mmio
+// 02/04/2023 All                 Pre-release to 3.1.5
+// 03/04/2023 Tony                Fixed IAudioClient.GetMixFormat.
 //------------------------------------------------------------------------------
 //
-// Remarks: Requires Windows Vista or later.
+// Remarks: Requires Windows 8 or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -43,19 +46,20 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit WinApi.CoreAudioApi.AudioClient;
@@ -69,7 +73,9 @@ uses
   WinApi.Windows,
   WinApi.WinApiTypes,
   WinApi.WinError,
-  WinApi.WinMM.MMReg,  // for WAVEFORMATEX
+  {WinMM}
+  //WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMeApi,
   {CoreAudioApi}
   WinApi.CoreAudioApi.AudioMediaType,
   WinApi.CoreAudioApi.AudioSessionTypes;
@@ -267,12 +273,12 @@ type
   IAudioClient = interface(IUnknown)
   ['{1CB9AD4C-DBFA-4c32-B178-C2F568A703B2}']
 
-    function Initialize(const ShareMode: AUDCLNT_SHAREMODE;
-                        const StreamFlags: DWord;
+    function Initialize(ShareMode: AUDCLNT_SHAREMODE;
+                        StreamFlags: DWord;
                         hnsBufferDuration: REFERENCE_TIME;
                         hnsPeriodicity: REFERENCE_TIME;
-                        const pFormat: PWaveFormatEx;
-                        {optional, can be Nil or a pointer to GUID_NULL} AudioSessionGuid: LPCGUID): HResult; stdcall;
+                        pFormat: PWAVEFORMATEX;
+                        {optional, can be Nil or a pointer to GUID_NULL} const AudioSessionGuid: {LPC}TGUID): HResult; stdcall;
     // Description:
     //
     //  Initializes the audio stream by creating a connection to the Windows Audio System (WAS)
@@ -488,9 +494,9 @@ type
     //  Once the audio stream has been successfully initialized, this call should always succeed.
     //
 
-    function IsFormatSupported(const ShareMode: AUDCLNT_SHAREMODE;
-                               const pFormat: PWaveFormatEx;
-                               const ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to Nil.
+    function IsFormatSupported(ShareMode: AUDCLNT_SHAREMODE;
+                               pFormat: WaveFormatEx;
+                               out ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to Nil.
                                ): HResult; stdcall;
     // Description:
     //
@@ -1067,11 +1073,12 @@ type
   {$EXTERNALSYM IAudioCaptureClient}
   IAudioCaptureClient = interface(IUnknown)
   ['{C8ADBD64-E71E-48a0-A4DE-185C395CD317}']
+
     function GetBuffer(out ppData: PByte;
                        out pNumFramesToRead: UINT32;
                        out pdwFlags: AUDCLNT_BUFFERFLAGS;
-                       {out} pu64DevicePosition: UINT64;
-                       {out} pu64QPCPosition: UINT64): HResult; stdcall;
+                       out pu64DevicePosition: UINT64;
+                       out pu64QPCPosition: UINT64): HResult; stdcall;
     //-------------------------------------------------------------------------
     // Description:
     //

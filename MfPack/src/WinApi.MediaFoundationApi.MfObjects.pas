@@ -10,7 +10,7 @@
 // Release date: 29-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: -
 //
 // Organisation: FactoryX
@@ -35,7 +35,7 @@
 //         Fields with a Common Type Specification.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 33
@@ -51,19 +51,21 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfObjects;
 
@@ -101,6 +103,21 @@ uses
 const
 
   // Interface IMFMediaType
+
+  //
+  // IsEqual flags
+  //
+
+  // For audio
+  // Major type match = both are audio
+  // Subtype match = format types match = iscompressed for both matches
+  // Format_data match = format blocks match exactly
+
+  // For video
+  // Major type match = both are video
+  // Sub type match = bit format for both are the same
+  // Format type match = both of them have format blocks
+  // Format_data match = both format blocks match exactly
 
   MF_MEDIATYPE_EQUAL_MAJOR_TYPES      = $00000001;
   {$EXTERNALSYM MF_MEDIATYPE_EQUAL_MAJOR_TYPES}
@@ -961,7 +978,9 @@ type
   MFVideoCompressedInfo = _MFVideoCompressedInfo;
   {$EXTERNALSYM MFVideoCompressedInfo}
 
-
+  // Applications should avoid using this structure.
+  // Instead, it is recommended that applications use attributes to describe the video format.
+  // See: https://learn.microsoft.com/en-us/windows/win32/api/mfobjects/ns-mfobjects-mfvideoformat
   PMFVIDEOFORMAT = ^MFVIDEOFORMAT;
   _MFVIDEOFORMAT = record
     dwSize: DWORD;
@@ -1154,19 +1173,19 @@ type
     function DeleteAllItems(): HResult; stdcall;
 
     function SetUINT32(const guidKey: TGUID;
-                       const unValue: UINT32): HResult; stdcall;
+                       unValue: UINT32): HResult; stdcall;
 
     function SetUINT64(const guidKey: TGUID;
-                       const unValue: UINT64): HResult; stdcall;
+                       unValue: UINT64): HResult; stdcall;
 
     function SetDouble(const guidKey: TGUID;
-                       const fValue: Double): HResult; stdcall;
+                       fValue: Double): HResult; stdcall;
 
     function SetGUID(const guidKey: TGUID;
-                     const guidValue: REFGUID): HResult; stdcall;
+                     const [ref] guidValue: REFGUID): HResult; stdcall;
 
     function SetString(const guidKey: TGUID;
-                       const wszValue: LPCWSTR): HResult; stdcall;
+                       wszValue: LPCWSTR): HResult; stdcall;
 
     function SetBlob(const guidKey: TGUID;
                      pBuf: UINT8;
@@ -1181,7 +1200,7 @@ type
 
     function GetCount(out pcItems: UINT32): HResult; stdcall;
 
-    function GetItemByIndex(const unIndex: UINT32;
+    function GetItemByIndex(unIndex: UINT32;
                             const guidKey: TGUID;
                             var pValue: PROPVARIANT): HResult; stdcall;
 
@@ -1194,10 +1213,10 @@ type
 
   // Interface IMFMediaBuffer
   // ========================
-  //     The IMFMediaBuffer interface represent a buffer of multimedia data
-  //     for any possible multimedia type.
-  //     It provides methods for accessing the buffer pointer, the current
-  //     length, and the maximum length of the buffer
+  // The IMFMediaBuffer interface represent a buffer of multimedia data
+  // for any possible multimedia type.
+  // It provides methods for accessing the buffer pointer, the current
+  // length, and the maximum length of the buffer.
   //
   PIMFMediaBuffer = ^IMFMediaBuffer;
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFMediaBuffer);'}
@@ -1205,9 +1224,9 @@ type
   IMFMediaBuffer = interface(IUnknown)
   ['{045FA593-8799-42b8-BC8D-8968C6453507}']
 
-    function Lock(out ppbBuffer: PByte;     // Receives a pointer to the start of the buffer.
-                  pcbMaxLength: PDWord;     // Receives the maximum amount of data that can be written to the buffer. This parameter can be Nil.
-                  pcbCurrentLength: PDWord  // Receives the length of the valid data in the buffer, in bytes. This parameter can be Nil.
+    function Lock(out ppbBuffer: PByte;        // Receives a pointer to the start of the buffer.
+                  {out} pcbMaxLength: PDWord;     // Receives the maximum amount of data that can be written to the buffer. This parameter can be nil.
+                  {out} pcbCurrentLength: PDWord  // Receives the length of the valid data in the buffer, in bytes. This parameter can be nil.
                   ): HResult; stdcall;
 
     function Unlock(): HResult; stdcall;
@@ -1235,6 +1254,7 @@ type
   // It is also valid to have an empty sample with no buffers.
   //
   PIMFSample = ^IMFSample;
+  PPIMFSample = ^PIMFSample; //a test issue
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFSample);'}
   {$EXTERNALSYM IMFSample}
   IMFSample = interface(IMFAttributes)
@@ -1330,6 +1350,64 @@ type
   {$EXTERNALSYM IID_IMF2DBuffer}
 
 
+  PMF2DBufferLockFlags = ^MF2DBuffer_LockFlags;
+  _MF2DBuffer_LockFlags               = (
+    MF2DBuffer_LockFlags_LockTypeMask = $1 or $2 or $3,
+    MF2DBuffer_LockFlags_Read         = $1,
+    MF2DBuffer_LockFlags_Write        = $2,
+    MF2DBuffer_LockFlags_ReadWrite    = $3,
+    MF2DBuffer_LockFlags_ForceDWORD   = $7FFFFFFF
+  );
+  {$EXTERNALSYM _MF2DBuffer_LockFlags}
+  MF2DBuffer_LockFlags = _MF2DBuffer_LockFlags;
+  {$EXTERNALSYM MF2DBuffer_LockFlags}
+
+
+  // Interface IMF2DBuffer2
+  // =======================
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMF2DBuffer2);'}
+  {$EXTERNALSYM IMF2DBuffer2}
+  IMF2DBuffer2 = interface(IMF2DBuffer)
+    ['{33ae5ea6-4316-436f-8ddd-d73d22f829ec}']
+
+    function Lock2DSize(lockFlags: MF2DBuffer_LockFlags;
+                        out ppbScanline0: PByte;
+                        out plPitch: LONG;
+                        out ppbBufferStart: PByte;
+                        out pcbBufferLength: DWORD): HRESULT; stdcall;
+
+    function Copy2DTo(pDestBuffer: IMF2DBuffer2): HRESULT; stdcall;
+
+  end;
+  IID_IMF2DBuffer2 = IMF2DBuffer2;
+  {$EXTERNALSYM IID_IMF2DBuffer2}
+
+
+  // Interface IMFDXGIBuffer
+  // ========================
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFDXGIBuffer);'}
+  {$EXTERNALSYM IMFDXGIBuffer}
+  IMFDXGIBuffer = interface(IUnknown)
+    ['{e7174cfa-1c9e-48b1-8866-626226bfc258}']
+
+    function GetResource(const riid: REFIID;
+                         out ppvObject: Pointer): HRESULT; stdcall;
+
+    function GetSubresourceIndex(out puSubresource: UINT): HRESULT; stdcall;
+
+    function GetUnknown(const guid: REFIID;
+                        const riid: REFIID;
+                        out ppvObject: PPointer): HRESULT; stdcall;
+
+    function SetUnknown(const guid: REFIID;
+                        pUnkData: IUnknown): HRESULT; stdcall;
+  end;
+  IID_IMFDXGIBuffer = IMFDXGIBuffer;
+  {$EXTERNALSYM IID_IMFDXGIBuffer}
+
+
   // Interface IMFMediaType
   // ======================
   // Represents a description of a media format.
@@ -1368,7 +1446,13 @@ type
   {$EXTERNALSYM IMFAudioMediaType}
   IMFAudioMediaType = interface(IMFMediaType)
   ['{26a0adc3-ce26-4672-9304-69552edd3faf}']
-
+    //
+    // This method has been deprecated, and its use should be avoided.
+    // There are no guarantees about how long the memory pointed to by the
+    // return value will be valid.
+    // Applications are advised to use MFCreateWaveFormatExFromMFMediaType()
+    // instead.
+    //
     function GetAudioFormat(): PWAVEFORMATEX; stdcall;
 
   end;
@@ -1760,7 +1844,7 @@ type
     //     Will contain the requested interface
     // </param>
     function ActivateObject(const riid: REFIID;
-                            out ppv: LPVOID): HResult; stdcall;
+                            out ppv): HResult; stdcall;  {const [ref]}
 
     // <summary>
     //     Shuts down the internal represented object

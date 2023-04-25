@@ -4,7 +4,7 @@ object dlgSelectDevice: TdlgSelectDevice
   ActiveControl = butOk
   BorderStyle = bsDialog
   Caption = 'Select Device'
-  ClientHeight = 80
+  ClientHeight = 93
   ClientWidth = 377
   Color = clBtnFace
   ParentFont = True
@@ -16,7 +16,7 @@ object dlgSelectDevice: TdlgSelectDevice
     Left = 0
     Top = 0
     Width = 281
-    Height = 80
+    Height = 93
     Align = alLeft
     Shape = bsFrame
     ExplicitLeft = 8
@@ -24,17 +24,18 @@ object dlgSelectDevice: TdlgSelectDevice
     ExplicitHeight = 162
   end
   object butOk: TButton
-    Left = 292
-    Top = 10
+    Left = 294
+    Top = 9
     Width = 75
     Height = 25
     Caption = 'Ok'
     Default = True
     ModalResult = 1
     TabOrder = 0
+    OnClick = butOkClick
   end
   object butCancel: TButton
-    Left = 292
+    Left = 294
     Top = 40
     Width = 75
     Height = 25
@@ -50,6 +51,5 @@ object dlgSelectDevice: TdlgSelectDevice
     Height = 21
     TabOrder = 2
     Text = 'ComboBox1'
-    OnClick = ComboBox1Click
   end
 end

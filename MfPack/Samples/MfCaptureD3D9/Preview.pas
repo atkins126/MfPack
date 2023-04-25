@@ -9,7 +9,7 @@
 // Release date: 08-03-2019
 // Language: ENU
 //
-// Version: 3.1.1
+// Version: 3.1.4
 //
 // Description: Manages video preview.
 //
@@ -21,13 +21,15 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 07/02/2023 Tony                Fixed issues with OnReadSample and bufferlock.
+// 04/03/2023 Tony                Updated Device loss methods.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -54,8 +56,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit Preview;
@@ -108,15 +112,29 @@ type
     ppDevices: PIMFActivate; // Pointer to array of IMFActivate pointers.
     count: UINT32;           // Number of elements in the array.
     selection: UINT32;       // Selected device, by array index.
-    sSelection: LPWSTR;      // Selected device name
+    pwcSelection: LPWSTR;    // Selected devicename
   end;
 
   // request commands for a-syncrone handling
   TRequest = (reqNone, reqResize, reqSample);
+  TState = (stInitializing, stError, stCapturing, stStopped);
 
-
-  TMFSourceReaderCallback = class(TInterfacedPersistent, IMFSourceReaderCallback)
+  TCPreview = class(TInterfacedPersistent, IMFSourceReaderCallback)
   private
+
+    m_pReader: IMFSourceReader;
+    m_pSource: IMFMediaSource;
+    m_draw: TDrawDevice;           // Manages the Direct3D device.
+
+    m_hwndVideo: HWND;             // Video window.
+    m_hwndEvent: HWND;             // Application window to receive events.
+    m_state: TState;
+
+    m_bFirstSample: BOOL;
+    m_llBaseTime: LongLong;
+    m_strSymbolicLink: string;
+    m_strDeviceName: string;
+
     // Implementation of the interface /////////////////////////////////////////
     function OnReadSample(hrStatus: HRESULT;
                           dwStreamIndex: DWord;
@@ -129,68 +147,45 @@ type
     function OnEvent(dwStreamIndex: DWord;
                      pEvent: IMFMediaEvent): HResult; stdcall;
 
-    // IMFSourceReaderCallback2
-    {function OnTransformChange(): HResult; stdcall;
-
-    function OnStreamError(dwStreamIndex: DWORD;
-                           hrStatus: HResult): HResult; stdcall;}  //TInterfacedObject,
-
     ////////////////////////////////////////////////////////////////////////////
-
-    public
-      constructor Create();
-      destructor Destroy(); override;
-
-  end;
-
-
-
-  TCPreview = class (TObject)
-  private
-    m_bFirstSample: BOOL;
-    m_llBaseTime: LongLong;
-    m_pwszSymbolicLink: LPWSTR;
-    m_cchSymbolicLink: UINT32;
 
     // Constructor
     constructor Create(hVideo: HWND;
-                       hEvent: HWND); virtual;
+                       hEvent: HWND); reintroduce; virtual;
 
-  protected
-    FCritSec: TCriticalSection;
-
-    m_hwndVideo: HWND;             // Video window.
-    m_hwndEvent: HWND;             // Application window to receive events.
-
-    m_pSourceReaderCallback: TMFSourceReaderCallback;
-    m_pReader: IMFSourceReader;
-    m_draw: TDrawDevice;           // Manages the Direct3D device.
-
-  public
-
-    m_Request: TRequest;
-
-    // Constructor is private. Use static CreateInstance method to create.
-    class function CreateInstance(hVideo: HWND;
-                                  hEvent: HWND;
-                                  out ppPlayer: TCPreview): HResult; static;
-    // Handle stuff before reaching Destroy
-    procedure BeforeDestruction(); override;
-    // Destructor
-    destructor Destroy(); override;
-    //
-    ////////////////////////////////////////////////////////////////////////////
 
     function Initialize(): HResult;
     procedure NotifyError(hr: HResult);
     function TryMediaType(pType: IMFMediaType): HResult;
-    function SetDevice(pActivate: IMFActivate): HResult;
-    function CloseDevice(): HResult;
     function ResizeVideo(): HResult;
 
-    property DeviceSymbolicLink: LPWSTR read m_pwszSymbolicLink;
+  public
 
+    m_Request: TRequest;
+    FCritSec: TCriticalSection;
+
+    // Constructor is private. Use static CreateInstance method to create.
+    class function CreateInstance(hVideo: HWND;
+                                  hEvent: HWND;
+                                  out pPlayer: TCPreview): HResult; static;
+    // Destructor
+    destructor Destroy(); override;
+    //
+    // Handle stuff before reaching Destroy
+    procedure BeforeDestruction(); override;
+    ////////////////////////////////////////////////////////////////////////////
+
+    function SetDevice(pActivate: IMFActivate): HResult;
+    function CloseDevice(): HResult;
+
+    property DeviceSymbolicLink: string read m_strSymbolicLink;
+    property DeviceName: string read m_strDeviceName;
+    property State: TState read m_state;
   end;
+
+  // helper
+  procedure HandleThreadMessages(AThread: THandle;
+                                 AWait: Cardinal = INFINITE);
 
 var
   param: ChooseDeviceParam;
@@ -199,6 +194,8 @@ var
 
 implementation
 
+
+
 //-------------------------------------------------------------------
 //  CreateInstance
 //
@@ -206,7 +203,7 @@ implementation
 //-------------------------------------------------------------------
 class function TCPreview.CreateInstance(hVideo: HWND;         // Handle to the video window.
                                         hEvent: HWND;         // Handle to the window to receive notifications.
-                                        out ppPlayer: TCPreview): HResult; // Receives a pointer to the CPreview object.
+                                        out pPlayer: TCPreview): HResult; // Receives the CPreview object.
 var
   hr: HResult;
 
@@ -218,18 +215,18 @@ begin
   assert(hEvent <> 0);
 {$ENDIF}
 
-  ppPLayer := TCPreview.Create(hVideo,
-                               hEvent);
+  pPLayer := TCPreview.Create(hVideo,
+                              hEvent);
 
   // The CPlayer constructor sets the ref count to 1.
 
-  if (ppPlayer = Nil) then
+  if (pPlayer = nil) then
     begin
       Result := E_OUTOFMEMORY;
       Exit;
     end;
 
-  hr := ppPlayer.Initialize();
+  hr := pPlayer.Initialize();
 
   Result := hr;
 end;
@@ -241,15 +238,13 @@ constructor TCPreview.Create(hVideo: HWND;
                              hEvent: HWND);
 begin
   inherited Create();
-  m_pReader := Nil;
-  m_draw := Nil;
+  m_pReader := nil;
+  m_draw := nil;
   m_hwndVideo := hVideo;     // Handle to the video window.
   m_hwndEvent := hEvent;     // Handle to the window to receive notifications.
-  m_pwszSymbolicLink := Nil;
-  m_cchSymbolicLink := 0;
+  m_State := stInitializing;
 
   // Create the callback
-  m_pSourceReaderCallback := TMFSourceReaderCallback.Create();
   FCritSec := TCriticalSection.Create();
 
   m_bFirstSample := FALSE;
@@ -268,9 +263,20 @@ end;
 // Destructor
 destructor TCPreview.Destroy();
 begin
-  m_draw.DestroyDevice();
-  m_draw.Free;
-  m_draw := Nil;
+  // CloseDevice() is called in BeforeDestruction()
+
+  if Assigned(m_pSource) then
+    SafeRelease(m_pSource);
+
+  if Assigned(m_pReader) then
+    SafeRelease(m_pReader);
+
+  if Assigned(m_draw) then
+    begin
+      m_draw.DestroyDevice();
+      FreeAndnil(m_draw);
+    end;
+
   FCritSec.Destroy;
   inherited Destroy();
 end;
@@ -308,35 +314,29 @@ begin
 
   if Assigned(m_pReader) then
     begin
+      if Assigned(m_pSource) then
+        begin
+          m_pSource.Shutdown();
+        end;
       m_pReader.Flush(MF_SOURCE_READER_ALL_STREAMS);
-      m_pReader := Nil;
     end;
 
-  if Assigned(m_pSourceReaderCallback) then
-    begin
-      m_pSourceReaderCallback.Free;
-      m_pSourceReaderCallback := Nil;
-    end;
-
-  if Assigned(m_pwszSymbolicLink) then
-    begin
-      CoTaskMemFree(m_pwszSymbolicLink);
-      m_pwszSymbolicLink := Nil;
-      m_cchSymbolicLink := 0;
-   end;
-
- FCritSec.Leave;
- Result := S_OK;
+  m_strSymbolicLink := '';
+  m_strDeviceName := '';
+  m_State := stStopped;
+  FCritSec.Leave;
+  Result := S_OK;
 end;
 
 
 procedure TCPreview.NotifyError(hr: HResult);
 begin
-  PostMessage(m_hwndEvent,
+  SendMessage(m_hwndEvent,
               WM_APP_PREVIEW_ERROR,
               WPARAM(hr),
               LPARAM(0));
 end;
+
 
 //------------------------------------------------------------------------------
 // TryMediaType
@@ -398,7 +398,7 @@ begin
 
         inc(i);
 
-      until i > g_cFormats;   // Defined in unit DrawDeviceClass: Holds the number of supported media types
+      until (i > g_cFormats);   // Defined in unit DrawDeviceClass: Holds the number of supported media types
     end;  // Repeat
 
   if bFound = True then
@@ -410,28 +410,16 @@ end;
 
 /////////////// TMFSourceReaderCallback methods ////////////////////////////////
 
-constructor TMFSourceReaderCallback.Create();
-begin
-  inherited Create();
-end;
-
-
-destructor TMFSourceReaderCallback.Destroy();
-begin
-  inherited Destroy();
-end;
-
-
 //------------------------------------------------------------------------------
 // OnReadSample
 //
 // Called when the IMFMediaSource.ReadSample method completes.
 //------------------------------------------------------------------------------
-function TMFSourceReaderCallback.OnReadSample(hrStatus: HRESULT;
-                                              dwStreamIndex: DWord;
-                                              dwStreamFlags: DWord;
-                                              llTimestamp: LongLong;
-                                              pSample: IMFSample): HResult;
+function TCPreview.OnReadSample(hrStatus: HRESULT;
+                                dwStreamIndex: DWord;
+                                dwStreamFlags: DWord;
+                                llTimestamp: LongLong;
+                                pSample: IMFSample): HResult;
 var
   hr: HResult;
   pBuffer: IMFMediaBuffer;
@@ -442,13 +430,16 @@ label
 begin
 
   hr := S_OK;
+  FCritSec.Enter();
 
-  if (g_pPreview.m_pReader = Nil) and (pSample = Nil) then
+  if not Assigned(g_pPreview) then
+    goto done;
+
+  if (g_pPreview.m_pReader = nil) and (pSample = nil) then
     begin
       hr := E_POINTER;
       goto done;
     end;
-
 
   if FAILED(hrStatus) then
     hr := hrStatus;
@@ -470,98 +461,77 @@ begin
           // Get the video frame buffer from the sample.
           // Like this
           if SUCCEEDED(hr) then
-           hr := pSample.GetBufferByIndex(0,
-                                          pBuffer);
+            hr := pSample.GetBufferByIndex(0,
+                                           pBuffer);
           // or like this (both are permitted)
           //   hr := pSample.ConvertToContiguousBuffer(pBuffer);
 
           // Draw the frame and create the lockbuffer (buffer)
-
           if SUCCEEDED(hr) then
             hr := g_pPreview.m_draw.DrawFrame(pBuffer);
-
-          pSample := Nil; // You must clear the sample before getting another one.
         end;
     end;
 
   // Request the next frame.
   if SUCCEEDED(hr) then
     begin
-     if g_pPreview.m_pReader <> nil then
+     if Assigned(g_pPreview.m_pReader) then
        hr := g_pPreview.m_pReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                             0)
-                                             // Nil,   // actual
-                                             // Nil,   // flags
-                                             // Nil,   // timestamp
-                                             // Nil);  // sample optional
+                                             0,
+                                             nil,   // actual
+                                             nil,   // flags
+                                             nil,   // timestamp
+                                             nil)   // sample optional
      else
        begin
          hr := E_POINTER;
          goto done;
        end;
-
     end;
 
   // Here you could implement the stream flags, like:
   // check the StreamFlags
-    if SUCCEEDED(hr) then
-      begin
-        case dwStreamFlags of
-        MF_SOURCE_READERF_ERROR:                    begin {An error occurred.
-                                                           If you receive this flag, do not make any further calls to IMFSourceReader methods.
-                                                           } end;
-        MF_SOURCE_READERF_ENDOFSTREAM:              begin {The source reader reached the end of the stream.} end;
-        MF_SOURCE_READERF_NEWSTREAM:                begin {One or more new streams were created.
-                                                           Respond to this flag by doing at least one of the following:
-                                                            - Set the output types on the new streams.
-                                                            - Update the stream selection by selecting or deselecting streams.}
-                                                    end;
-        MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED:   begin {The native format has changed for one or more streams.
-                                                          The native format is the format delivered by the media source before any decoders are inserted.}
-                                                    end;
-        MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED:  begin {The current media has type changed for one or more streams.
-                                                           To get the current media type, call the IMFSourceReader.GetCurrentMediaType method.}
-                                                    end;
-        MF_SOURCE_READERF_STREAMTICK:               begin {There is a gap in the stream.
-                                                           This flag corresponds to an MEStreamTick event from the media source.}
-                                                    end;
-        MF_SOURCE_READERF_ALLEFFECTSREMOVED:        begin {All transforms inserted by the application have been removed for a particular stream.
-                                                           This could be due to a dynamic format change from a source or decoder that prevents custom transforms from
-                                                           being used because they cannot handle the new media type.}
-                                                    end;
-        else
-          // Show timeframes in Mainwindow caption
-          SetWindowText(g_pPreview.m_hwndEvent,
-                        'Capturing: ' + HnsTimeToStr(llTimestamp, false));
 
-          // On resize, resize the picture to destination size.
-          // Note: On critical events, like for example OnResize, we need to process these when a sample
-          //       is ready. (Note: Remember we are dealing with asynchronous mode event handling)
-          if (g_pPreview.m_Request = ReqResize) then
-            begin
-              g_pPreview.ResizeVideo();
-              g_pPreview.m_Request := ReqNone;
-            end;
-        end;
-      end;
+  // Show timeframes in Mainwindow caption
+  SetWindowText(g_pPreview.m_hwndEvent,
+                'Capturing: ' + HnsTimeToStr(llTimestamp, false));
+
+  // On resize, resize the picture to destination size.
+  // Note: On critical events, like for example OnResize, we need to process these when a sample
+  //       is ready. (Note: Remember we are dealing with asynchronous mode event handling)
+  if (g_pPreview.m_Request = ReqResize) then
+    begin
+      g_pPreview.ResizeVideo();
+      g_pPreview.m_Request := ReqNone;
+    end;
+
 
 done:
-  if FAILED(hr) then
-    g_pPreview.NotifyError(hr);
 
-  pBuffer := Nil;
+  if FAILED(hr) then
+    begin
+      g_pPreview.NotifyError(hr);
+      m_State := stError;
+    end
+  else
+    m_State := stCapturing;
+
+  pBuffer := nil;
+
+  FCritSec.Leave();
+  SetEvent(m_hwndEvent);
   Result := hr;
 end;
 
 
-function TMFSourceReaderCallback.OnFlush(dwStreamIndex: DWord): HRESULT;
+function TCPreview.OnFlush(dwStreamIndex: DWord): HRESULT;
 begin
   Result := S_OK;
 end;
 
 
-function TMFSourceReaderCallback.OnEvent(dwStreamIndex: DWord;
-                                         pEvent: IMFMediaEvent): HResult; stdcall;
+function TCPreview.OnEvent(dwStreamIndex: DWord;
+                           pEvent: IMFMediaEvent): HResult; stdcall;
 begin
   Result := S_OK;
 end;
@@ -577,10 +547,15 @@ end;
 function TCPreview.SetDevice(pActivate: IMFActivate): HResult;
 var
   hr: HRESULT;
-  pSource: IMFMediaSource;
   pAttributes: IMFAttributes;
   pType: IMFMediaType;
   i: Integer;
+  m_pwszSymbolicLink: PWideChar;
+  m_pwszDeviceName: PWideChar;
+  m_cchAllocStr: UINT32;
+
+label
+  done;
 
 begin
   hr := S_OK;
@@ -588,19 +563,33 @@ begin
   // Release the current device, if any.
   if Assigned(m_pReader) then
     hr := CloseDevice();
-
-  FCritSec.Enter;
+  if FAILED(hr) then
+    goto done;
 
   // Create the media source for the device.
-  if SUCCEEDED(hr) then
-    hr := pActivate.ActivateObject(IID_IMFMediaSource,
-                                   Pointer(pSource));
+  hr := pActivate.ActivateObject(IID_IMFMediaSource,
+                                 {Pointer} m_pSource);
+  if FAILED(hr) then
+    goto done;
 
   // Get the symbolic link.
-  if SUCCEEDED(hr) then
-    hr := pActivate.GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
-                                       m_pwszSymbolicLink,
-                                       m_cchSymbolicLink);
+  hr := pActivate.GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
+                                     m_pwszSymbolicLink,
+                                     m_cchAllocStr);
+  if FAILED(hr) or (m_cchAllocStr = 0) then
+    goto done;
+
+  m_strSymbolicLink := WideCharToString(m_pwszSymbolicLink);
+
+  hr := pActivate.GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
+                                     m_pwszDeviceName,
+                                     m_cchAllocStr);
+  if FAILED(hr) or (m_cchAllocStr = 0) then
+    goto done;
+
+  m_strDeviceName := WideCharToString(m_pwszSymbolicLink);
+
+
 
   //
   // Create the source reader.
@@ -608,67 +597,72 @@ begin
 
   // Create an attribute store to hold initialization settings.
 
-  if SUCCEEDED(hr) then
-    hr := MFCreateAttributes(pAttributes,
-                             2);
+  hr := MFCreateAttributes(pAttributes,
+                           2);
+  if FAILED(hr) then
+    goto done;
 
-  if SUCCEEDED(hr) then
-    hr := pAttributes.SetUINT32(MF_READWRITE_DISABLE_CONVERTERS,
-                               {TRUE}UINT32(1));
+  hr := pAttributes.SetUINT32(MF_READWRITE_DISABLE_CONVERTERS,
+                             {TRUE}UINT32(1));
+  if FAILED(hr) then
+    goto done;
 
   // Set the callback pointer.
-  if SUCCEEDED(hr) then
-    hr := pAttributes.SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK,
-                                 m_pSourceReaderCallback);
+  hr := pAttributes.SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK,
+                               Self);
+  if FAILED(hr) then
+    goto done;
 
-  if SUCCEEDED(hr) then
-    hr := MFCreateSourceReaderFromMediaSource(pSource,
-                                              pAttributes,
-                                              m_pReader);
+  hr := MFCreateSourceReaderFromMediaSource(m_pSource,
+                                            pAttributes,
+                                            m_pReader);
+  if FAILED(hr) then
+    goto done;
 
   // Try to find a suitable output type.
-  if SUCCEEDED(hr) then
+
+  for i := 0 to g_cFormats -1 do
     begin
-      for i := 0 to g_cFormats -1 do
-        begin
-          hr := m_pReader.GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                             i,
-                                             pType);
+      hr := m_pReader.GetNativeMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                                         i,
+                                         pType);
 
-          if FAILED(hr) then
-            Break;
+      if FAILED(hr) then
+        Break;
 
-          hr := TryMediaType(pType);
+      hr := TryMediaType(pType);
 
-          SafeRelease(pType);
+      SafeRelease(pType);
 
-          if SUCCEEDED(hr) then
-            Break;  // Found an output type.
-      end;
+      if SUCCEEDED(hr) then
+        Break;  // Found an output type.
     end;
+  if FAILED(hr) then
+    goto done;
 
-  if SUCCEEDED(hr) then
-    begin
-      // Ask for the first sample. From here the IMFSourceReaderCallback.OnReadSample will be activated
-      hr := m_pReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                 0);
+  // Ask for the first sample. From here the IMFSourceReaderCallback.OnReadSample will be activated
+  hr := m_pReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                             0,
+                             nil,
+                             nil,
+                             nil,
+                             nil);
 
-      m_bFirstSample := TRUE;
-      m_llBaseTime := 0;
-    end;
+  m_bFirstSample := True;
+  m_llBaseTime := 0;
 
   if FAILED(hr) then
     begin
-      if Assigned(pSource) then
+      if Assigned(m_pSource) then
         begin
-          pSource.Shutdown();
+          m_pSource.Shutdown();
           // NOTE: The source reader shuts down the media source
           // by default, but we might not have gotten that far.
         end;
       CloseDevice();
     end;
 
-  FCritSec.Leave;
+done:
   Result := hr;
 end;
 
@@ -693,11 +687,40 @@ begin
       if FAILED(hr) then
         MessageBox(0,
                    PWideChar('ResetDevice failed!'),
-                   Nil,
+                   nil,
                    MB_OK);
     end;
   FCritSec.Leave;
   Result := hr;
+end;
+
+
+// Helpers
+procedure HandleThreadMessages(AThread: THandle;
+                               AWait: Cardinal = INFINITE);
+var
+  oMsg: TMsg;
+
+begin
+
+  while (MsgWaitForMultipleObjects(1,
+                                   AThread,
+                                   False,
+                                   AWait,
+                                   QS_ALLINPUT) = WAIT_OBJECT_0 + 1) do
+    begin
+      PeekMessage(oMsg,
+                  0,
+                  0,
+                  0,
+                  PM_REMOVE);
+
+      if oMsg.Message = WM_QUIT then
+        Exit;
+
+      TranslateMessage(oMsg);
+      DispatchMessage(oMsg);
+    end;
 end;
 
 end.

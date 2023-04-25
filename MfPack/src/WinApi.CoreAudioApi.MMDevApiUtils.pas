@@ -10,7 +10,7 @@
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.5
 // Description: MMDevApiUtils, Device api helper routines >= Win 8
 //
 // Organisation: FactoryX
@@ -22,6 +22,8 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 24/02/2023 Tony                Updated function GetEndpointDevices.
+// 23/04/2023 Tony                Added function GetJackInfo.
 //------------------------------------------------------------------------------
 //
 // Remarks: Pay close attention for supported platforms (ie Vista or Win 7/8/8.1/10).
@@ -32,7 +34,7 @@
 //          Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX301
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -47,25 +49,28 @@
 //==============================================================================
 //
 // LICENSE
-// 
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+//
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
-// 
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
-// 
+//
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.CoreAudioApi.MMDevApiUtils;
 
 interface
+
+// {$DEFINE USE_EMBARCADERO_DEF}
 
 uses
   {WinApi}
@@ -75,12 +80,20 @@ uses
   WinApi.StrMif,
   WinApi.Coml2Api,
   WinApi.ComBaseApi,
+  {WinMM}
   WinApi.WinMM.MMreg,
   WinApi.WinMM.MMDdk,
   {ActiveX}
+  {$IFDEF USE_EMBARCADERO_DEF}
+  WinApi.PropSys,
+  WinApi.ActiveX,
+  {$ELSE}
   WinApi.ActiveX.PropIdl,
   WinApi.ActiveX.PropSys,
   WinApi.ActiveX.ObjBase,
+  {$ENDIF}
+
+
   {System}
   System.Classes,
   System.Win.ComObj,
@@ -118,10 +131,11 @@ type
    DevInterfaceName: LPWSTR;  // The friendly name of the audio adapter to which the endpoint device is attached (for example, "XYZ Audio Adapter").
    DeviceDesc: LPWSTR;        // The device description of the endpoint device (for example, "Speakers").
    DeviceName: LPWSTR;        // The friendly name of the endpoint device (for example, "Speakers (XYZ Audio Adapter)").
-   pwszID: LPWSTR;            //
+   pwszID: LPWSTR;            // Internal ID.
    dwState: DWord;            // State of the device (disconnected, active, unplugged or not present)
    sState: string;            // State of the device in readable string
-   iID: integer;              // Device index ID, starting with 0
+   iID: Integer;              // Device index ID, starting with 0
+   DataFlow: EDataFlow;       // eRender or eCapture.
   end;
   EndPointDevice = _EndPointDevice;
   TEndPointDevice = _EndPointDevice;
@@ -151,7 +165,7 @@ type
  //   https://docs.microsoft.com/en-us/windows/win32/coreaudio/audio-events-for-legacy-audio-applications
  //-----------------------------------------------------------
 
-  TAudioVolumeEvents = class(TObject)
+TAudioVolumeEvents = class(TObject)
   private
     hrStatus: HRESULT;
     pManager: IAudioSessionManager;
@@ -176,7 +190,7 @@ type
   // This function enumerates all audio rendering endpoint devices.
   // It returns an array of TEndPointDevice.
   // Params:
-  //   {in}     flow: eRender, eCapture or eAll
+  //   {in}     flow: eRender or eCapture
   //   {in}     state: Set this parameter to the bitwise OR of one or more DEVICE_STATE_XXX constants
   //   {out}    endpointdevices: Returns an array of TEndPointDevices.
   //   {out}    Number of endpoints returned.
@@ -268,12 +282,19 @@ type
   function GetWaveOutId(role: ERole;
                         out pWaveOutId: PInteger): HRESULT;
 
+  //-----------------------------------------------------------
+  // Get the IKsJackDescription interface that describes the
+  // audio jack or jacks that the endpoint device plugs into.
+  //-----------------------------------------------------------
+  function GetJackInfo(pDevice: IMMDevice;
+                       out ppJackDesc: IKsJackDescription): HResult;
+
 
 implementation
 
 // Constructor
 constructor TAudioVolumeEvents.Create(flow: EDataFlow;
-                                      role: ERole; 
+                                      role: ERole;
                                       AudioEvents: IAudioSessionEvents);
 var
   pEnumerator: IMMDeviceEnumerator;
@@ -343,9 +364,8 @@ end;
 
 end;
 
-
 // Destructor
-destructor TAudioVolumeEvents.Destroy;
+destructor TAudioVolumeEvents.Destroy();
 begin
   if Assigned(pControl) then
     begin
@@ -353,12 +373,11 @@ begin
     end;
   SafeRelease(pManager);
   SafeRelease(pControl);
-  SafeRelease(pAudioEvents);
   inherited Destroy;
 end;
 
 
-function TAudioVolumeEvents.GetStatus(): HRESULT;  { return _hrStatus; }
+function TAudioVolumeEvents.GetStatus(): HResult;
 begin
   Result := hrStatus;
 end;
@@ -400,6 +419,14 @@ end;
 
 // Get GetEndpointDevices
 // Remarks: the index of endpointdevices indicates also the device index.
+// Parameters
+// flow: eRender, eCapture or eAll.
+// state: value of this parameter is one of the following: DEVICE_STATE_ACTIVE
+//                                                         DEVICE_STATE_DISABLED
+//                                                         DEVICE_STATE_NOTPRESENT
+//                                                         DEVICE_STATE_UNPLUGGED
+// endpointdevices: Dynamic array that holds EndPointDevice properties.
+// devicesCount: Number of specified devices found
 function GetEndpointDevices(const flow: EDataFlowEx;
                             state: DWord;
                             out endpointdevices: TEndPointDeviceArray;
@@ -418,6 +445,9 @@ var
   i: Integer;
   dwState: DWord;
 
+label
+  done;
+
   procedure CheckHr(hres: HResult);
     begin
       if FAILED(hres) then
@@ -427,38 +457,38 @@ var
 begin
   hr := S_OK;
 
-try
-try
-  SetLength(endpointdevices, 0);
+  SetLength(endpointdevices,
+            0);
 
   if (state = 0) then
     state := $0000000F; {15 = ALL}
 
   // Create the enumerator
-  CheckHr( CoCreateInstance(CLSID_MMDeviceEnumerator,
-                            Nil,
-                            CLSCTX_ALL,
-                            IID_IMMDeviceEnumerator,
-                            pEnumerator) );
+  CheckHr(CoCreateInstance(CLSID_MMDeviceEnumerator,
+                           nil,
+                           CLSCTX_ALL,
+                           IID_IMMDeviceEnumerator,
+                           pEnumerator));
 
-  CheckHr( pEnumerator.EnumAudioEndpoints(EDataFlow(flow),
-                                          state,
-                                          pCollection));
+  CheckHr(pEnumerator.EnumAudioEndpoints(EDataFlow(flow),
+                                         state,
+                                         pCollection));
 
-  CheckHr( pCollection.GetCount(count) );
+  CheckHr(pCollection.GetCount(count));
 
   // No endpoints found.
   if (count = 0) then
     begin
       devicesCount := 0;
-      Result := MF_E_NOT_FOUND;
-      Exit;
+      hr := MF_E_NOT_FOUND;
+      goto done;
     end;
 
   // Store devices found
   devicesCount := count;
   // expand the array (in case we have an open array)
-  SetLength(endpointdevices, count);
+  SetLength(endpointdevices,
+            count);
   // Initialize containers for property values.
   PropVariantInit(DevIfaceName);
   PropVariantInit(DevDesc);
@@ -468,25 +498,25 @@ try
   for i := 0 to count -1 do
     begin
       // Get pointer to endpoint i.
-      CheckHr( pCollection.Item(i,
-                                pEndpoint) );
+      CheckHr(pCollection.Item(i,
+                               pEndpoint));
       // Get the endpoint ID string.
-      CheckHr( pEndpoint.GetId(pwszID) );
+      CheckHr(pEndpoint.GetId(pwszID));
       // Get the endpoint state
-      CheckHr( pEndpoint.GetState(dwState) );
+      CheckHr(pEndpoint.GetState(dwState));
       // Open propertystore, to get device descriptions
-      CheckHr( pEndpoint.OpenPropertyStore(STGM_READ,
-                                           pProps) );
+      CheckHr(pEndpoint.OpenPropertyStore(STGM_READ,
+                                          pProps));
 
       // Get the endpoint's friendly-name property.
-      CheckHr( pProps.GetValue(PKEY_DeviceInterface_FriendlyName,
-                               DevIfaceName) );
+      CheckHr(pProps.GetValue(PKEY_DeviceInterface_FriendlyName,
+                              DevIfaceName));
       // Get the endpoint's device description property.
-      CheckHr( pProps.GetValue(PKEY_Device_DeviceDesc,
-                               DevDesc) );
+      CheckHr(pProps.GetValue(PKEY_Device_DeviceDesc,
+                              DevDesc));
       // Get the endpoint's device name property.
-      CheckHr( pProps.GetValue(PKEY_Device_FriendlyName,
-                               DevName) );
+      CheckHr(pProps.GetValue(PKEY_Device_FriendlyName,
+                              DevName));
 
       // Store endpoint's properties in array.
       endpointdevices[i].DevInterfaceName := DevIfaceName.pwszVal;
@@ -496,21 +526,18 @@ try
       endpointdevices[i].dwState := dwState;
       endpointdevices[i].sState := GetDeviceStateAsString(dwState);
       endpointdevices[i].iID := i;
+      endpointdevices[i].DataFlow := EDataFlow(flow);
 
       SafeRelease(pProps);
       SafeRelease(pEndpoint);
     end;
 
-except
-  // Do Nothing. Caller is responsible for error handling.
-end;
-finally
+done:
   PropVariantClearSafe(DevIfaceName);
   PropVariantClearSafe(DevDesc);
   PropVariantClearSafe(DevName);
   pwszID := nil;
   Result := hr;
-end;
 end;
 
 
@@ -588,6 +615,7 @@ done:
   PropVariantClear(pvvar);
   Result := hr;
 end;
+
 
 function GetDeviceStateAsString(state: DWord): string;
 begin
@@ -878,6 +906,68 @@ leave:
     CoTaskMemFree(pstrEndpointIdKey);  // Nil pointer okay
     CoTaskMemFree(pstrEndpointId);
     Result := hr;
+end;
+
+
+function GetJackInfo(pDevice: IMMDevice;
+                     out ppJackDesc: IKsJackDescription): HResult;
+var
+  hr: HResult;
+  pDeviceTopology: IDeviceTopology;
+  pConnFrom: IConnector;
+  pConnTo: IConnector;
+  pPart: IPart;
+  pJackDesc: IKsJackDescription;
+
+label
+  leave;
+
+begin
+
+  // Get the endpoint device's IDeviceTopology interface.
+  hr := pDevice.Activate(IID_IDeviceTopology,
+                         CLSCTX_ALL,
+                         nil,
+                         Pointer(pDeviceTopology));
+
+  if FAILED(hr) then
+    goto leave;
+
+  // The device topology for an endpoint device always
+  // contains just one connector (connector number 0).
+  hr := pDeviceTopology.GetConnector(0,
+                                     pConnFrom);
+  if FAILED(hr) then
+    goto leave;
+
+  // Step across the connection to the jack on the adapter.
+  hr := pConnFrom.GetConnectedTo(pConnTo);
+
+  if (hr = ERROR_PATH_NOT_FOUND) then
+    // The adapter device is not currently active.
+    hr := E_NOINTERFACE;
+
+  if FAILED(hr) then
+    goto leave;
+
+
+  // Get the connector's IPart interface.
+  hr := pConnTo.QueryInterface(IID_IPart,
+                               Pointer(pPart));
+  if FAILED(hr) then
+    goto leave;
+
+  // Activate the connector's IKsJackDescription interface.
+  hr := pPart.Activate(CLSCTX_INPROC_SERVER,
+                       IID_IKsJackDescription,
+                       Pointer(pJackDesc));
+  if FAILED(hr) then
+    goto leave;
+
+  ppJackDesc := pJackDesc;
+
+leave:
+  Result := hr;
 end;
 
 

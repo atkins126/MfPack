@@ -1,11 +1,11 @@
 # MfCaptureD3D9
-Version: X 3.1.3
+Version: X 3.1.4
 
 NOTES: 
  - This release is updated for compiler version 17 up to 35.
  - SDK version 10.0.22621.0 (Win 11)
  - Requires Windows 7 or later.
- - Minimum supported MfPack version: 3.1.1
+ - Minimum supported MfPack version: 3.1.4
 
 Description:
  -  Demonstrates how to preview video from a capture device,
@@ -16,6 +16,6 @@ Project location: https://github.com/FactoryXCode/MfPack
                   https://sourceforge.net/projects/MFPack
 
 First release date: 06-02-2019
-Final release date: 01-07-2022
+Final release date: 05-03-2023
 
 Copyright © FactoryX. All rights reserved.

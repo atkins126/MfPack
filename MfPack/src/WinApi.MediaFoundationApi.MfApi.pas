@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Requires Windows Vista or later.
 //              MfApi.pas is the unit containing the APIs for using the MF platform.
 //
@@ -23,6 +23,7 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 25/11/2022 Tony                Updated MFCopyImage.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
@@ -46,7 +47,7 @@
 //          Fields with a Common Type Specification.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -61,26 +62,30 @@
 //==============================================================================
 //
 // LICENSE
-// 
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+//
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
-// 
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+//
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfApi;
 
   {$HPPEMIT '#include "mfapi.h"'}
 
 interface
+
+// {$DEFINE USE_EMBARCADERO_DEF}
 
 uses
   {WinApi}
@@ -93,9 +98,13 @@ uses
   WinApi.StrMif,
   WinApi.Unknwn,
   WinApi.ComBaseApi,
-  {WinApi.ActiveX}
-  WinApi.ActiveX.PropSys,
+  {ActiveX}
+  {$IFDEF USE_EMBARCADERO_DEF}
+  WinApi.ActiveX,
+  {$ELSE}
   WinApi.ActiveX.PropIdl,
+  WinApi.ActiveX.PropSys,
+  {$ENDIF}
   {System}
   System.Types,
   {DirectX or use rtl, Clootie Dx}
@@ -116,7 +125,9 @@ uses
   {$I 'WinApiTypes.inc'}
 
 type
+  PMFWORKITEM_KEY = ^MFWORKITEM_KEY;
   MFWORKITEM_KEY = UInt64;
+  {$EXTERNALSYM MFWORKITEM_KEY}
 
 const
   MF_SDK_VERSION                      = $0002;
@@ -225,7 +236,7 @@ const
 
   function MFPutWorkItemEx2(dwQueue: DWORD;
                             Priority: LONG;
-                            var pResult: IMFAsyncResult): HResult; stdcall;
+                            pResult: IMFAsyncResult): HResult; stdcall;
   {$EXTERNALSYM MFPutWorkItemEx2}
   // Puts an asynchronous operation on a work queue, with a specified priority.
   // Parameters
@@ -241,7 +252,7 @@ const
   //    A pointer to the IMFAsyncResult interface of an asynchronous result object.
   //    To create the result object, call MFCreateAsyncResult.
 
-  function MFPutWaitingWorkItem(hEvent: THandle;
+  function MFPutWaitingWorkItem(const hEvent: THandle;
                                 Priority: LONG;
                                 pResult: IMFAsyncResult;
                                 out pKey: MFWORKITEM_KEY ): HResult; stdcall;
@@ -259,7 +270,7 @@ const
   // pKey [out]
   //    Receives a key that can be used to cancel the wait.
   //    To cancel the wait, call MFCancelWorkItem and pass this key in the Key parameter.
-  //    This parameter can be Nil.
+  //    This parameter can be 0.
 
   function MFAllocateSerialWorkQueue(dwWorkQueue: DWORD;
                                      out pdwWorkQueue: DWORD): HResult; stdcall;
@@ -320,7 +331,7 @@ const
   //    Due to asynchronous nature of timers, application might still get a
   //    timer callback after MFCancelWorkItem has returned.
 
-  function MFCancelWorkItem(Key: MFWORKITEM_KEY): HResult; stdcall;
+  function MFCancelWorkItem(const Key: MFWORKITEM_KEY): HResult; stdcall;
   {$EXTERNALSYM MFCancelWorkItem}
   // Attempts to cancel an asynchronous operation that was scheduled with
   // MFScheduleWorkItem or MFScheduleWorkItemEx.
@@ -647,10 +658,10 @@ const
   //
 
 
-  function MFLockSharedWorkQueue(wszClass: PCWSTR;
+  function MFLockSharedWorkQueue(wszClass: LPCWSTR;
                                  BasePriority: LONG;
                                  var pdwTaskId: DWORD;
-                                 out pID: DWORD): HResult; stdcall;
+                                 out pID: DWORD): HResult; stdcall
   {$EXTERNALSYM MFLockSharedWorkQueue}
   // Obtains and locks a shared work queue.
   // Parameters
@@ -2127,7 +2138,7 @@ const
   ///////////////////////////////  Attributes //////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  function MFCreateAttributes([ref] const ppMFAttributes: IMFAttributes;
+  function MFCreateAttributes(out ppMFAttributes: IMFAttributes;
                               cInitialSize: UINT32): HResult; stdcall;
   {$EXTERNALSYM MFCreateAttributes}
 
@@ -4700,7 +4711,7 @@ const
 
   function MFFrameRateToAverageTimePerFrame(unNumerator: UINT32; // The numerator of the frame rate.
                                             unDenominator: UINT32; // The denominator of the frame rate.
-                                            out punAverageTimePerFrame: UINT64): HRESULT; stdcall; // Receives the average duration of a video frame, in 100-nanosecond units.
+                                            out punAverageTimePerFrame: REFERENCE_TIME): HRESULT; stdcall; // Receives the average duration of a video frame, in 100-nanosecond units.
   {$EXTERNALSYM MFFrameRateToAverageTimePerFrame}
 
   // Calculates the frame rate, in frames per second, from the average duration of a video frame.
@@ -4710,7 +4721,7 @@ const
   //  if they need to translate between the older format structures and the media type attributes used in Media Foundation.
   //  This function uses a look-up table for certain common durations.
   //  The table is listed in the Remarks section for the MFFrameRateToAverageTimePerFrame function.
-  function MFAverageTimePerFrameToFrameRate(unAverageTimePerFrame: UINT64;  // The average duration of a video frame, in 100-nanosecond units.
+  function MFAverageTimePerFrameToFrameRate(unAverageTimePerFrame: REFERENCE_TIME;  // The average duration of a video frame, in 100-nanosecond units.
                                             out punNumerator: UINT32; // Receives the numerator of the frame rate.
                                             out punDenominator: UINT32): HRESULT; stdcall; // Receives the denominator of the frame rate.
   {$EXTERNALSYM MFAverageTimePerFrameToFrameRate}
@@ -5170,7 +5181,7 @@ const
 
   function MFCopyImage(pDest: PByte;
                        lDestStride: LONG;
-                       pSrc: PByte;
+                       const pSrc: PByte;
                        lSrcStride: LONG;
                        dwWidthInBytes: DWORD;
                        dwLines: DWORD): HRESULT; stdcall;

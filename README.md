@@ -1,4 +1,10 @@
-# MfPack
+### Before going on, some policy:
+- If you have a request, question, idea or need help, please commit to [Discussions](https://github.com/FactoryXCode/MfPack/discussions).
+
+- If you encounter a bug then [Issues](https://github.com/FactoryXCode/MfPack/issues) is the one and only place to be.
+
+
+# About MfPack
 
  Delphi translations for Microsoft Media Foundation and related API's.
 
@@ -17,13 +23,12 @@
 - The COMPLETE Windows Media (WinMM) API.
 - Media Foundation samples.
 
-
 # <u>Latest release:</u> 
 
 
 # MfPack 
 
-Version X 3.1.3 
+Version X 3.1.4
 Delphi XE2 up to and including Delphi 12 
 SDK version: 10.0.22621.0 (Windows 11)
 
@@ -143,4 +148,56 @@ SDK version: 10.0.22621.0 (Windows 11)
 
 ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/CameraFrameCaptureSample.png)
 
-**© FactoryX. All rights reserved.***
+**CaptureEngineVideoCapture sample**
+*Demonstrates how to capture a snapshot or a recording (A-synchronous) from a capture device,*
+*such as a webcam using the IMFCaptureEngine and IMFCapturePreviewSink.*
+*This sample also demonstrates how to use the MfMediaTypeDebug API.*
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/MFCaptureEngineVideoCapture.jpg)
+
+**SinkWriterToEncodeVideo Sample**
+
+*Example 1 creates a simple green bitmap (640x480) and store it to a file with a length of 20 seconds.*
+*Example 2 demonstrates how to use the SinkWriter to create a video from one or more bitmap files.*
+  
+ ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/SinkWriterSample.png)
+
+**LoopBackCapture Sample 1**
+
+*This sample shows, how to capture sound from your soundcard using WASAPI and save this capture*
+*with the quality that is supported by your soundcard.*
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/LoopBackCapture.png)
+
+
+**LoopBackCapture Sample 2**
+
+Description:
+Demonstrates how to capture system audio either from a specific process tree or for all process except a process tree and
+the use of ActivateAudioInterfaceAsync Win32 API with a new initialization structure. 
+The new data structure makes it possible to restrict captured audio data to that rendered by a specific 
+process and any of its child processes. Windows 10 has always supported capturing all audio that is played on 
+an audio endpoint (referred to as "system" loopback capture), which captures all audio from all apps that 
+are playing sounds on the chosen audio endpoint. 
+
+With the new structure, only audio from the specified process, and its children, will be captured. Audio rendered by
+other processes will not be captured. A flag is also provided to reverse the behavior, capturing all system
+audio *except* those from the the specified process (and its children). Furthermore, the capture is not tied to a 
+specific audio endpoint, eliminating the need to create a separate IAudioClient to capture from each physical 
+audio endpoint. 
+
+If the processes whose audio will be captured does not have any audio rendering streams, then the capturing 
+process receives silence.
+
+It also demonstrates how to get a process by using the tlhelp32 API, to list a snapshot of running processes and be able to pick one.
+The application is provided with a dialog to select a running process from the process tree you want to pick and has
+a button to get the current PID of your application.
+
+Examples:
+
+* Capture audio from process xxxx and its children: `ApplicationLoopback xxxx includetree Captured.wav`
+* Capture audio from all process except process xxxx and its children: `ApplicationLoopback xxxx excludetree Captured.wav`
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/Loopback_2.png)  
+  
+**© FactoryX. All rights reserved.**

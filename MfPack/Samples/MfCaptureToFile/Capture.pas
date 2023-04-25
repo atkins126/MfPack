@@ -10,7 +10,7 @@
 // Release date: 01-02-2022
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: Manages video capture.
 //              This sample demonstrates how to capture video from camera to a file.
 //
@@ -22,13 +22,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-//
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -54,8 +54,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit Capture;
@@ -209,7 +211,7 @@ implementation
 constructor TDeviceList.Create();
 begin
   inherited Create();
-  m_ppDevices := Nil;
+  m_ppDevices := nil;
   m_cDevices := 0;
 end;
 
@@ -231,10 +233,10 @@ begin
   if Assigned(m_ppDevices) then
     begin
       for i := 0 to m_cDevices -1 do
-        m_ppDevices[i] := Nil;
+        m_ppDevices[i] := nil;
 
       CoTaskMemFree(m_ppDevices);
-      m_ppDevices := Nil;
+      m_ppDevices := nil;
       m_cDevices := 0;
     end;
 end;
@@ -362,7 +364,7 @@ begin
   if Assigned(m_pWriter) then
     SafeRelease(m_pWriter);
 
-  m_critsec.Destroy();
+  FreeAndnil(m_critsec);
 
   inherited Destroy();
 end;
@@ -439,14 +441,14 @@ begin
                                   LPCWSTR(''),
                                   MFT_ENUM_FLAG_SYNCMFT,
                                   0,
-                                  Nil,
+                                  nil,
                                   0,
-                                  Nil);
+                                  nil);
 
   if SUCCEEDED(hr) then
     hr := m_pWriter.SetInputMediaType(sink_stream,
                                       pType,
-                                      Nil);
+                                      nil);
 
   if SUCCEEDED(hr) then
     hr := m_pWriter.BeginWriting();
@@ -515,7 +517,11 @@ begin
 
   // Read another sample.
   hr := m_pReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                             0);
+                             0,
+                             nil,
+                             nil,
+                             nil,
+                             nil);
 
 done:
   if FAILED(hr) then
@@ -578,8 +584,8 @@ begin
   // Create the sink writer
   if SUCCEEDED(hr) then
     hr := MFCreateSinkWriterFromURL(pwszFileName,
-                                    Nil,
-                                    Nil,
+                                    nil,
+                                    nil,
                                     m_pWriter);
 
   // Set up the encoding parameters.
@@ -593,7 +599,11 @@ begin
 
       // Request the first video frame.
       hr := m_pReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                 0);
+                                 0,
+                                 nil,
+                                 nil,
+                                 nil,
+                                 nil);
     end;
 
   if SUCCEEDED(hr) then
@@ -619,7 +629,7 @@ var
   hr: HResult;
 
 begin
-  m_critsec.Enter;
+
   hr := S_OK;
 
   if Assigned(m_pWriter) then
@@ -629,13 +639,11 @@ begin
   SafeRelease(m_pReader);
 
   CoTaskMemFree(m_DeviceFriendlyName);
-  m_DeviceFriendlyName := Nil;
+  m_DeviceFriendlyName := nil;
   CoTaskMemFree(m_DeviceSymbolicLink);
-  m_DeviceSymbolicLink := Nil;
+  m_DeviceSymbolicLink := nil;
 
   State := State_NotReady;
-
-  m_critsec.Leave;
 
   Result := hr;
 end;
@@ -648,7 +656,7 @@ var
 begin
   m_critsec.Enter;
 
-  bIsCapturing := (m_pWriter <> Nil);
+  bIsCapturing := (m_pWriter <> nil);
 
   if bIsCapturing then
     State := State_Capturing

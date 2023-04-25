@@ -10,7 +10,7 @@
 // Release date: 05-07-2020
 // Language: ENU
 //
-// Version: 3.1.1
+// Version: 3.1.3
 // Description: This sample implements a simple media player that responds to the "ducking"
 //              feature in Windows 7 and higher.
 //              It also implements a volume control which tracks
@@ -25,7 +25,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 13/08/2020 All                 Enigma release. New layout and namespaces
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
@@ -33,11 +33,11 @@
 //          feature in Windows 7 and higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
-// Compiler version: 23 up to 33
-// SDK version: 10.0.19041.0
+// Compiler version: 23 up to 35
+// SDK version: 10.0.22621.0
 //
 // Todo: -
 //
@@ -59,9 +59,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmDuckingMediaPlayer;
@@ -339,18 +340,20 @@ end;
 //
 procedure TForm1.tbVolumeSliderChange(Sender: TObject);
 var
-  volumePosition: Integer;
+  sVolumePosition: Single;
+  sVolume: Single;
 
 begin
-  volumePosition := tbVolumeSlider.Position;
-  g_MediaPlayer.SetVolume(Single(volumePosition) / 100.0);
+  sVolumePosition := tbVolumeSlider.Position;
+  sVolume := (sVolumePosition / 100);
+  g_MediaPlayer.SetVolume(sVolume);
 end;
 
 //
 // Update the progress slider to match the current playback position.
 // NOTE:
 //  We used the TTimerclass which use the Windows API timer functions SetTimer and KillTimer as been used in the official MS sample.
-//  Since Delphi doen't have slider component, we use the TTrackBar for this. In other samples we used the TProgressBar.
+//  Since Delphi doesn't have a slider component, we use the TTrackBar for this. Using a TProgressBar is also used (see player samples).
 procedure TForm1.tmrProgressTimer(Sender: TObject);
 var
   position: LongInt;

@@ -9,7 +9,7 @@
 // Release date: 08-03-2018
 // Language: ENU
 //
-// Version: 3.1.1
+// Version: 3.1.4
 //
 // Description: Preview window.
 //
@@ -21,14 +21,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 // 29/01/2222 Tony                Changed OnDeviceChange for compatibility with Win 10/11
+// 07/02/2023 Tony                Fixed issues with OnReadSample and bufferlock.
+// 04/03/2023 Tony                Updated Device loss methods.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -55,8 +57,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmMfCaptureD3D9;
@@ -74,6 +78,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Services.Dbt,
+  System.UITypes,
   {Vcl}
   Vcl.Graphics,
   Vcl.Controls,
@@ -87,6 +92,7 @@ uses
   WinApi.MediaFoundationApi.MfObjects,
   WinApi.MediaFoundationApi.MfApi,
   WinApi.MediaFoundationApi.MfIdl,
+  WinApi.MediaFoundationApi.MfMetLib,
   {ActiveX}
   WinApi.ActiveX.ObjBase,
   {Project}
@@ -117,16 +123,20 @@ type
     hwWindowHandle: HWND; // handle to recieve messages
     g_hdevnotify: HDEVNOTIFY;
 
-    function DelayedOnCreate(): BOOL;
+    function RegisterDeviceNotifications(): BOOL;
+    function GetDevices(): HResult;
     procedure OnChooseDevice(const hw: HWND;
                              const bPrompt: BOOL);
     procedure OnDeviceChange(var AMessage: TMessage); message WM_DEVICECHANGE;
-    // Callback
-    function MessageHook(var AMessage: TMessage): Boolean;
+
     // Messages
     procedure OnMove(var message: TWMMove); message WM_MOVE;
     procedure OnSize(var message: TWMSize); message WM_SIZE;
     procedure OnWindowVisible(var message: TMessage); message WM_WINDOWVISIBLE;
+
+    procedure OnPreviewError(var Msg: TMessage); message WM_APP_PREVIEW_ERROR;
+    procedure WMEraseBkGnd(var Msg: TMessage); message WM_ERASEBKGND;
+    procedure OnQueryEndSession(var Msg: TMessage); message WM_QUERYENDSESSION;
 
   public
     { Public declarations }
@@ -144,34 +154,25 @@ implementation
 
 {$R *.dfm}
 
-function TfrmMain.MessageHook(var AMessage: TMessage): Boolean;
+
+procedure TfrmMain.OnPreviewError(var Msg: TMessage);
 begin
-  Result := False;
-  case AMessage.Msg of
-
-    WM_APP_PREVIEW_ERROR:    begin
-                               ShowMessage('Preview error ' + IntToStr(AMessage.wParam));
-                               Result:= True;
-                             end;
-
-    WM_ERASEBKGND:           begin
-                               Result:= True;
-                             end;
-
-    WM_QUERYENDSESSION:      begin
-                               //
-                               // Here you should do savings, destroy objects etc.
-                               //
-                               Result:= True;
-                             end;
-  end;
-
-  AMessage.Result := DefWindowProc(hwWindowHandle,
-                                   AMessage.Msg,
-                                   AMessage.wParam,
-                                   AMessage.lParam);
+  ShowMessage('Preview error ' + IntToStr(Msg.wParam));
 end;
 
+
+procedure TfrmMain.WMEraseBkGnd(var Msg: TMessage);
+begin
+  inherited;
+end;
+
+
+procedure TfrmMain.OnQueryEndSession(var Msg: TMessage);
+begin
+   //
+   // Here you should do savings, destroy objects etc.
+   //
+end;
 
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -185,11 +186,14 @@ end;
 // Post message OK to init d3d objects
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
-  PostMessage(Handle,
+  hwWindowHandle := Self.Handle;
+
+  SendMessage(hwWindowHandle,
               WM_WINDOWVISIBLE,
               0,
               0);
 end;
+
 
 procedure TfrmMain.SelectDevice1Click(Sender: TObject);
 begin
@@ -197,8 +201,6 @@ begin
   OnChooseDevice(hwWindowHandle,
                  True);
 end;
-
-
 
 
 //-------------------------------------------------------------------
@@ -209,23 +211,44 @@ end;
 procedure TfrmMain.CleanUp();
 begin
 
-  if Assigned(g_hdevnotify) then
-    begin
-      UnregisterDeviceNotification(g_hdevnotify);
-      g_hdevnotify := Nil;
-    end;
-
   if Assigned(g_pPreview) then
-    begin
-      g_pPreview.Free;
-      g_pPreview := Nil;
-    end;
+    FreeAndNil(g_pPreview);
 
   // Release the selectdialog device
   if Assigned(dlgSelectDevice) then
     dlgSelectDevice.Close();
+
+  UnRegisterForDeviceNotification(g_hdevnotify);
+
 end;
 
+
+function TfrmMain.GetDevices(): HResult;
+var
+  hr: HRESULT;
+  pAttributes: IMFAttributes;
+
+label
+  done;
+
+begin
+  // Initialize an attribute store to specify enumeration parameters.
+  hr := MFCreateAttributes(pAttributes,
+                           1);
+  if FAILED(hr) then
+    goto done;
+
+  // Enumerate devices.
+  hr := MFEnumDeviceSources(pAttributes,
+                            param.ppDevices,
+                            param.count);
+  if FAILED(hr) then
+    goto done;
+  // NOTE: param.count might be zero.
+
+done:
+  Result := hr;
+end;
 
 //-------------------------------------------------------------------
 //  OnChooseDevice
@@ -240,11 +263,10 @@ procedure TfrmMain.OnChooseDevice(const hw: HWND;
                                   const bPrompt: BOOL);
 var
   hr: HRESULT;
-  iDevice: UINT;
   bCancel: BOOL;
   pAttributes: IMFAttributes;
   mResult: Integer;
-  i, x: Integer;
+  i: Integer;
   uiNameLen: UINT32;
   szName: LPWSTR;
 
@@ -252,35 +274,15 @@ label
   done;
 
 begin
+
   // No dialog initiated on startup, this happens when for instance the mainform is not visible yet
   if not Assigned(dlgSelectDevice) then
-    begin
-      dlgSelectDevice := TdlgSelectDevice.Create(Self);
-    end;
+    dlgSelectDevice := TdlgSelectDevice.Create(Self);
 
-  iDevice := 0;   // Index into the array of devices
   uiNameLen := 0;
-
   bCancel := False;
 
-  // Check if preview is assigned, else create a new instance of preview
-
-  if not assigned(g_pPreview) then
-    begin
-      // Create the object that manages video preview.
-      hr := TCPreview.CreateInstance(hwWindowHandle,
-                                     hwWindowHandle,
-                                     g_pPreview);
-
-      if FAILED(hr) then
-        begin
-          ShowMessage('TCPreview.CreateInstance failed!');
-          goto done;
-        end;
-    end;
-
   // Initialize an attribute store to specify enumeration parameters.
-
   hr := MFCreateAttributes(pAttributes,
                            1);
 
@@ -314,10 +316,11 @@ begin
           // Clear the combobox
           dlgSelectDevice.ComboBox1.Clear;
           // Fill the combobox with found capture devices
-          for x := 0 to param.count - 1 do
+          for i := 0 to param.count - 1 do
             begin
+
               // Try to get the display-friendly-name.
-              hr := param.ppDevices[x].GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
+              hr := param.ppDevices[i].GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
                                                           szName,
                                                           uiNameLen);
               // Append the friendly name to the combobox.
@@ -330,31 +333,46 @@ begin
           mResult := dlgSelectDevice.ShowModal;
 
           if (mResult = IDOK) then
-            iDevice := param.selection
+            begin
+              // Create the object that manages video preview.
+              if not Assigned(g_pPreview) then
+                hr := TCPreview.CreateInstance(hwWindowHandle,
+                                               hwWindowHandle,
+                                               g_pPreview);
+
+              if FAILED(hr) then
+                begin
+                  ShowMessage('TCPreview.CreateInstance failed!');
+                  goto done;
+                end;
+            end
           else
             begin
-             bCancel := True; // User cancelled
+              bCancel := True; // User cancelled
             end;
 
+          // Give this source to the player object for preview.
           if ((not bCancel) and (param.count > 0)) then
-            // Give this source to the CPlayer object for preview.
-            hr := g_pPreview.SetDevice(param.ppDevices[iDevice]);
+            hr := g_pPreview.SetDevice(param.ppDevices[param.selection]);
         end;
     end
   else   // Skip the dialog and select the first capture device - if any -
     begin
       if (param.count > 0) then
-        hr := g_pPreview.SetDevice(param.ppDevices[0])
+        begin
+          // Create the object that manages video preview.
+          if not Assigned(g_pPreview) then
+            hr := TCPreview.CreateInstance(hwWindowHandle,
+                                           hwWindowHandle,
+                                           g_pPreview);
+          if SUCCEEDED(hr) then
+            hr := g_pPreview.SetDevice(param.ppDevices[0]);
+        end
       else
         hr := E_FAIL;
     end;
 
 done:
-
-  pAttributes := Nil;
-
-  for i := 0 to param.count-1 do
-    SafeRelease(param.ppDevices[i]);
 
   CoTaskMemFree(param.ppDevices);
 
@@ -373,48 +391,57 @@ end;
 //------------------------------------------------------------------------------
 procedure TfrmMain.OnDeviceChange(var AMessage: TMessage);
 var
-  bDeviceLost: BOOL;
   PDevBroadcastHeader: PDEV_BROADCAST_HDR;
   pDevBroadCastIntf: PDEV_BROADCAST_DEVICEINTERFACE;
   pwDevSymbolicLink: PWideChar;
+  bDeviceLost: Bool;
+  hr: HResult;
 
 begin
-
-  if (g_pPreview = Nil) then
+  if not Assigned(g_pPreview) then
     Exit;
 
-  bDeviceLost := False;
-
-  // Check if the current device was lost.
   if (AMessage.WParam = DBT_DEVICEREMOVECOMPLETE) then
     begin
-      // Check if the current video capture device was lost.
+      // Check for added/removed devices, regardless of whether
+      // the application is capturing video at this time.
+      GetDevices();
 
-      if PDEV_BROADCAST_HDR(AMessage.LParam).dbch_devicetype <> DBT_DEVTYP_DEVICEINTERFACE then
+      // Now check if the current video capture device was lost.
+
+      if (PDEV_BROADCAST_HDR(AMessage.LParam).dbch_devicetype <> DBT_DEVTYP_DEVICEINTERFACE) then
         Exit;
 
       // Get the symboliclink of the lost device and check.
       PDevBroadcastHeader := PDEV_BROADCAST_HDR(AMessage.LParam);
       pDevBroadCastIntf := PDEV_BROADCAST_DEVICEINTERFACE(PDevBroadcastHeader);
+
       // Note: Since Windows 8 the value of dbcc_name is no longer the devicename, but the symboliclink of the device.
+      // Dereference the struct's field dbcc_name (array [0..0] of WideChar) for a readable string.
       pwDevSymbolicLink := PChar(@pDevBroadCastIntf^.dbcc_name);
+
+      hr := S_OK;
       bDeviceLost := False;
-      if StrIComp(PWideChar(g_pPreview.DeviceSymbolicLink),
-                  PWideChar(pwDevSymbolicLink)) = 0 then
-        bDeviceLost := True;
-    end;
 
+      if Assigned(g_pPreview) then
+        if (g_pPreview.State = stCapturing) then
+          begin
+            if (StrIComp(PWideChar(g_pPreview.DeviceSymbolicLink),
+                         PWideChar(pwDevSymbolicLink)) = 0) then
+              bDeviceLost := True;
 
-  if (bDeviceLost = True) then
-    begin
-      g_pPreview.CloseDevice();
-
-      MessageBox(hwWindowHandle,
-                 lpcwstr('Lost the capture device.'),
-                 lpcwstr(frmMain.caption),
-                 MB_OK);
+            if (FAILED(hr) or bDeviceLost) then
+              begin
+                MessageDlg(Format('Lost capture device %s.', [g_pPreview.DeviceName]),
+                           mtError,
+                           mbOKCancel,
+                           MB_OK);
+                SafeRelease(g_pPreview); //.CloseDevice();
+              end;
+          end;
     end;
 end;
+
 
 // OnMove
 procedure TfrmMain.OnMove(var Message: TWMMove);
@@ -422,6 +449,7 @@ begin
   inherited;
   //
 end;
+
 
 // OnResize
 procedure TfrmMain.OnSize(var Message: TWMSize);
@@ -436,6 +464,7 @@ begin
    end;
 end;
 
+
 // To prevent calling OnResize twice at init,
 // wait until the mainwindow is in visible state and then
 // initiate the app (See ONCREATE sample C++)
@@ -445,7 +474,7 @@ end;
 // Only when the form is in visible state, it's safe to initiate D3D9 objects.
 procedure TfrmMain.OnWindowVisible(var message: TMessage);
 begin
-  if not DelayedOnCreate() then
+  if not RegisterDeviceNotifications() then
     application.Terminate;  //
 end;
 
@@ -454,65 +483,25 @@ function TfrmMain.ShutDown(): Boolean;
 begin
   // Clean up all instances
   CleanUp();
-  CoTaskMemFree(param.ppDevices);
-  Application.UnhookMainWindow(MessageHook);
+
   Result := True;
 end;
 
-//
-// Initiate the D3D9 objects
-//
-function TfrmMain.DelayedOnCreate(): BOOL;
-var
-  di: DEV_BROADCAST_DEVICEINTERFACE;
-  sz: Integer;
-  hr: HRESULT;
 
+//
+// Initiate DeviceNotifications
+//
+function TfrmMain.RegisterDeviceNotifications(): BOOL;
 begin
   Result := False;
-  hwWindowHandle := Self.Handle;
-
-  // Register this window to get device notification messages.
-  sz := SizeOf(DEV_BROADCAST_DEVICEINTERFACE);
-  ZeroMemory(@di, sz);
-  di.dbcc_size := sz;
-  di.dbcc_devicetype := DBT_DEVTYP_DEVICEINTERFACE;
-  di.dbcc_reserved := 0;
-  di.dbcc_classguid := KSCATEGORY_VIDEO_CAMERA; // KSCATEGORY_CAPTURE : Since windows 10 you should not use this guid to register for device loss!
-                                                // Otherwise it will return a wrong symoliclink when detecting a device lost.
-  di.dbcc_name := #0;
-
-  g_hdevnotify := RegisterDeviceNotification(hwWindowHandle,
-                                             @di,
-                                             DEVICE_NOTIFY_WINDOW_HANDLE);
-
-  if (g_hdevnotify = Nil) then
+  if not RegisterForDeviceNotification(hwWindowHandle,
+                                       g_hdevnotify) then
     begin
       ShowMessage('RegisterDeviceNotification failed. ' + IntToStr(GetLastError()));
       Exit;
     end;
-
-  // Delphi specific
-  Application.HookMainWindow(MessageHook);
-
-  // Create the object that manages video preview.
-  hr := TCPreview.CreateInstance(hwWindowHandle,
-                                 hwWindowHandle,
-                                 g_pPreview);
-
-  if (FAILED(hr)) then
-    begin
-      ShowMessage('CPreview.CreateInstance failed. ' + IntToStr(hr));
-      Exit;
-    end;
-
-  // Select the first available device (if any).
-  frmMain.OnChooseDevice(hwWindowHandle, FALSE);
-
-  ZeroMemory(@di, sz);
   Result := True;
 end;
-
 
 
 procedure TfrmMain.Exit1Click(Sender: TObject);
@@ -520,12 +509,13 @@ begin
   Close();
 end;
 
+
 // Since the mainform is the first unit to be initialized, we put the
 // initialization code here.
 
 initialization
   // Initialize the COM library
-  if SUCCEEDED(CoInitializeEx(Nil,
+  if SUCCEEDED(CoInitializeEx(nil,
                               COINIT_APARTMENTTHREADED or COINIT_DISABLE_OLE1DDE)) then
 
     if FAILED(MFStartup(MF_VERSION,

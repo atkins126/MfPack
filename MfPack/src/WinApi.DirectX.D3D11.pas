@@ -10,7 +10,7 @@
 // Release date: 13-08-2022
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: Microsoft DirectX D3D11 used by Media Foundation.
 //              You can use Direct3D 11 graphics to create 3-D graphics for games,
 //              scientific and desktop apps.
@@ -25,12 +25,13 @@
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 // 31/08/2022                     Updated to latest D3D11 SDK 10.0.22621.0 version.
+// 08/02/2023                     Corrected D3D11_CREATE_DEVICE_FLAG enumeration.
 //------------------------------------------------------------------------------
 //
 // Remarks: Embarcadero's <= Delphi 10.4 D3D11 is outdated!
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -46,19 +47,20 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit WinApi.DirectX.D3D11;
@@ -95,7 +97,6 @@ uses
   {$ENDIF}
 
   {$I 'WinApiTypes.inc'}
-
 
 
 const
@@ -849,10 +850,6 @@ type
   D3D11_BIND_FLAG = UINT;
   {$EXTERNALSYM D3D11_BIND_FLAG}
 
-  PD3D11_CREATE_DEVICE_FLAG = ^D3D11_CREATE_DEVICE_FLAG;
-  D3D11_CREATE_DEVICE_FLAG = UINT;
-  {$EXTERNALSYM D3D11_CREATE_DEVICE_FLAG}
-
 
 const
   // See: AuthenticatedChannel
@@ -882,9 +879,9 @@ type
   {$EXTERNALSYM D3D11_CPU_ACCESS_FLAG}
 
 const
-  D3D11_CPU_ACCESS_WRITE = UINT($10000);
+  D3D11_CPU_ACCESS_WRITE = D3D11_CPU_ACCESS_FLAG($10000);
   {$EXTERNALSYM D3D11_CPU_ACCESS_WRITE}
-  D3D11_CPU_ACCESS_READ = UINT($20000);
+  D3D11_CPU_ACCESS_READ = D3D11_CPU_ACCESS_FLAG($20000);
   {$EXTERNALSYM D3D11_CPU_ACCESS_READ}
 
 type
@@ -892,9 +889,9 @@ type
   {$EXTERNALSYM D3D11_CLEAR_FLAG}
 
 const
-  D3D11_CLEAR_DEPTH = UINT($1);
+  D3D11_CLEAR_DEPTH = D3D11_CLEAR_FLAG($1);
   {$EXTERNALSYM D3D11_CLEAR_DEPTH}
-  D3D11_CLEAR_STENCIL = UINT($2);
+  D3D11_CLEAR_STENCIL = D3D11_CLEAR_FLAG($2);
   {$EXTERNALSYM D3D11_CLEAR_STENCIL}
 
 type
@@ -902,17 +899,21 @@ type
   {$EXTERNALSYM D3D11_MAP}
 
 const
-  D3D11_MAP_READ = 1;
+  D3D11_MAP_READ = D3D11_MAP(1);
   {$EXTERNALSYM D3D11_MAP_READ}
-  D3D11_MAP_WRITE = 2;
+  D3D11_MAP_WRITE = D3D11_MAP(2);
   {$EXTERNALSYM D3D11_MAP_WRITE}
-  D3D11_MAP_READ_WRITE = 3;
+  D3D11_MAP_READ_WRITE = D3D11_MAP(3);
   {$EXTERNALSYM D3D11_MAP_READ_WRITE}
-  D3D11_MAP_WRITE_DISCARD = 4;
+  D3D11_MAP_WRITE_DISCARD = D3D11_MAP(4);
   {$EXTERNALSYM D3D11_MAP_WRITE_DISCARD}
-  D3D11_MAP_WRITE_NO_OVERWRITE = 5;
+  D3D11_MAP_WRITE_NO_OVERWRITE = D3D11_MAP(5);
   {$EXTERNALSYM D3D11_MAP_WRITE_NO_OVERWRITE}
 
+type
+  PD3D11_CREATE_DEVICE_FLAG = ^D3D11_CREATE_DEVICE_FLAG;
+  D3D11_CREATE_DEVICE_FLAG = UINT;
+  {$EXTERNALSYM D3D11_CREATE_DEVICE_FLAG}
 
   // const  are placed here to prevent E2086
 const
@@ -920,7 +921,7 @@ const
   {$EXTERNALSYM D3D11_CREATE_DEVICE_SINGLETHREADED}
   D3D11_CREATE_DEVICE_DEBUG = D3D11_CREATE_DEVICE_FLAG($2);
   {$EXTERNALSYM D3D11_CREATE_DEVICE_DEBUG}
-  D3D11_CREATE_DEVICE_SWITCH_TO_REF = D3D11_CREATE_DEVICE_FLAG($4);
+  D3D11_CREATE_DEVICE_SWITCH_TO_REF = D3D11_CREATE_DEVICE_FLAG($4);  // NOTE: This flag is not supported in Direct3D11.
   {$EXTERNALSYM D3D11_CREATE_DEVICE_SWITCH_TO_REF}
   D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS = D3D11_CREATE_DEVICE_FLAG($8);
   {$EXTERNALSYM D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS}
@@ -928,6 +929,12 @@ const
   {$EXTERNALSYM D3D11_CREATE_DEVICE_BGRA_SUPPORT}
   D3D11_CREATE_DEVICE_DEBUGGABLE = D3D11_CREATE_DEVICE_FLAG($40);
   {$EXTERNALSYM D3D11_CREATE_DEVICE_DEBUGGABLE}
+  D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY = D3D11_CREATE_DEVICE_FLAG($80);
+  {$EXTERNALSYM D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY}
+  D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT = D3D11_CREATE_DEVICE_FLAG($100);
+  {$EXTERNALSYM D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT}
+  D3D11_CREATE_DEVICE_VIDEO_SUPPORT = D3D11_CREATE_DEVICE_FLAG($800);
+  {$EXTERNALSYM D3D11_CREATE_DEVICE_VIDEO_SUPPORT}
 
   // VideoDecoder
   D3D11_DECODER_PROFILE_MPEG2_MOCOMP   : TGUID = '{e6a9f44b-61b0-4563-9ea4-63d2a3c6fe66}';

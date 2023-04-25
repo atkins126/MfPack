@@ -10,7 +10,7 @@
 // Release date: 21-12-2019
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description:
 //   This application demonstrates using the Media Foundation
 //   source reader to extract decoded audio from an audio/video file.
@@ -31,13 +31,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: >= MfPackX300
+// Related projects: MfPackX314
 // Known Issues: The IMFSourceReader.ReadSample method eats a lot of CPU cycles and
 //               power on low latency file reading.
 //
@@ -64,8 +64,11 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit frmAudioClipEx;
 
@@ -76,6 +79,8 @@ uses
   Winapi.Windows,
   Winapi.Messages,
   WinApi.WinApiTypes,
+  WinApi.ComBaseApi,
+  WinApi.ActiveX.ObjBase,
   {System}
   System.SysUtils,
   System.Variants,
@@ -311,14 +316,28 @@ begin
   CanClose := False;
   butCancelClick(Self); // when sampling is going on, we need to send a message to quit.
 
-  MfAudioClip.Free;
+  MfAudioClip.Free();
+  CoUninitialize();
   CanClose := True;
 end;
 
 
 procedure TAudioClipExFrm.FormCreate(Sender: TObject);
+var
+  hr: HResult;
 begin
   prbProgress.Max := prbProgress.Width;
+
+  hr := CoInitializeEx(nil,
+                       COINIT_MULTITHREADED);
+  if FAILED(hr) then
+    begin
+      MessageBox(0,
+                 lpcwstr('Initialize Com Failure.' + 'The application will closed.'),
+                 lpcwstr('Com Failure'),
+                 MB_ICONSTOP);
+      Close();
+    end;
 end;
 
 

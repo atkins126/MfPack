@@ -10,7 +10,7 @@
 // Release date: 08-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: Helper methods.
 //
 // Organisation: FactoryX
@@ -21,13 +21,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -53,8 +53,11 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit VideoTumbNailHelpers;
 
@@ -72,9 +75,11 @@ uses
   WinApi.DirectX.D2D1Helper;
 
 
-type
 
+{$IFDEF USE_D2D_MATRIX_3X2_F_VERSION2}
+type
   D2DMatrix3x2FHelper = Matrix3x2FHelper;
+{$ENDIF}
 
 
   function WidthD2D1RectF(const d2d1rect: D2D1_RECT_F): FLOAT; inline;
@@ -188,6 +193,7 @@ begin
   Result.x := point.x * pmat._11 + point.y * pmat._21 + pmat._31;
   Result.y := point.x * pmat._12 + point.y * pmat._22 + pmat._32;
 end;
+
 
 // Note that the Alphachannel will not be altered
 function D2D1TColorF(dcolor: TColor;

@@ -10,8 +10,8 @@
 // Release date: 05-01-2016
 // Language: ENU
 //
-// Revision Version: 3.1.3
-// Description: This unit holds basic Media Foundation methods needed to play,
+// Revision Version: 3.1.4
+// Description: This unit contains basic Media Foundation methods needed to play,
 //              record, encode, decode, etc.
 //
 // Company: FactoryX
@@ -27,12 +27,14 @@
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 // 13/08/2022 Tony                Implemented more functionality and updated methods.
+// 30/01/2023 Tony                Updated some.
+// 03/03/2023                     Updated and fixed device notification issues.
 // -----------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -48,20 +50,20 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfMetLib;
@@ -108,29 +110,16 @@ uses
   WinApi.MediaFoundationApi.WMCodecDsp,
   WinApi.MediaFoundationApi.MfError,
   WinApi.MediaFoundationApi.MfCaptureEngine,
-
-
   {CoreAudioApi}
   WinApi.CoreAudioApi.AudioPolicy,
   WinApi.CoreAudioApi.MMDeviceApi;
 
-  {$WEAKPACKAGEUNIT ON}
-  {$MINENUMSIZE 4}
-
-  {$IFDEF WIN32}
-    {$ALIGN 1}
-  {$ELSE}
-    {$ALIGN 8} // Win64
-  {$ENDIF}
-
   {$I 'WinApiTypes.inc'}
-
-
 
 type
 
   //
-  TMFAudioFormat = record
+  TMFAudioFormat = {$IFDEF UNICODE} record {$ELSE} object {$ENDIF} // Compatible with all Delphi versions.
     mfSource: IMFMediaSource; // MediaSource must be created before use!
     tgMajorFormat: TGUID;
     tgSubFormat: TGUID;
@@ -145,32 +134,34 @@ type
     unBlockAlignment: UINT32;
     unAvgBytesPerSec: UINT32;
     unChannelMask: UINT32;
-    procedure Reset();
+    public
+      procedure Reset();
   end;
   // Array that holds audio data
   TMFAudioFormatArray = array of TMFAudioFormat;
 
 
   // Used by TDeviceProperties, holding capabillities of a video capture device
-  TVideoFormatInfo = record
+  TVideoFormatInfo = {$IFDEF UNICODE} record {$ELSE} object {$ENDIF} // Compatible with all Delphi versions.
   public
     // The index of the native format found on a device
     FormatsIndex: Integer;
     mfMediaType: IMFMediaType; // MediaType interface.
+
     // Dimensions
     iVideoWidth: UINT32;
     iVideoHeight: UINT32;
     iBufferWidth: UINT32;
     iBufferHeight: UINT32;
-    iStride: UINT32;
-    bIsTopDown: Boolean;
+    iStride: UINT32;    // Stride is positive for top-down images, and negative for bottom-up images.
 
     // Major & Subtypes
     fSubType: TGuid;
     fMajorType: TGuid;
 
     // Supported framerates
-    iFrameRate: UINT32;
+    fFrameRate: Float;
+    iFrameRateNumerator: UINT32;
     iFrameRateDenominator: UINT32;
     iMaxFrameRate: UINT32;
     iMaxFrameRateDenominator: UINT32;
@@ -184,8 +175,8 @@ type
 
     // Is supported by Media Foundation
     bMFSupported: Boolean;
-
-    procedure Reset();
+    public
+      procedure Reset();
   end;
 
   // Array that holds retrieved capabillities records
@@ -193,17 +184,18 @@ type
 
 
   // Used in arrays to hold enum data.
-  TDeviceProperties = record
+  TDeviceProperties = {$IFDEF UNICODE} record {$ELSE} object {$ENDIF}  // Compatible with all Delphi versions.
     riId: TGuid;             // Source type: video or audio capture devices.
     iCount: Integer;         // Number of devices of the same type and brand.
     iDeviceIndex: Integer;   // Zero based device index.
-    lpFriendlyName: LPWSTR;  // Readable string from the system .
+    lpFriendlyName: LPWSTR;  // Readable string from the system.
     lpDisplayName: LPWSTR;   // Displayname of the FriendlyName when doubles are found.
     lpSymbolicLink: LPWSTR;  // Device symlink.
     aVideoFormats: TVideoFormatInfoArray; // Video capabilities of the device supported by Media Foundation.
     aAudioFormats: TMFAudioFormatArray; // Audio capabilities of the device supported by Media Foundation.
     dwSupportedFormats: DWord; // Number of mediatype formats of the capturedevice supported by Media Foundation.
     dwNativeFormats: DWord;    // Number of native mediatype formats of the capturedevice.
+    pActivate: IMFActivate;    // The activation object of the device.
     public
       procedure Reset();       // Resets the record to default.
   end;
@@ -231,7 +223,7 @@ type
 
   // Stream contents
   PStreamContents = ^TStreamContents;
-  _StreamContents = record
+  _StreamContents = {$IFDEF UNICODE} record {$ELSE} object {$ENDIF}  // Compatible with all Delphi versions.
     dwStreamIndex: DWORD;                 // The stream index (zero based !)
     dwStreamID: DWORD;                    // The stream identifier (see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms703852)
     bSelected: BOOL;                      // The currently selected stream.
@@ -285,7 +277,7 @@ type
                           out ppObject): HRESULT;
 
   // Alternative for ProcessMessages
-  // Usage: HandleMessages(GetCurrentThread());
+  // Example usage: HandleMessages(GetCurrentThread());
   procedure HandleMessages(AThread: THandle;
                            AWait: Cardinal = INFINITE);
 
@@ -414,13 +406,13 @@ type
 
   // Creates and initializes a source node from a MediaSource.
   function AddSourceNode(pTopology: IMFTopology;                  // Topology.
-                         pSource: IMFMediaSource;               // Media source.
+                         pSource: IMFMediaSource;                 // Media source.
                          pPD: IMFPresentationDescriptor;          // Presentation descriptor.
                          pSD: IMFStreamDescriptor;                // Stream descriptor.
                          out ppNode: IMFTopologyNode): HRESULT;   // Receives the node pointer.
 
   // Creates and initializes a source node from a MediaSource.
-  function AddSourceStreamNode(pSource: IMFMediaSource;             // Media source.
+  function AddSourceStreamNode(pSource: IMFMediaSource;               // Media source.
                                pSourcePD: IMFPresentationDescriptor;  // Presentation descriptor.
                                pSourceSD: IMFStreamDescriptor;        // Stream descriptor.
                                out ppNode: IMFTopologyNode): HRESULT; // Receives the node pointer.
@@ -491,7 +483,7 @@ type
   // For each output node in the topology, set the value of the MF_TOPONODE_MEDIASTOP
   // to the stop time in 100-nanosecond (hns) units.
   // Note that setting this attribute after playback starts has no effect.
-  // Therefore, set the attribute before calling IMFMediaSession.Start.
+  // Therefore, set the attribute before calling IMFMediaSession.Start().
   // The following code shows how to set the stop time on an existing topology.
 
   function SetMediaStop(pTopology: IMFTopology;
@@ -578,10 +570,10 @@ type
   //
   // If you do not set the capture format, the capturedevice will use its default format.
   // This function sets the capture format.
-  function SetDeviceFormat(const pSource: IMFMediaSource;
+  function SetDeviceFormat(pSource: IMFMediaSource;
                            dwFormatIndex: DWORD): HResult; overload;
-  function SetDeviceFormat(const pSource: IMFMediaSource;
-                           const pMediaType: IMFMediaType;
+  function SetDeviceFormat(pSource: IMFMediaSource;
+                           pMediaType: IMFMediaType;
                            dwFormatIndex: DWORD): HResult; overload;
 
 
@@ -630,7 +622,9 @@ type
 
   // Counts mediatypes from a device
   // When the list index goes out of bounds, GetNativeMediaType returns MF_E_NO_MORE_TYPES.
-  // Set MfSupportedOnly to False if you want to get the total of all native types from the device.
+  // This is not an error, but indicates the end of the list.
+  // Set MfSupportedOnly to False if you want to get the total of all native types from the device and
+  // to True for Media Foundation supported formats
   function CountTypesFromDevice(pReader: IMFSourceReader;
                                 const pStreamIndex: DWORD;
                                 out pCount: DWord;
@@ -639,8 +633,13 @@ type
   // Returns the name of a guid
   function GetGUIDNameConst(const guid: TGUID): string;
 
-  // Checks if a given subtype is supported by Media Foundation.
-  function IsMfSupportedFormat(pSubType: TGuid): Boolean; inline;
+  // Checks if a given input subtype is supported by Media Foundation MFT.
+  function IsMfSupportedFormat(pSubType: TGuid): Boolean; inline; deprecated;
+  function IsMftSupportedInputFormat(pSubType: TGuid): Boolean; inline;
+
+  // Checks if a given output subtype is supported by Media Foundation MFT.
+  function IsMftSupportedOutputFormat(pSubType: TGuid): Boolean; inline;
+
 
 // Device Loss
 // ===========
@@ -650,12 +649,15 @@ type
   // function to register for device notifications.
   // Register for the KSCATEGORY_CAPTURE device class, as shown in this function.
   function RegisterForDeviceNotification(hw: HWND;
-                                         out g_hdevnotify: HDEVNOTIFY): HRESULT;
+                                         out g_hdevnotify: HDEVNOTIFY): Bool;
 
-  // Before an application is closing, unregister for device notifications.
-  function UnRegisterForDeviceNotification(g_hdevnotify: HDEVNOTIFY): HRESULT;
+  // Before an application or device is closing, unregister for device notifications.
+  function UnRegisterForDeviceNotification(g_hdevnotify: HDEVNOTIFY): Bool;
 
-  // Get the Symbolic Link of the Device
+
+// Device SymLink & FriendlyName
+//==============================
+  // Get the Symbolic Link of the device.
   // Enumerate the video devices on the system, as described in Enumerating Video Capture Devices.
   // Choose a device from the list, and then query the activation object for the
   // MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK (= default) or MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_SYMBOLIC_LINK attribute,
@@ -665,6 +667,10 @@ type
                            out g_cchSymbolicLink: UINT32;
                            devMediaType: TGUID): HRESULT;
 
+  // Get the readable name of the device.
+  function GetDeviceName(pActivate: IMFActivate;
+                         out g_pwszDeviceName: PWideChar;
+                         out g_cchDeviceName: UINT32): HRESULT;
 
 
   // Enable Video Acceleration
@@ -695,7 +701,7 @@ type
 // =======================
 
   // Creates a media source for the choosen deviceindex of the video capture device in the enumeration list.
-  function CreateVideoCaptureDevice(const iDeviceIndex: Integer;
+  function CreateVideoCaptureDevice(const iDeviceIndex: UINT32;
                                     out pSource: IMFMediaSource): HRESULT; overload;
 
   // Does the same if you know the symbolic link
@@ -740,18 +746,18 @@ type
                                               ): HRESULT;
 
   // Copy an attribute value from one attribute store to another.
-  function CopyAttribute(const pSrc: IMFAttributes;
+  function CopyAttribute(pSrc: IMFAttributes;
                          var pDest: IMFAttributes;
                          const key: TGUID): HRESULT; overload;
 
-  function CopyAttribute(const pSrc: IMFMediaType;
+  function CopyAttribute(pSrc: IMFMediaType;
                          var pDest: IMFMediaType;
                          const key: TGUID): HRESULT; overload;
 
 
   // Creates a compatible video format with a different subtype if param guidSubType <> GUID_NULL else
   // the SubType will be the source subtype.
-  function CloneVideoMediaType(const pSrcMediaType: IMFMediaType;
+  function CloneVideoMediaType(pSrcMediaType: IMFMediaType;
                                const guidSubType: REFGUID;
                                out ppNewMediaType: IMFMediaType): HRESULT;
 
@@ -762,9 +768,11 @@ type
   //         MFImageFormat_JPEG, GUID_ContainerFormatBmp, GUID_ContainerFormatJpeg etc.
   //
   // WARNING: DON'T USE MFImageFormat_RGB32! (This will end with a WINCODEC_ERR_COMPONENTNOTFOUND)
-  function CreatePhotoMediaType(psubTypeGuid: TGuid;
-                                var pPhotoMediaType: IMFMediaType): HRESULT ;
-
+  function CreatePhotoMediaType(const psubTypeGuid: TGuid;
+                                var pPhotoMediaType: IMFMediaType): HRESULT; overload;
+  function CreatePhotoMediaType(const psubTypeGuid: TGuid;
+                                pSrcMediaType: IMFMediaType;
+                                out ppPhotoMediaType: IMFMediaType): HRESULT; overload;
 
 
 // VIDEO MEDIA TYPE HELPERS //////////////////////////////////////////////////
@@ -823,10 +831,7 @@ type
   function SetOutputRectangleAspectRatio(pAttributes: IMFAttributes;
                                          stVideoPadFlags: MFVideoPadFlags = MFVideoPadFlag_PAD_TO_None): HResult; inline;
 
-  // Helper function to check if
-
-//////////////////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
 
 
   // Gets metadata from a media source or other object.
@@ -860,7 +865,7 @@ type
   function GetMediaDescription(pMajorGuid: TGuid;
                                out mtMediaType: TMediaTypes): HRESULT;
 
-  // Gets audio (EndPoint)device capabillyties
+  // Gets audio (EndPoint)device capabilities
   function GetAudioFormat(var pMfAudioFormat: TMFAudioFormat): HRESULT;
 
   // Gets audio stream info
@@ -874,7 +879,7 @@ type
                            out pBlockAlignment: UINT32): HRESULT;
 
 // Ducking
-//========
+// =======
 
   // The following code gets a reference to the IAudioSessionControl2
   // interface and call its methods to determine whether the stream associated with
@@ -904,7 +909,7 @@ type
 
 
 // Media files duration and filesize
-//==================================
+// =================================
 
   // Getting the File Duration
   // To get the duration of a media file, call the IMFSourceReader.GetPresentationAttribute method and
@@ -1005,14 +1010,14 @@ begin
   iBufferWidth := 0;
   iBufferHeight := 0;
   iStride := 0;
-  bIsTopDown := False;
 
   // Major & Subtypes
   fSubType := GUID_NULL;
   fMajorType := GUID_NULL;
 
   // Supported framerates
-  iFrameRate := 0;
+  fFrameRate := 0.0;
+  iFrameRateNumerator := 0;
   iFrameRateDenominator := 0;
   iMaxFrameRate := 0;
   iMaxFrameRateDenominator := 0;
@@ -1044,7 +1049,11 @@ begin
 
   for i := 0 to Length(aVideoFormats) - 1 do
     aVideoFormats[i].Reset;
-  aVideoFormats := nil;
+  CoTaskMemFree(aVideoFormats);
+  for i := 0 to Length(aAudioFormats) - 1 do
+    aAudioFormats[i].Reset;
+  CoTaskMemFree(aAudioFormats);
+
 end;
 
 
@@ -1261,7 +1270,7 @@ function CreateVideoDeviceSource(DeviceIndex: DWord;
                                  out pSource: IMFMediaSource): HResult;
 var
   hr: HResult;
-  icount: INT;
+  icount: UINT32;
   i: Integer;
   MediaSource: IMFMediaSource;
   pAttributes: IMFAttributes;
@@ -1308,17 +1317,11 @@ begin
     goto Done;
 
   pSource := MediaSource;
-  // pSource._AddRef();
-
-{$POINTERMATH OFF}
 
 Done:
 
-{$POINTERMATH ON}
   for i := 0 to iCount -1 do
    SafeRelease(ppDevices[i]);
-{$POINTERMATH ON}
-
   CoTaskMemFree(ppDevices);
   Result := hr;
 end;
@@ -1407,7 +1410,6 @@ begin
 
   // Return IMFactivate pointer to caller
   mfActivate := pActivate;
-
 done:
   Result := hr;
 end;
@@ -2342,8 +2344,12 @@ function SetMediaStopDynamic(pSession: IMFMediaSession;
                              pTopology: IMFTopology;
                              stop: LONGLONG): HRESULT;
 const
-  MAXUINT32 = 4294967294;  // UINT32 0..4294967295 on 32 bit platforms.
-                           // Int64 on 64 bit platforms.
+  {$IFDEF WIN32}
+  MAXVALUE = 4294967294;  // UINT32 0..4294967295 on 32 bit platforms.
+  {$ELSE}
+  MAXVALUE = 9223372036854775806;  // Int64 on 64 bit platforms.
+  {$ENDIF}
+
 var
   pAttr: IMFTopologyNodeAttributeEditor;
   pCol: IMFCollection;
@@ -2353,7 +2359,7 @@ var
   nodeID: TOPOID;
   cNodes: DWORD;
   i: Integer;
-  update: MFTOPONODE_ATTRIBUTE_UPDATE;
+  update: PMFTOPONODE_ATTRIBUTE_UPDATE;
 
 label
   done;
@@ -2366,6 +2372,7 @@ begin
       Exit;
     end;
 
+  update := nil;
 
   hr := MFGetService(pSession,
                      MF_TOPONODE_ATTRIBUTE_EDITOR_SERVICE,
@@ -2395,23 +2402,28 @@ begin
         goto done;
 
       hr := pNode.GetTopoNodeID(nodeID);
-      if FAILED(hr) then
-        goto done;
 
-      update.NodeId := nodeID;
-      update.guidAttributeKey := MF_TOPONODE_MEDIASTOP;
-      update.attrType := MF_ATTRIBUTE_UINT64;
-      // Be careful to set the value of attrType correctly.
-      // Although u64 is a 32-bit type, the method requires that attrType be set to MF_ATTRIBUTE_UINT64.
-      update.u64 := UINT32(stop); // ! See Remarks !
+      if SUCCEEDED(hr) then
+        begin
+          update^.NodeId := nodeID;
+          update^.guidAttributeKey := MF_TOPONODE_MEDIASTOP;
+          update^.attrType := MF_ATTRIBUTE_UINT64;
+          // Be careful to set the value of attrType correctly.
+          // Although u64 is a 32-bit type, the method requires that attrType be set to MF_ATTRIBUTE_UINT64.
+          update^.u64 := UINT32(stop); // ! See Remarks !
 
-      hr := pAttr.UpdateNodeAttributes(id,
-                                       1,
-                                       update);
-      if FAILED(hr) then
-        goto done;
+
+          hr := pAttr.UpdateNodeAttributes(id,
+                                           1,
+                                           update);
+          if FAILED(hr) then
+            goto done;
+        end;
 
       SafeRelease(pNode);
+
+      if FAILED(hr) then
+        goto done;
     end;
 
 done:
@@ -2528,10 +2540,12 @@ try
     begin
       hr := ppActivate[0].ActivateObject(IID_IMFTransform,
                                          Pointer(ppEncoder));
+
     end;
 {$POINTERMATH OFF}
 
 finally
+  CoTaskMemFree(ppActivate);
   Result := hr;
 end;
 end;
@@ -2805,7 +2819,7 @@ var
   pMediaSource: IMFMediaSource;
   pSourceReader: IMFSourceReader;
   ppDevices: PIMFActivate; // Pointer to array of IMFActivate
-  iCount: Integer;
+  iCount: UINT32;
   uiNameLen: UINT32;
   iIndex: Integer;
   szName,
@@ -2990,7 +3004,7 @@ begin
     end;
 
 Done:
-  ReleaseActivateArray(ppDevices);
+
   Result := hr;
 end;
 
@@ -3007,7 +3021,7 @@ var
   dwCount: DWord;
   dwSupportedCount: DWord;
   dwNativeCount: DWord;
-  //VideoInfo: TVideoFormatInfo;
+  i: Integer;
 
 label
   Done;
@@ -3078,10 +3092,14 @@ begin
 
       hr := MFGetAttributeRatio(pMediaType,
                                 MF_MT_FRAME_RATE,
-                                pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iFrameRate,
+                                pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iFrameRateNumerator,
                                 pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iFrameRateDenominator);
       if FAILED(hr) then
         Break;
+
+      // Calculate framerate ( = FrameRateNumerator / iFrameRateDenominator )
+      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].fFrameRate := GetFrameRateFromRatio(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iFrameRateNumerator,
+                                                                                                 pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iFrameRateDenominator);
 
       hr := MFGetAttributeRatio(pMediaType,
                                 MF_MT_FRAME_RATE_RANGE_MIN,
@@ -3097,11 +3115,10 @@ begin
       if FAILED(hr) then
         Break;
 
-      // Get the stride to find out if the bitmap is top-down or bottom-up.
+      // Get the stride to find out if the image is top-down or bottom-up.
       pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iStride := MFGetAttributeUINT32(pMediaType,
                                                                                              MF_MT_DEFAULT_STRIDE,
                                                                                              1);
-      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bIsTopDown := (pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].iStride > 0);
 
       // Get the pixel aspect ratio. (This value might not be set.)
       hr := MFGetAttributeRatio(pMediaType,
@@ -3113,15 +3130,15 @@ begin
 
 
       // On this point we check if the format is supported or not.
-      // See https://docs.microsoft.com/en-us/windows/win32/medfound/video-processor-mft#input-formats
+      // See: https://learn.microsoft.com/en-us/windows/win32/medfound/video-processor-mft#input-formats
+      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bMFSupported := IsMftSupportedInputFormat(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].fSubType);
 
-      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bMFSupported := IsMfSupportedFormat(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].fSubType);
       if pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bMFSupported then
         Inc(dwSupportedCount);
 
       // We get all native types. Unsupported formats are marked as unsupported.
       // The application should process the needs.
-      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bMFSupported := IsMfSupportedFormat(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].fSubType);
+      pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].bMFSupported := IsMftSupportedInputFormat(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].fSubType);
       pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].FormatsIndex := dwIndex;
 
       hr := MfCreateMediaType(pDeviceProperties[pDeviceIndex].aVideoFormats[dwIndex].mfMediaType);
@@ -3136,14 +3153,22 @@ begin
     end;
 
 Done:
-   //If a failure occurs, the entire array will be cleared.
-   if FAILED(hr) then
-     pDeviceProperties := nil;
 
-  // Store supported formats only.
-  pDeviceProperties[pDeviceIndex].dwSupportedFormats := dwSupportedCount;
-  // Store unsupported and supported formats.
-  pDeviceProperties[pDeviceIndex].dwNativeFormats := dwNativeCount;
+   if SUCCEEDED(hr) then
+     begin
+       // Store supported output formats only.
+       pDeviceProperties[pDeviceIndex].dwSupportedFormats := dwSupportedCount;
+       // Store unsupported and supported formats.
+       pDeviceProperties[pDeviceIndex].dwNativeFormats := dwNativeCount;
+       // the activation object
+
+     end
+   else // If a failure occurs, the entire array will be cleared.
+     begin
+       for i := 0 to Length(pDeviceProperties) do
+         pDeviceProperties[i].Reset;
+       pDeviceProperties := nil;
+     end;
   Result := hr;
 end;
 
@@ -3172,7 +3197,7 @@ function CreateCaptureDeviceInstance(pDeviceProperties: TDeviceProperties;
                                      out ppSource: IMFMediaSource;
                                      out ppActivate: IMFActivate): HRESULT;
 var
-  count: INT;
+  count: UINT32;
   pConfig: IMFAttributes;
   ppDevices: PIMFActivate;  // Pointer to array of IMFActivate
   hr: HRESULT;
@@ -3218,10 +3243,8 @@ begin
   else
     hr := MF_E_NOT_FOUND;
 
-{$POINTERMATH OFF}
-
 Done:
-  ReleaseActivateArray(ppDevices);
+  CoTaskMemFree(ppDevices);
   Result := hr;
 end;
 
@@ -3330,7 +3353,7 @@ begin
 
       if pMfSupportedOnly then
         begin
-          if IsMfSupportedFormat(fSubType) then
+          if IsMftSupportedInputFormat(fSubType) then
             begin
               inc(dwMfSupportedCount);
               inc(dwNativeCount);
@@ -3672,7 +3695,14 @@ Done:
 end;
 
 
+// Deprecated, renamed to IsMfSupportedInputFormat
 function IsMfSupportedFormat(pSubType: TGuid): Boolean; inline;
+begin
+  Result := IsMftSupportedInputFormat(pSubType);
+end;
+
+
+function IsMftSupportedInputFormat(pSubType: TGuid): Boolean; inline;
 var
   bRes: Boolean;
   arSubTypes: array [0..19] of TGuid;
@@ -3684,7 +3714,8 @@ label
 begin
   bRes := False;
 
-  // Supported subtype formats
+  // Supported subtype formats for input.
+  // See: https://learn.microsoft.com/en-us/windows/win32/medfound/video-processor-mft#input-formats
   arSubTypes[0]  := MFVideoFormat_ARGB32;
   arSubTypes[1]  := MFVideoFormat_RGB24;
   arSubTypes[2]  := MFVideoFormat_RGB32;
@@ -3721,46 +3752,91 @@ Done:
 end;
 
 
+function IsMftSupportedOutputFormat(pSubType: TGuid): Boolean; inline;
+var
+  bRes: Boolean;
+  arSubTypes: array [0..13] of TGuid;
+  i: Integer;
+
+label
+  Done;
+
+begin
+  bRes := False;
+
+  // Supported subtype formats for output.
+  // See: https://learn.microsoft.com/en-us/windows/win32/medfound/video-processor-mft#output-formats
+  arSubTypes[0]  := MFVideoFormat_ARGB32;
+  arSubTypes[1]  := MFVideoFormat_AYUV;
+  arSubTypes[2]  := MFVideoFormat_I420;
+  arSubTypes[3]  := MFVideoFormat_IYUV;
+  arSubTypes[4]  := MFVideoFormat_NV12;
+  arSubTypes[5]  := MFVideoFormat_RGB24;
+  arSubTypes[6]  := MFVideoFormat_RGB32;
+  arSubTypes[7]  := MFVideoFormat_RGB555;
+  arSubTypes[8]  := MFVideoFormat_RGB565;
+  arSubTypes[9]  := MFVideoFormat_UYVY;
+  arSubTypes[10] := MFVideoFormat_V216;
+  arSubTypes[11] := MFVideoFormat_YUY2;
+  arSubTypes[12] := MFVideoFormat_YV12;
+
+  for i := 0 to Length(arSubTypes) -1 do
+    begin
+      if IsEqualGuid(pSubType,
+                     arSubTypes[i]) then
+        begin
+          bRes := True;
+          goto done;
+        end;
+    end;
+
+Done:
+  Result := bRes;
+end;
+
+
+
 // Device Loss
 // ===========
 // Allways call UnregisterDeviceNotification (Windows) when finnished
 function RegisterForDeviceNotification(hw: HWND;
-                                       out g_hdevnotify: HDEVNOTIFY): HRESULT;
+                                       out g_hdevnotify: HDEVNOTIFY): Bool;
 var
-  di: DEV_BROADCAST_DEVICEINTERFACE;
+  devbroadcastdevice: DEV_BROADCAST_DEVICEINTERFACE;
+  iSize: Integer;
 
 begin
+  if (hw > 0) then
+    begin
+      iSize := SizeOf(DEV_BROADCAST_DEVICEINTERFACE);
+      ZeroMemory(@devbroadcastdevice,
+                 iSize);
 
-  di.dbcc_size := SizeOf(di);
-  di.dbcc_devicetype := DBT_DEVTYP_DEVICEINTERFACE;
-  di.dbcc_classguid := KSCATEGORY_CAPTURE;
+      devbroadcastdevice.dbcc_size := iSize;
+      devbroadcastdevice.dbcc_devicetype := DBT_DEVTYP_DEVICEINTERFACE;
+      devbroadcastdevice.dbcc_reserved := 0;
+      devbroadcastdevice.dbcc_classguid := KSCATEGORY_VIDEO_CAMERA; // KSCATEGORY_CAPTURE : Since windows 10 you should not use this guid to register for device loss! Otherwise it will return a wrong symoliclink when detecting a device lost.
+      devbroadcastdevice.dbcc_name := #0;
 
-  g_hdevnotify := RegisterDeviceNotification(hw,
-                                             @di,
-                                             DEVICE_NOTIFY_WINDOW_HANDLE);
-
-  if (g_hdevnotify = nil) then
-    Result := E_FAIL // {include winerror for this} HRESULT_FROM_WIN32(GetLastError())  // or use HRESULT_FROM_NT()
-  else
-    Result := S_OK;
+      g_hdevnotify := RegisterDeviceNotification(hw,
+                                                 @devbroadcastdevice,
+                                                 DEVICE_NOTIFY_WINDOW_HANDLE);
+    end;
+  Result := Assigned(g_hdevnotify);
 end;
 
-
-function UnRegisterForDeviceNotification(g_hdevnotify: HDEVNOTIFY): HRESULT;
-var
-  hr : HResult;
-
-begin
-  hr := S_OK;
-  if (g_hdevnotify <> nil) then
-    if UnregisterDeviceNotification(g_hdevnotify) then
-      hr := S_OK
-    else
-      hr := E_FAIL;
-  Result := hr;
-end;
 
 //
+function UnRegisterForDeviceNotification(g_hdevnotify: HDEVNOTIFY): Bool;
+begin
+  Result := True;
+  if Assigned(g_hdevnotify) then
+    Result := UnregisterDeviceNotification(g_hdevnotify);
+end;
+
+
+// Device SymLink & FriendlyName
+//==============================
 function GetSymbolicLink(pActivate: IMFActivate;
                          out g_pwszSymbolicLink: PWideChar;
                          out g_cchSymbolicLink: UINT32;
@@ -3778,7 +3854,21 @@ begin
     Result := E_FAIL;
 end;
 
+
 //
+function GetDeviceName(pActivate: IMFActivate;
+                       out g_pwszDeviceName: PWideChar;
+                       out g_cchDeviceName: UINT32): HRESULT;
+begin
+  Result := (pActivate as IMFAttributes).GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
+                                                                g_pwszDeviceName,
+                                                                g_cchDeviceName);
+end;
+
+
+
+// Enable Video Acceleration
+// =========================
 function FindDeviceManager(pTopology: IMFTopology;          // Topology to search.
                            out ppDeviceManager: IInterface;     // Receives a pointer to the device manager.
                            out ppNode: IMFTopologyNode): HRESULT;
@@ -3871,10 +3961,10 @@ end;
 // The following fuction creates a media source for the given video capture device (iDeviceIndex) in
 // the enumeration list:
 //
-function CreateVideoCaptureDevice(const iDeviceIndex: Integer;
+function CreateVideoCaptureDevice(const iDeviceIndex: UINT32;
                                   out pSource: IMFMediaSource): HRESULT; overload;
 var
-  count: INT;
+  count: UINT32;
   i: Integer;
   pConfig: IMFAttributes;
   ppDevices: PIMFActivate; // Pointer to array of IMFActivate interfaces
@@ -4117,8 +4207,8 @@ begin
                                     pSink);
     end;
 
-  Result := hr;
   CoTaskMemFree(wstrID);
+  Result := hr;
 end;
 
 
@@ -4274,7 +4364,7 @@ end;
 
 
 //
-function CopyAttribute(const pSrc: IMFAttributes;
+function CopyAttribute(pSrc: IMFAttributes;
                        var pDest: IMFAttributes;
                        const key: TGUID): HRESULT;
 var
@@ -4298,7 +4388,7 @@ begin
 end;
 
 
-function CopyAttribute(const pSrc: IMFMediaType;
+function CopyAttribute(pSrc: IMFMediaType;
                        var pDest: IMFMediaType;
                        const key: TGUID): HRESULT;
 var
@@ -4326,7 +4416,7 @@ end;
 
 // Creates a compatible video format with a different subtype if param guidSubType <> GUID_NULL else
 // the SubType will be the source subtype.
-function CloneVideoMediaType(const pSrcMediaType: IMFMediaType;
+function CloneVideoMediaType(pSrcMediaType: IMFMediaType;
                              const guidSubType: REFGUID;
                              out ppNewMediaType: IMFMediaType): HRESULT;
 var
@@ -4401,13 +4491,8 @@ end;
 
 
 //
-function CreatePhotoMediaType(psubTypeGuid: TGuid; {can be one of the following: MFImageFormat_RGB32, MFImageFormat_JPEG or WIC guidContainerFormats like GUID_ContainerFormatBmp etc.}
+function CreatePhotoMediaType(const psubTypeGuid: TGuid; {can be one of the following: MFImageFormat_RGB32, MFImageFormat_JPEG or WIC guidContainerFormats like GUID_ContainerFormatBmp etc.}
                               var pPhotoMediaType: IMFMediaType): HRESULT;
-
-const
-  uiFrameRateNumerator = 30;
-  uiFrameRateDenominator = 1;
-
 var
   hr: HRESULT;
   mfPhotoMediaType: IMFMediaType;
@@ -4441,9 +4526,47 @@ begin
 
 Done:
   Result := hr;
-
 end;
 
+// overloaded function
+function CreatePhotoMediaType(const psubTypeGuid: TGuid;
+                              pSrcMediaType: IMFMediaType;
+                              out ppPhotoMediaType: IMFMediaType): HResult;
+var
+  hr: HResult;
+  pPhotoMediaType: IMFMediaType;
+
+label
+  done;
+begin
+
+  ppPhotoMediaType := nil;
+
+  hr := MFCreateMediaType(pPhotoMediaType);
+  if (FAILED(hr)) then
+    goto done;
+
+  hr := pPhotoMediaType.SetGUID(MF_MT_MAJOR_TYPE,
+                                MFMediaType_Image);
+  if (FAILED(hr)) then
+    goto done;
+
+  hr := pPhotoMediaType.SetGUID(MF_MT_SUBTYPE,
+                                psubTypeGuid);
+  if (FAILED(hr)) then
+    goto done;
+
+  hr := CopyAttribute(pSrcMediaType,
+                      pPhotoMediaType,
+                      MF_MT_FRAME_SIZE);
+  if (FAILED(hr)) then
+    goto done;
+
+  ppPhotoMediaType := pPhotoMediaType;
+
+done:
+  Result := hr;
+end;
 
 //
 function GetFrameRate(pType: IMFMediaType;
@@ -5855,7 +5978,7 @@ end;
 
 
 //
-function SetDeviceFormat(const pSource: IMFMediaSource;
+function SetDeviceFormat(pSource: IMFMediaSource;
                          dwFormatIndex: DWORD): HResult;
 var
   pPD: IMFPresentationDescriptor;
@@ -5905,8 +6028,8 @@ end;
 
 
 //
-function SetDeviceFormat(const pSource: IMFMediaSource;
-                         const pMediaType: IMFMediaType;
+function SetDeviceFormat(pSource: IMFMediaSource;
+                         pMediaType: IMFMediaType;
                          dwFormatIndex: DWORD): HResult;
 var
   pPD: IMFPresentationDescriptor;

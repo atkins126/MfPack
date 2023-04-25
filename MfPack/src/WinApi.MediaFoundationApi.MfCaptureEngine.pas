@@ -10,7 +10,7 @@
 // Release date: 09-10-2015
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: -
 //
 // Organisation: FactoryX
@@ -24,12 +24,13 @@
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 // 07/03/2022 Tony                Fixed IMFCaptureEngineClassFactory.CreateInstance
 // 22/04/2022 Tony                Fixed IMFCaptureSource.GetAvailableDeviceMediaType
+// 20/02/2023 Tony                Fixed some issues.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -44,20 +45,22 @@
 //==============================================================================
 //
 // LICENSE
-// 
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+//
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
-// 
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+//
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit WinApi.MediaFoundationApi.MfCaptureEngine;
 
@@ -113,9 +116,9 @@ type
   // Defines the capture sink type
   PMfCaptureEngineSinkType = ^MF_CAPTURE_ENGINE_SINK_TYPE;
   MF_CAPTURE_ENGINE_SINK_TYPE           = (
-    MF_CAPTURE_ENGINE_SINK_TYPE_RECORD  = 0,  // Record sink, used for outputting compressed data
-    MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW = $1, // Record sink, used for outputting uncompressed data or rendering video
-    MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO   = $2  // Photo sink, used for retrieving a single photograph
+    MF_CAPTURE_ENGINE_SINK_TYPE_RECORD  = 0,  // A recording sink, for capturing audio and video to a file.
+    MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW = $1, // A preview sink, for previewing live audio or video.
+    MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO   = $2  // A photo sink, for capturing still images.
   );
   {$EXTERNALSYM MF_CAPTURE_ENGINE_SINK_TYPE}
 
@@ -125,7 +128,7 @@ const
     MF_CAPTURE_ENGINE_FIRST_SOURCE_PHOTO_STREAM                  = DWord($FFFFFFFB);
     MF_CAPTURE_ENGINE_FIRST_SOURCE_VIDEO_STREAM                  = DWord($FFFFFFFC);
     MF_CAPTURE_ENGINE_FIRST_SOURCE_AUDIO_STREAM                  = DWord($FFFFFFFD);
-    //
+
     MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW  = DWord($fffffffa); // The preferred stream for previewing video
     {$EXTERNALSYM MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW}
     MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_RECORD   = DWord($fffffff9); // The preferred stream for recording video
@@ -140,7 +143,6 @@ const
     {END NTDDI_VERSION}
     MF_CAPTURE_ENGINE_MEDIASOURCE                                = DWord($ffffffff);
     {$EXTERNALSYM MF_CAPTURE_ENGINE_MEDIASOURCE}
-
 
 type
   //////////////////////////////////////////////////////////////////////////////
@@ -544,6 +546,7 @@ type
   // within the Capture Engine. The app obtains a
   // pointer to this interface using IMFCaptureEngine.GetSink.
   //
+  PIMFCaptureSink = ^IMFCaptureSink;
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFCaptureSink);'}
   {$EXTERNALSYM IMFCaptureSink}
   IMFCaptureSink = interface(IUnknown)
@@ -670,7 +673,7 @@ type
   IMFCapturePreviewSink = interface(IMFCaptureSink)
   ['{77346cfd-5b49-4d73-ace0-5b52a859f2e0}']
 
-    function SetRenderHandle(handle: THandle): HResult; stdcall;
+    function SetRenderHandle(handle: HWND): HResult; stdcall;
     // Allows an app to render samples
     // <param name = "handle">
     // HWND (= THandle)
@@ -680,9 +683,9 @@ type
     // <param name = "pSurface">
     // IUnknown(IDCompositionVisual)
 
-    function UpdateVideo(pSrc: PMFVideoNormalizedRect;
-                         pDst: TRECT;
-                         pBorderClr: PCOLORREF): HResult; stdcall;
+    function UpdateVideo({optional} pSrc: PMFVideoNormalizedRect;
+                         {optional} pDst: PRECT;
+                         {optional} pBorderClr: PCOLORREF): HResult; stdcall;
     // Updates the video frame.
     // Call this method when the preview window receives a WM_PAINT or WM_SIZE mes
     // Parameters
@@ -697,7 +700,7 @@ type
     //  pBorderClr [in]
     //    The border color. Use the RGB macro to create this value.
 
-    function SetSampleCallback(dwStreamSinkIndex: DWORD;
+    function SetSampleCallback(const dwStreamSinkIndex: DWORD;
                                pCallback: IMFCaptureEngineOnSampleCallback): HResult; stdcall;
     // Allows an app to retrieve samples via a callback
     // <param name = "dwSinkStreamIndex">
@@ -732,7 +735,7 @@ type
     // <param name = "dwRotationValue">
     // The degree by which the video is rotated.  Valid values are 0, 90, 180, or 270 degrees.
 
-    function SetCustomSink(var pMediaSink: IMFMediaSink): HResult; stdcall;
+    function SetCustomSink(pMediaSink: IMFMediaSink): HResult; stdcall;
     // Allows an app to set a custom sink for the preview path
     // <param name = "pMediaSink">
     // Pointer to IUnknown(IMFMediaSink) interface.
@@ -915,9 +918,9 @@ type
   IMFCaptureEngine = interface(IUnknown)
   ['{a6bba433-176b-48b2-b375-53aa03473207}']
     function Initialize(pEventCallback: IMFCaptureEngineOnEventCallback;
-                        const pAttributes: IMFAttributes = nil;
-                        const pAudioSource: IUnknown = nil;
-                        const pVideoSource: IUnknown = nil): HResult; stdcall;
+                        pAttributes: IMFAttributes = nil;
+                        pAudioSource: IUnknown = nil;
+                        pVideoSource: IUnknown = nil): HResult; stdcall;
     // Initializes the the capture engine.
     // App should listen for MF_CAPTURE_ENGINE_INITIALIZED via IMFCaptureEngineOnEventCallback.
     // <param name ="pEventCallback">
@@ -941,8 +944,8 @@ type
     // Asynchronous method to start recording.
     // App should listen for MF_CAPTURE_ENGINE_RECORD_STARTED via IMFCaptureEngineOnEventCallback.
 
-    function StopRecord(bFinalize: BOOL;
-                        bFlushUnprocessedSamples: BOOL): HResult; stdcall;
+    function StopRecord(const bFinalize: BOOL;
+                        const bFlushUnprocessedSamples: BOOL): HResult; stdcall;
     // Asynchronous method to stop recording.
     // App should listen for MF_CAPTURE_ENGINE_RECORD_STOPPED via IMFCaptureEngineOnEventCallback.
     // <param name = "bFinalize">
@@ -956,14 +959,14 @@ type
     // App should listen for MF_CAPTURE_ENGINE_PHOTO_TAKEN via IMFCaptureEngineOnEventCallback.
 
     function GetSink(mfCaptureEngineSinkType: MF_CAPTURE_ENGINE_SINK_TYPE;
-                     [ref] const ppSink: IMFCaptureSink): HResult; stdcall;
+                     out ppSink: IMFCaptureSink): HResult; stdcall;
     // Method to obtain access to an IMFCaptureSink.
     // <param name = "mfCaptureEngineSinkType">
     // Specifies the capture sink type from the MF_CAPTURE_ENGINE_SINK_TYPE enumeration.
     // <param name = "ppSink">
     // Receives a pointer to IMFCaptureSink interface.
 
-    function GetSource([ref] const ppSource: IMFCaptureSource): HResult; stdcall;
+    function GetSource(out ppSource: IMFCaptureSource): HResult; stdcall;
     // Method to obtain access to IMFCaptureSource.
     // <param name = "ppSource">
     // Receives a pointer to IMFCaptureSource interface.

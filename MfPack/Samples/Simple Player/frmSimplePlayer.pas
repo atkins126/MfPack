@@ -9,7 +9,7 @@
 // Release date: 05-07-2020
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 // Description: Demonstrates audio/video playback using the IMFPMediaPlayer API.
 //              Note: This API is deprecated!
 //
@@ -21,12 +21,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //
 //          The MFPlayer API is deprecated: See: https://docs.microsoft.com/en-us/windows/win32/api/mfplay/
+//          Due to many issues playing different formats, it's not recommended to use this API.
 //
 //          To play a file, select **Open File** from the **File** menu.
 //          To pause, press the **Spacebar**. To resume playback, press the **Spacebar** again.
@@ -34,7 +35,7 @@
 //          To change volume, press left arrow (decrease) or right arrow (increase).
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: It's not recommended to use this api.
 //               As MS said this api is deprecated and support for most media types is not (fully) supported.
 //
@@ -61,9 +62,10 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-//
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 unit frmSimplePlayer;

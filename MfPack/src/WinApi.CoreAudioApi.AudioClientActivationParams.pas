@@ -10,7 +10,7 @@
 // Release date: 20-08-2021
 // Language: ENU
 //
-// Revision Version: 3.1.3
+// Revision Version: 3.1.4
 // Description: This header is used by Core Audio APIs.
 //
 // Organisation: FactoryX
@@ -27,7 +27,7 @@
 // Remarks: Requires Windows 10 build 20348 or later.
 //
 // Related objects: -
-// Related projects: MfPackX313
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -43,19 +43,20 @@
 //
 // LICENSE
 //
-//  The contents of this file are subject to the
-//  GNU General Public License v3.0 (the "License");
-//  you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License at
-//  https://www.gnu.org/licenses/gpl-3.0.html
+// The contents of this file are subject to the Mozilla Public License
+// Version 2.0 (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the License at
+// https://www.mozilla.org/en-US/MPL/2.0/
 //
 // Software distributed under the License is distributed on an "AS IS"
 // basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
 //
 //==============================================================================
 
@@ -83,9 +84,8 @@ const
   // a process ID instead of the device interface path of a physical audio device.
   // Use this for the deviceInterfacePath parameter of ActivateAudioInterfaceAsync when
   // AUDIOCLIENT_ACTIVATION_PARAMS.ActivationType is set to AUDIOCLIENT_ACTIVATION_TYPE_PROCESS_LOOPBACK.
+  VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK = 'VAD\Process_Loopback';
   {$EXTERNALSYM VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK}
-  VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK = 'VAD\\Process_Loopback';
-
 
 type
 
@@ -121,7 +121,7 @@ type
   PAUDIOCLIENT_ACTIVATION_PARAMS = AUDIOCLIENT_ACTIVATION_TYPE;
   AUDIOCLIENT_ACTIVATION_PARAMS = record
     ActivationType: AUDIOCLIENT_ACTIVATION_TYPE;
-    case Integer of
+    case Integer of   // Used when ActivationType is AUDIOCLIENT_ACTIVATION_TYPE_PROCESS_LOOPBACK.
       0: (ProcessLoopbackParams: AUDIOCLIENT_PROCESS_LOOPBACK_PARAMS);
     end;
   {$EXTERNALSYM PAUDIOCLIENT_ACTIVATION_PARAMS}

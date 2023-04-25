@@ -10,7 +10,7 @@
 // Release date: 29-03-2022
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 //
 // Description:
 //   This unit shows how to get a videoframe from a camera in A-sync mode.
@@ -23,13 +23,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX312/Samples/CameraFrameCapture
+// Related projects: MfPackX314/Samples/CameraFrameCapture
 //
 // Compiler version: 23 up to 35
 // SDK version: 10.0.22621.0
@@ -52,8 +52,11 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit CameraCapture.Asynchronous;
 
@@ -63,6 +66,7 @@ uses
   {Winapi}
   WinAPI.Messages,
   WinAPI.Windows,
+  WinApi.WinApiTypes,
   {System}
   System.Classes,
   System.SysUtils,
@@ -115,6 +119,7 @@ type
     function OnFlush(dwStreamIndex: DWord): HRESULT; stdcall;
     function OnEvent(dwStreamIndex: DWord;
                      pEvent: IMFMediaEvent): HRESULT; stdcall;
+
     function ReadNextSample(): Boolean;
     {$endregion}
 
@@ -174,6 +179,7 @@ function TCameraCaptureAsync.OnEvent(dwStreamIndex: DWord;
                                      pEvent: IMFMediaEvent): HRESULT;
 begin
   // Note: This will be called in a worker thread.
+
   Result := S_OK;
 end;
 
@@ -413,19 +419,20 @@ var
   oResult: HRESULT;
 
 begin
+
   Result := Assigned(SourceReader);
 
   if Result then
-  begin
-    StartTimer;
-    FFindingSample := True;
-    oResult := SourceReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                                       0,
-                                       nil,
-                                       nil,
-                                       nil,
-                                       nil);
-    Result := SUCCEEDED(oResult);
+    begin
+      StartTimer;
+      FFindingSample := True;
+      oResult := SourceReader.ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+                                         0,
+                                         nil,
+                                         nil,
+                                         nil,
+                                         nil);
+      Result := SUCCEEDED(oResult);
 
     if not Result then
       HandleSampleReadError(oResult);

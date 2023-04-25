@@ -9,7 +9,7 @@
 // Release date: 24-04-2019
 // Language: ENU
 //
-// Version: 3.1.0
+// Version: 3.1.3
 // Description: Floating form for subtitles.
 //
 // Company: FactoryX
@@ -21,13 +21,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX312
+// Related projects: MfPackX314
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -54,8 +54,8 @@
 // under the License.
 //
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this source code provided that this header is included this source code provided that this header is included
+// in full at the top of the file. Commercial users are not allowed to include this API as part of their product without implicit permission.
 //
 //==============================================================================
 unit FloatingFrm;

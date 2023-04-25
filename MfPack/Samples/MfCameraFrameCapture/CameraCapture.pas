@@ -10,7 +10,7 @@
 // Release date: 29-03-2022
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 //
 // Description:
 //   This unit contains the TCameraCapture class for project CameraFrameCapture.
@@ -23,13 +23,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX312/Samples/CameraFrameCapture
+// Related projects: MfPackX314/Samples/CameraFrameCapture
 //
 // Compiler version: 23 up to 35
 // SDK version: 10.0.22621.0
@@ -52,8 +52,11 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit CameraCapture;
 
@@ -73,11 +76,13 @@ uses
   WinAPI.MediaFoundationApi.MfUtils,
   WinApi.MediaFoundationApi.MfIdl,
   WinApi.StrmIf,
+  {DirectX}
+  Winapi.DirectX.D3D11,
+  WinApi.DirectX.D3DCommon,
   {Application}
   Support,
-  SampleConverter,
-  Winapi.D3D11,
-  Winapi.D3DCommon;
+  SampleConverter;
+
 
 type
   TVideoFormat = record
@@ -272,7 +277,7 @@ end;
 
 destructor TCameraCapture.Destroy();
 begin
-  SafeDelete(FCritSec);
+  FreeAndNil(FCritSec);
   FreeAndNil(FSampleConverter);
   DestroyDirectXDevice;
   inherited;
@@ -647,8 +652,8 @@ begin
       try
         // Enumerate the devices.
         Result := SUCCEEDED(MFEnumDeviceSources(oAttributes,
-                            ppDevices,
-                            iCount));
+                                                ppDevices,
+                                                iCount));
 
        iDeviceIndex := -1;
        for i := 0 to iCount - 1 do
@@ -734,7 +739,8 @@ begin
 end;
 
 
-function TCameraCapture.PopulateFormatDetails(const AMediaFormat: IMFMediaType; var ADetails: TVideoFormat): Boolean;
+function TCameraCapture.PopulateFormatDetails(const AMediaFormat: IMFMediaType;
+                                              var ADetails: TVideoFormat): Boolean;
 var
   uiHeigth: UINT32;
   uiWidth: UINT32;
@@ -802,7 +808,8 @@ begin
 end;
 
 
-procedure TCameraCapture.Log(const AMessage: string; const AType: TLogType);
+procedure TCameraCapture.Log(const AMessage: string;
+                             const AType: TLogType);
 begin
   if Assigned(FOnLog) then
     FOnLog(AMessage,

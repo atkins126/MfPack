@@ -10,7 +10,7 @@
 // Release date: 21-12-2019
 // Language: ENU
 //
-// Revision Version: 3.1.2
+// Revision Version: 3.1.4
 //
 // Description:
 //   This application demonstrates using the Media Foundation
@@ -32,7 +32,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
@@ -65,8 +65,11 @@
 // License for the specific language governing rights and limitations
 // under the License.
 //
-// Users may distribute this source code provided that this header is included
-// in full at the top of the file.
+// Non commercial users may distribute this sourcecode provided that this
+// header is included in full at the top of the file.
+// Commercial users are not allowed to distribute this sourcecode as part of
+// their product.
+//
 //==============================================================================
 unit AudioClipEngine;
 
@@ -299,7 +302,7 @@ begin
     end;
 
   if Assigned(FCritSec) then
-    SafeDelete(FCritSec);
+    FreeAndNil(FCritSec);
 
   wcSourceFile := Nil;
   inherited BeforeDestruction();
@@ -424,7 +427,11 @@ nextsample:
   if Assigned(pReader) then
     // Read the next sample.
     hr := pReader.ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM,
-                             0)
+                             0,
+                             nil,
+                             nil,
+                             nil,
+                             nil)
   else
     goto done;
 
@@ -882,7 +889,11 @@ var
 begin
   // Read the first sample. this will start the callback OnReadSample
   hr := pReader.ReadSample(MF_SOURCE_READER_FIRST_AUDIO_STREAM,
-                           0);
+                           0,
+                           nil,
+                           nil,
+                           nil,
+                           nil);
 
   if Failed(hr) then
     FinalizeClip(STATE_ERROR,

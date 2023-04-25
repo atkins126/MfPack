@@ -3,14 +3,15 @@ program MfTranscode;
 uses
   {$IFDEF FASTMM}
   FastMM4,
+  {$ENDIF }
+  {$IFDEF MadExcept}
+  madExcept,
   madLinkDisAsm,
   madListHardware,
   madListProcesses,
   madListModules,
   {$ENDIF }
-  {$IFDEF MAD}
-  madExcept,
-  {$ENDIF }
+
   Vcl.Forms,
   frmTranscode in 'frmTranscode.pas' {frmTranscoder},
   Transcoder in 'Transcoder.pas';
