@@ -10,7 +10,7 @@
 // Release date: 29-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.5
 // Description: Common methods used by Media Foundation,
 //              Core Audio etc..
 //
@@ -23,17 +23,12 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 13/08/2022 Tony                Implemented more functionality and updated methods.
-// 11/12/2022 Tony                Added some modifications.
-// 20/02/2023 Tony                Fixed some issues with SafeRelease/SaveDelete.
-// 11/03/2023 Tony                Added CreateFile2 function (fileapi.h). See:
-//                                https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX315
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -42,9 +37,7 @@
 // Todo: -
 //
 //==============================================================================
-// Source: Some parts from Msdn
-//
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Source: See comments.
 //==============================================================================
 //
 // LICENSE
@@ -472,7 +465,9 @@ type
 
   // System
   //=======
-  function BoolToStrYesNo(const aBoolean: Boolean): string; inline;
+  function BoolToStrYesNo(const aBoolean: Boolean;
+                          sYes: string = 'Yes';
+                          sNo: string = 'No'): string; inline;
   // = BoolToStr, For backward compatibility
   function MfpBoolToStr(const aBoolean: Boolean): string; inline;
   function BoolToStr(const aBoolean: Boolean): string; inline;
@@ -1217,9 +1212,9 @@ end;
 procedure CopyTColorToMFARGB(const cColor: TColor;
                              out argb: MFARGB); inline;
 begin
-  argb.rgbRed   := (cColor AND $FF);
-  argb.rgbGreen := (cColor shr 8) AND $FF;
   argb.rgbBlue  := (cColor shr 16) AND $FF;
+  argb.rgbGreen := (cColor shr 8) AND $FF;
+  argb.rgbRed   := (cColor AND $FF);
   argb.rgbAlpha := (cColor shr 24) AND $FF;
 end;
 
@@ -1279,32 +1274,30 @@ end;
 procedure CopyClrRefToRgbTriple(src: COLORREF;
                                 out srd: RGBTRIPLE); inline;
 begin
-  srd.rgbtRed := byte(src shl 16);
-  srd.rgbtGreen := byte(src shl 8);
   srd.rgbtBlue := byte(src shl 0);
+  srd.rgbtGreen := byte(src shl 8);
+  srd.rgbtRed := byte(src shl 16);
 end;
 
 
 // copies a RGBTRIPLE to DWord (COLORREF)
-// Note the Delphi RGBTriple has a reversed RGBA order (BGRA), the color calculation has to be reversed too.
 procedure CopyRgbTripleToClrRef(src: RGBTRIPLE;
                                 out srd: COLORREF); inline;
 begin
-  srd := ((DWord(src.rgbtRed) shl 16) or
+  srd := ((DWord(src.rgbtBlue) shl 0) or
           (DWord(src.rgbtGreen) shl 8) or
-          (DWord(src.rgbtBlue) shl 0) or
+          (DWord(src.rgbtRed) shl 16) or
           ($00000000 shl 24));
 end;
 
 
 // copies a RGBQUAD to DWord (COLORREF)
-// Note the Delphi RGBQuad has a reversed RGB order (BGR), the color calculation has to be reversed too.
 procedure CopyRGBQuadToClrRef(src: RGBQUAD;
                               out srd: COLORREF); inline;
 begin
-  srd := ((DWord(src.rgbRed) shl 16) or
+  srd := ((DWord(src.rgbBlue) shl 0) or
           (DWord(src.rgbGreen) shl 8) or
-          (DWord(src.rgbBlue) shl 0) or
+          (DWord(src.rgbRed) shl 16) or
           (DWord(src.rgbReserved) shl 24)); // this should always be 0!
 end;
 
@@ -1313,9 +1306,9 @@ end;
 procedure CopyClrRefToRGBQuad(src: COLORREF;
                               out srd: RGBQUAD); inline;
 begin
-  srd.rgbRed := byte(src shl 16);
-  srd.rgbGreen := byte(src shl 8);
   srd.rgbBlue := byte(src shl 0);
+  srd.rgbGreen := byte(src shl 8);
+  srd.rgbRed := byte(src shl 16);
   srd.rgbReserved := byte(src shl 24); // this should always be 0!
 end;
 
@@ -1333,9 +1326,9 @@ begin
   d := aCb - 128;
   e := aCr - 128;
 
-  rgbq.rgbRed :=   Clip(( 298 * c + 409 * e + 128) shr 8);
-  rgbq.rgbGreen := Clip(( 298 * c - 100 * d - 208 * e + 128) shr 8);
   rgbq.rgbBlue :=  Clip(( 298 * c + 516 * d + 128) shr 8);
+  rgbq.rgbGreen := Clip(( 298 * c - 100 * d - 208 * e + 128) shr 8);
+  rgbq.rgbRed :=   Clip(( 298 * c + 409 * e + 128) shr 8);
 
   Result:=  rgbq;
 end;
@@ -1367,13 +1360,12 @@ end;
 //
 //  The coordinate (0.0, 0.0) on N is mapped to the upper-left corner of R.
 //  The coordinate (1.0, 1.0) on N is mapped to the lower-right corner of R.
-//  Any coordinates of N that fall outside the range [0...1] are mapped to positions
+//  Any coordinates of N that fall outside the range [0..1] are mapped to positions
 //  outside the rectangle R.
 //
 // A normalized rectangle can be used to specify a region within a video rectangle,
 // without knowing the resolution or even the aspect ratio of the video.
 // For example, the upper-left quadrant is defined as {0.0, 0.0, 0.5, 0.5}.
-
 
 // Note: TRect/TRectF record methods are defined in Delphi
 
@@ -1742,7 +1734,9 @@ begin
   GetMem(pwResult,
          (Length(source) +1) * SizeOf(PWideChar));
   try
-    StringToWideChar(source, pwResult, Length(source) +1); // +1 because a pending 0 is added
+    StringToWideChar(source,
+                     pwResult,
+                     Length(source) +1); // +1 because a pending 0 is added
   finally
     //
     Result := pwResult;
@@ -1904,12 +1898,14 @@ end;
 
 
 // System
-function BoolToStrYesNo(const aBoolean: Boolean): string; inline;
+function BoolToStrYesNo(const aBoolean: Boolean;
+                        sYes: string = 'Yes';
+                        sNo: string = 'No'): string; inline;
 begin
   if aBoolean then
-    Result := 'Yes'
+    Result := sYes
   else
-    Result := 'No';
+    Result := sNo;
 end;
 
 
