@@ -22,7 +22,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
@@ -3263,12 +3263,7 @@ const
                                            D2: $0000;
                                            D3: $0010;
                                            D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
-
-  MFAudioFormat_Dolby_AC4_IMS   : TGUID = (D1: WAVE_FORMAT_DOLBY_AC4_IMS;
-                                           D2: $0000;
-                                           D3: $0010;
-                                           D4: ($80, $00, $00, $AA, $00, $38, $9B, $71));
-
+  {$EXTERNALSYM MFAudioFormat_Dolby_AC4}
 
 
   // These audio types are not derived from an existing wFormatTag
@@ -5930,25 +5925,33 @@ implementation
 uses
   System.SysUtils;
 
+
   // Implement Additional Prototypes here.
 
 
+//
 function HI32(unPacked: UINT64): UINT32;
 begin
   Result := unPacked shr 32;
 end;
 
+
+//
 function LO32(unPacked: UINT64): UINT32;
 begin
   Result := unPacked and $0ffffffff;
 end;
 
+
+//
 function Pack2UINT32AsUINT64(unHigh: UINT32;
                              unLow: UINT32): UINT64;
 begin
   Result := UINT64(unHigh) shl 32 or unLow;
 end;
 
+
+//
 procedure Unpack2UINT32AsUINT64(unPacked: UINT64;
                                 out punHigh: UINT32;
                                 out punLow: UINT32);
@@ -5988,6 +5991,7 @@ end;
 //--------------------- Macros converted to functions ------------------------
 
 
+//
 function FCC(ch4: TCh4): DWord; inline;
 begin
   Result :=  DWord(Ord(ch4[0])) or
@@ -5997,6 +6001,7 @@ begin
 end;
 
 
+//
 function DEFINE_MEDIATYPE_GUID(const format: DWord): TGuid;
 begin
   Result.D1 := format;
@@ -6159,6 +6164,7 @@ const
 //==========================================
 
 
+//
 function UIntAdd(var uAugend: UINT32;
                  const uAddend: UINT32;
                  out puResult: PUINT32): HRESULT; inline;
@@ -6174,7 +6180,7 @@ begin
 end;
 
 
-
+//
 function SizeTMult(const cbMultiplicand: SIZE_T;
                    const cbMultiplier: SIZE_T;
                    out pcbResult: PSIZE_T): HRESULT; inline;
@@ -6188,7 +6194,7 @@ begin
 end; // SizeTMult
 
 
-
+//
 function PackSize(unWidth: UINT32;
                   unHeight: UINT32): UINT64;
 begin
@@ -6197,6 +6203,7 @@ begin
 end;
 
 
+//
 procedure UnpackSize(unPacked: UINT64;
                      out punWidth: UINT32;
                      out punHeight: UINT32);
@@ -6207,6 +6214,7 @@ begin
 end;
 
 
+//
 function PackRatio(nNumerator: INT32;
                    unDenominator: UINT32): UINT64;
 begin
@@ -6215,6 +6223,7 @@ begin
 end;
 
 
+//
 procedure UnpackRatio(unPacked: UINT64;
                       out pnNumerator: UINT32;
                       out punDenominator: UINT32);
@@ -6225,6 +6234,7 @@ begin
 end;
 
 
+//
 function MFGetAttributeUINT32(pAttributes: IMFAttributes;
                               guidKey: TGUID;
                               unDefault: UINT32): UINT32;
@@ -6242,6 +6252,7 @@ begin
 end;
 
 
+//
 function MFGetAttributeUINT64(pAttributes: IMFAttributes;
                               guidKey: TGUID;
                               unDefault: UINT64): UINT64;
@@ -6257,6 +6268,7 @@ begin
 end;
 
 
+//
 function MFGetAttributeDouble(pAttributes: IMFAttributes;
                               guidKey: TGUID;
                               fDefault: Double ): Double;
@@ -6269,6 +6281,7 @@ begin
 
   Result := fRet;
 end;
+
 
 //
 function MFGetAttribute2UINT32asUINT64(pAttributes: IMFAttributes;
@@ -6293,6 +6306,7 @@ begin
   Result := hr;
 end;
 
+
 //
 function MFSetAttribute2UINT32asUINT64(pAttributes: IMFAttributes;
                                        guidKey: TGUID;
@@ -6303,6 +6317,7 @@ begin
                                   Pack2UINT32AsUINT64(unHigh32,
                                                       unLow32));
 end;
+
 
 //
 function MFGetAttributeRatio(pAttributes: IMFAttributes;
@@ -6316,6 +6331,7 @@ begin
                                           punDenominator);
 end;
 
+
 //
 function MFGetAttributeSize(pAttributes: IMFAttributes;
                             guidKey: TGUID;
@@ -6327,6 +6343,7 @@ begin
                                           punWidth,
                                           punHeight);
 end;
+
 
 //
 function MFSetAttributeRatio(pAttributes: IMFAttributes;
@@ -6340,6 +6357,7 @@ begin
                                           unDenominator);
 end;
 
+
 //
 function MFSetAttributeSize(pAttributes: IMFAttributes;
                             guidKey: TGUID;
@@ -6351,6 +6369,7 @@ begin
                                           unWidth,
                                           unHeight);
 end;
+
 
 //
 function MFGetAttributeString(pAttributes: IMFAttributes;

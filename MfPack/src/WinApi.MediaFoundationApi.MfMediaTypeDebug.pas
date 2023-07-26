@@ -21,7 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: How to use:
@@ -132,8 +132,7 @@ type
     destructor Destroy(); override;
 
     // Call this method to log
-    function LogMediaType(pType: IMFMediaType;
-                          const aCount: UINT32): HRESULT;
+    function LogMediaType(pType: IMFMediaType): HRESULT;
     // Call this method to save each log to a separate file.
     procedure SafeDebugResultsToFile(const pMethodName: string = '';
                                      const pFileName: string = 'MFMediaTypeDebug';
@@ -164,8 +163,7 @@ begin
 end;
 
 
-function TMediaTypeDebug.LogMediaType(pType: IMFMediaType;
-                                      const aCount: UINT32): HRESULT;
+function TMediaTypeDebug.LogMediaType(pType: IMFMediaType): HRESULT;
 var
   hr: HResult;
   unCount: UINT32;
