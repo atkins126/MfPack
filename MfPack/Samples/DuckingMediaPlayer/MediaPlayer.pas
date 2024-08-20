@@ -10,7 +10,7 @@
 // Release date: 05-07-2020
 // Language: ENU
 //
-// Version: 3.1.3
+// Version: 3.1.6
 // Description: This sample implements a simple media player that responds to the "ducking"
 //              feature in Windows 7 and higher.
 //              It also implements a volume control which tracks
@@ -24,17 +24,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/06/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -549,8 +549,12 @@ function TCMediaPlayer.HandleGraphEvent(): Boolean;
 var
   stopped: Boolean;
   evCode: LongInt;
-  param1, param2: LONG_PTR;
-  timeBegin, timeStop: REFERENCE_TIME;
+
+  param1,
+  param2: {WinApi.Windows.}LONG_PTR;
+
+  timeBegin,
+  timeStop: REFERENCE_TIME;
 
 begin
   stopped := False;

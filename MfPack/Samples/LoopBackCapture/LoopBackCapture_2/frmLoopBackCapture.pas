@@ -10,7 +10,7 @@
 // Release date: 02-04-2023
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: The audio loopbackcapture engine.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 31/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -68,12 +68,14 @@ uses
   Winapi.Messages,
   WinApi.ComBaseApi,
   Winapi.ShellAPI,
+  WinApi.WinApiTypes,
   {ActiveX}
   WinApi.ActiveX,
   {System}
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.Diagnostics,
   {Vcl}
   Vcl.Graphics,
   Vcl.Controls,
@@ -82,6 +84,7 @@ uses
   Vcl.ComCtrls,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
+  Vcl.Samples.Spin,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfApi,
   WinApi.MediaFoundationApi.MfUtils,
@@ -90,7 +93,8 @@ uses
   {Application}
   Common,
   LoopbackCapture,
-  ProcessInfoDlg;
+  ProcessInfoDlg,
+  UniThreadTimer;
 
 type
   TfrmMain = class(TForm)
@@ -99,14 +103,13 @@ type
     rb2: TRadioButton;
     rb1: TRadioButton;
     butGetPID: TButton;
-    Button1: TButton;
+    butShowProcesses: TButton;
     Bevel2: TBevel;
     Label2: TLabel;
     edProcName: TEdit;
     cbxStayOnTop: TCheckBox;
     Panel1: TPanel;
     Label1: TLabel;
-    lblFileExt: TLabel;
     edFileName: TEdit;
     cbxDontOverWrite: TCheckBox;
     butStart: TButton;
@@ -116,14 +119,13 @@ type
     Bevel1: TBevel;
     Bevel3: TBevel;
     Panel3: TPanel;
-    lblDeviceBufferDuration: TLabel;
-    tbDeviceBufferDuration: TTrackBar;
     Label4: TLabel;
-    rb441b16: TRadioButton;
-    rb48b24: TRadioButton;
-    rb48b32: TRadioButton;
-    rb96b24: TRadioButton;
-    rb96b32: TRadioButton;
+    sedBufferSize: TSpinEdit;
+    cbxAutoBufferSize: TCheckBox;
+    lblCaptureBufferDuration: TLabel;
+    lblBufferDuration: TLabel;
+    cbxWavFormats: TComboBox;
+    lblFileExt: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject;
                              var CanClose: Boolean);
@@ -134,27 +136,34 @@ type
     procedure edFileNameKeyUp(Sender: TObject;
                               var Key: Word;
                               Shift: TShiftState);
-    procedure Button1Click(Sender: TObject);
+    procedure butShowProcessesClick(Sender: TObject);
     procedure edPIDKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure cbxStayOnTopClick(Sender: TObject);
-    procedure tbDeviceBufferDurationChange(Sender: TObject);
 
   private
     { Private declarations }
     sFileName: string;
     sOrgFileName: string;
     bEdited: Boolean;
-    iProgress: Int64;
+    iTotalBytesWritten: Int64;
+    pvBufferDuration: REFERENCE_TIME;
     bIncludeProcessTree: Boolean;
     oLoopbackCapture: TLoopbackCapture;
-    aprocessId: Integer;
+    aMainProcessId: Integer;
     aWavFmt: TWavFormat;
-    aDeviceBufferDuration: REFERENCE_TIME;
+    // We use timers here, to prevent distortions when quering the capturethread for timing and processed data.
+    // The timer must be set to 1 millisecond resolution.
+    thrTimer: TUniThreadedTimer;
+    aStopWatch: TStopwatch;
 
-    procedure OnProgressEvent(var AMessage: TMessage); message WM_PROGRESSNOTIFY;
-    procedure OnRecordingStopped(var AMessage: TMessage); message WM_RECORDINGSTOPPEDNOTYFY;
+    procedure SetBufferDuration();
+
+    // Event handlers.
+    procedure OnCapturingStartEvent(Sender: TObject);
+    procedure OnCapturingStoppedEvent(Sender: TObject);
+
     function StartCapture(): HResult;
-    procedure SetDeviceBufferDuration();
+    procedure TimerTimer(sender: TObject);
 
   public
     { Public declarations }
@@ -171,6 +180,7 @@ implementation
 
 procedure TfrmMain.butPlayDataClick(Sender: TObject);
 begin
+
   ShellExecute(Handle,
                'open',
                StrToPWideChar(sFileName + lblFileExt.Caption),
@@ -185,8 +195,9 @@ var
   hr: HResult;
 
 begin
+
   // Set to default, if user selected nothing.
-  if (aprocessId = 0) then
+  if (aMainProcessId = 0) then
     begin
       butGetPIDClick(Self);
       rb1.Checked := true;
@@ -197,13 +208,13 @@ begin
   if FAILED(hr) then
     begin
       MessageBox(0,
-                 LPCWSTR('Your computer does not support this Media Foundation API version' +
-                         IntToStr(MF_VERSION) + '.'),
-                 LPCWSTR('MFStartup Failure!'),
+                 LPCWSTR('Start Capture failed with result ' + IntToStr(hr)),
+                 LPCWSTR('Start Capture Failure!'),
                  MB_ICONSTOP);
+      Exit;
     end;
 
-  butStart.Enabled := not SUCCEEDED(hr);
+  butStart.Enabled := FAILED(hr);
   butStop.Enabled := SUCCEEDED(hr);
 end;
 
@@ -213,15 +224,16 @@ var
   hr: HResult;
 
 begin
-  hr := oLoopbackCapture.StopCaptureAsync();
 
+  hr := oLoopbackCapture.StopCaptureAsync();
   butStart.Enabled := SUCCEEDED(hr);
   butStop.Enabled := not SUCCEEDED(hr);
 end;
 
 
-procedure TfrmMain.Button1Click(Sender: TObject);
+procedure TfrmMain.butShowProcessesClick(Sender: TObject);
 begin
+
   // Create the dialog if it's not allready done.
   if not Assigned(dlgProcessInfo) then
     begin
@@ -233,19 +245,22 @@ begin
   // Ask the user to select one.
   if (dlgProcessInfo.ShowModal = mrOk) then
     begin
-      aprocessId := dlgProcessInfo.SelectedPID;
-      edPID.Text := IntToStr(aprocessId);
+      aMainProcessId := dlgProcessInfo.SelectedMainPID; //dlgProcessInfo.SelectedPID;
+      edPID.Text := IntToStr(aMainProcessId);
       edProcName.Text := dlgProcessInfo.SelectedProcName;
+      rb2.Checked := True;
     end
   else
     begin
       // User canceled.
+      rb1.Checked := True;
     end;
 end;
 
 
 procedure TfrmMain.cbxStayOnTopClick(Sender: TObject);
 begin
+
   if cbxStayOnTop.Checked then
     SetWindowPos(Handle,
                  HWND_TOPMOST,
@@ -268,6 +283,7 @@ end;
 procedure TfrmMain.edFileNameKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+
   bEdited := True;
 end;
 
@@ -276,15 +292,18 @@ procedure TfrmMain.edPIDKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
   i: Integer;
+
 begin
+
   if TryStrToInt(edPID.Text, i) and (i >= 0) then
-   aprocessId := i;
+   aMainProcessId := i;
 end;
 
 
 // Get the PID from this application
 procedure TfrmMain.butGetPIDClick(Sender: TObject);
 begin
+
   edPID.Text := IntToStr(GetCurrentProcessId());
   edProcName.Text := Application.Title;
 end;
@@ -292,17 +311,32 @@ end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
+
   CanClose := False;
+  aStopWatch.Stop;
+  thrTimer.Enabled := False;
+
   FreeAndNil(oLoopbackCapture);
+  FreeAndNil(thrTimer);
   CanClose := True;
 end;
 
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  oLoopbackCapture := TLoopbackCapture.Create(Handle);
+
+  aStopWatch := TStopwatch.Create;
+  thrTimer := TUniThreadedTimer.Create(nil);
+  thrTimer.Period := 1;  // One millisecond resolution.
+  thrTimer.Enabled := False;
+  thrTimer.OnTimerEvent := TimerTimer;
+
+  oLoopbackCapture := TLoopbackCapture.Create();
+
+  // Set event handlers.
+  oLoopbackCapture.OnStoppedCapturing := OnCapturingStoppedEvent;
+  oLoopbackCapture.OnStartCapturing := OnCapturingStartEvent;
   butGetPID.OnClick(Self);
-  SetDeviceBufferDuration();
   bEdited := False;
 end;
 
@@ -312,26 +346,25 @@ var
   hr: HResult;
   i: Integer;
   bFileExists: Boolean;
-
-label
-  done;
+  hnsPeriod: REFERENCE_TIME;
 
 begin
+
   hr := S_OK;
-  iProgress := 0;
+  iTotalBytesWritten := 0;
 
   if not Assigned(oLoopbackCapture) then
     begin
       hr := E_POINTER;
-      goto done;
+      Exit(hr);
     end;
 
   // Check for valid inputs
-  aprocessId := StrToInt(edPID.Text);
-  if (aprocessId <= 0) then
+  aMainProcessId := StrToInt(edPID.Text);
+  if (aMainProcessId <= 0) then
     begin
-      aprocessId := 0;
-      edPID.Text := IntToStr(aprocessId);
+      aMainProcessId := 0;
+      edPID.Text := IntToStr(aMainProcessId);
     end;
 
   if rb1.Checked then
@@ -339,20 +372,7 @@ begin
   else if rb2.Checked then
     bIncludeProcessTree := True;
 
-  // Buffersize depends on latency and bitrate
-  SetDeviceBufferDuration();
-
-  // Bitrate and resolution.
-  if rb441b16.Checked then
-    aWavFmt := fmt44100b16
-  else if rb48b24.Checked then
-    aWavFmt := fmt48000b24
-  else if rb48b32.Checked then
-    aWavFmt := fmt48000b32
-  else if rb96b24.Checked then
-    aWavFmt := fmt96000b24
-  else if rb96b32.Checked then
-    aWavFmt := fmt96000b32;
+  // Check filename.
 
   if SUCCEEDED(hr) then
     begin
@@ -391,51 +411,116 @@ begin
       butStop.Enabled := True;
       butStart.Enabled := False;
       butPlayData.Enabled := False;
+      SetBufferDuration();
+
+      // Bitrate and resolution.
+      case cbxWavFormats.ItemIndex of
+        0: aWavFmt := fmt44100b16;
+        1: aWavFmt := fmt48000b24;
+        2: aWavFmt := fmt48000b32;
+        3: aWavFmt := fmt96000b24;
+        4: aWavFmt := fmt96000b32;
+      end;
 
       // Capture the audio stream from the default rendering device.
       hr := oLoopbackCapture.StartCaptureAsync(Handle,
-                                               aprocessId,
+                                               aMainProcessId,
                                                bIncludeProcessTree,
+                                               LPCWSTR(sFileName + lblFileExt.Caption),
                                                aWavFmt,
-                                               aDeviceBufferDuration,
-                                               LPCWSTR(sFileName + lblFileExt.Caption));
+                                               pvBufferDuration);
       if FAILED(hr) then
         begin
           butStop.Enabled := False;
           butStart.Enabled := True;
-          goto done;
+          Exit(hr);
         end;
+
+      hnsPeriod := Round(1000 * (oLoopbackCapture.CaptureBufferLength / oLoopbackCapture.CurrentWavFormat.nSamplesPerSec));
+      lblCaptureBufferDuration.Caption := Format('Capture Buffer Duration: %d ms.', [hnsPeriod]);
     end;
-done:
+
   Result := hr;
 end;
 
 
-procedure TfrmMain.OnProgressEvent(var aMessage: TMessage);
+procedure TFrmMain.SetBufferDuration();
+var
+  sms: string;
+
 begin
-  iProgress := aMessage.WParam;
-  lblMsg.Caption := Format('Capturing from source: Bytes processed: %d',[iProgress]);
+
+  if cbxAutoBufferSize.Checked then
+    pvBufferDuration := 0
+  else
+    pvBufferDuration := (REFTIMES_PER_SEC) * sedBufferSize.Value;
+
+  if (pvBufferDuration > REFTIMES_PER_SEC) then
+    sms := 'milliseconds'
+  else
+    sms := 'millisecond';
+
+  if (pvBufferDuration = 0) then
+    lblBufferDuration.Caption := 'The audioclient will automaticly adjust the buffer duration.'
+  else
+    lblBufferDuration.Caption := Format('Capture buffer duration(%d %s)',
+                                        [sedBufferSize.Value,
+                                         sms])
 end;
 
 
-procedure TfrmMain.OnRecordingStopped(var AMessage: TMessage);
+procedure TfrmMain.OnCapturingStartEvent(Sender: TObject);
 begin
+  thrTimer.Enabled := True;
+  aStopWatch.Start;
+  aStopWatch.StartNew;
+end;
+
+
+procedure TfrmMain.OnCapturingStoppedEvent(Sender: TObject);
+begin
+
+  // Stop the timer and stopwatch.
+  thrTimer.Enabled := False;
+  aStopWatch.Stop;
+  aStopWatch.Reset;
+
+  if not Assigned(oLoopbackCapture) then
+    Exit;
+
   butPlayData.Enabled := True;
-  lblMsg.Caption := Format('Capturing Stopped: %s bytes processed.', [iProgress.ToString()]);
+  lblMsg.Caption := Format('Capturing stopped. Captured %f Mb.',
+                           [oLoopbackCapture.BytesWritten / (1000 * 1000)]);
 end;
 
 
-procedure TfrmMain.tbDeviceBufferDurationChange(Sender: TObject);
+procedure TfrmMain.TimerTimer(sender: TObject);
 begin
-  SetDeviceBufferDuration();
+
+  lblMsg.Caption := 'Capturing from source: ' + FormatDateTime('hh:nn:ss:zzz',
+                                                               aStopWatch.ElapsedMilliseconds / MSecsPerDay);
+  HandleThreadMessages(GetCurrentThread());
 end;
 
 
-procedure TfrmMain.SetDeviceBufferDuration();
-begin
-  lblDeviceBufferDuration.Caption := Format('Device buffer (%d MilliSeconds)', [tbDeviceBufferDuration.Position]);
-  aDeviceBufferDuration := tbDeviceBufferDuration.Position * AUDIO_BUFFER_FMT;
-end;
 
+// initialization and finalization =============================================
+
+
+initialization
+
+  if FAILED(MFStartup(MF_VERSION,
+                      MFSTARTUP_LITE)) then
+      begin
+        MessageBox(0,
+                   lpcwstr('Your computer does not support this Media Foundation API version ' +
+                           IntToStr(MF_VERSION) + '.'),
+                   lpcwstr('MFStartup Failure!'),
+                           MB_ICONSTOP);
+      end;
+
+finalization
+
+  MFShutdown();
 
 end.

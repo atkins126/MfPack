@@ -1,9 +1,3 @@
-### Before going on, some policy:
-- If you have a request, question, idea or need help, please commit to [Discussions](https://github.com/FactoryXCode/MfPack/discussions).
-
-- If you encounter a bug then [Issues](https://github.com/FactoryXCode/MfPack/issues) is the one and only place to be.
-
-
 # About MfPack
 
  Delphi translations for Microsoft Media Foundation and related API's.
@@ -11,12 +5,12 @@
 # MfPack covers the Delphi translations of:
 
 - Core Audio API's:
-  * Windows Audio Session API (WASAPI, successor of DirectSound) 
+  * Windows Audio Session API (WASAPI) 
   * DeviceTopology API
   * EndpointVolume API
   * Multimedia Device (MMDevice) API
 - Microsoft Media Foundation API (successor of DirectShow).
-- XAudio2 API (XBox game development)
+- XAudio2 API (XBox game development, successor of DirectSound).
 - Microsoft DirectX API's (D2D1, D3D9, D3D11, D3D12, DirectComposition, DXGI, DirectWrite and DXVA) Note that D3D11 and above are part of Media Foundation.
 - Windows Imaging Component (WIC) API.
 - MPEG2 API.
@@ -28,9 +22,9 @@
 
 # MfPack 
 
-Version X 3.1.5
+Version X 3.1.7
 Delphi XE2 up to and including Delphi 12 
-SDK version: 10.0.22621.0 (Windows 11)
+SDK version: 10.0.26100.0 (Windows 11)
 
 
 # Samples
@@ -164,6 +158,10 @@ SDK version: 10.0.22621.0 (Windows 11)
   
  ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/SinkWriterSample.png)
 
+*Example 3 demonstrates how to use the SinkWriter to create a video from one or more image files including audio.*
+ ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/ImageToVideo_3.jpg)
+
+
 **LoopBackCapture Sample 1**
 
 *This sample shows, how to capture sound from your soundcard using WASAPI and save this capture*
@@ -194,15 +192,72 @@ It also demonstrates how to get a process by using the tlhelp32 API, to list a s
 The application is provided with a dialog to select a running process from the process tree you want to pick and has
 a button to get the current PID of your application.
 
-![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/LoopbackCapture2.png) 
+The application is using MMCSS and runs the rendering part in a separate thread.
 
-**Tools**
-* *
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/LoopbackCapture2.png)
+
+
+**Threaded Loopback Capture Sample**
+
+Demonstrates how to capture sound from a rendering or capture device (one of the soundcard's endpoints)
+using WASAPI in combination with mmio to write wav-files.
+This sample lets you to choose between different latency's and 
+buffersize for better sound to eliminate buffer related gliches.
+ 
+It has some more advanced features like: 
+   - The rendering part is running in a separate thread to eliminate glitches.
+   - Able to use MMCSS (Multimedia Class Scheduler service).
+   - Stream switch detection.
+   - possibility to write wav data in native format 44.1 kHz/ 16 bit PCM or 
+     the soundcard's audio format (including Uncompressed IEEE floating-point audio).
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/ThreadedLoopbackCapture.png)
+
+
+
+**XAudio2Player Basic Player**
+
+XAudio2 is the long-awaited replacement for DirectSound.
+It addresses several outstanding issues and feature requests, like low latency etc.
+
+This sample demonstrates how to use XAudio2 to render different file formats like WAV, FLAC, MP3 etc.
+The sample uses the IMFSourceReader to decode the format suitable for playing in XAudio2.
+It shows you the basics of using XAudio2 without formatting the mediatypes yourself.
+The sample uses the MfPeakMeter component. This requires that you install the MfComponents.
+In your projectsettings you must add ..MfPack\Samples\MfComponents in the project options searchpath.
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/XAudio_Basic_Sample.png)
+
+ 
+**XAudio2Player Sample 2**
+
+This sample shows you how to implement the IXAudio2VoiceCallback.
+The sample uses the MfPeakMeter component. This requires that you install the MfComponents.
+In your projectsettings you must add ..MfPack\Samples\MfComponents in the project options searchpath.  
+It also has a pitch control.
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/XAudio2_Sample2.png)
+
+
+**XAudio2Player Sample 3**
+
+This sample demonstrates how to implement XAudio2 effects and 
+how to go forward or backward during playing with a progressbar and keeping up progress.
+
+It shows you how to implement events and methods instead of using messages from the XaudioEngine.
+The sample uses the MfPeakMeter component. This requires that you install the MfComponents.
+In your projectsettings you must add ..MfPack\Samples\MfComponents in the project options searchpath.  
+
+![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/XAudio2_Sample3.png)
+
+
+***Tools***
+
 **HResult Lookup Tool Application**
 
 *This tool can be used to determine HResult or Error codes returned by the Windows OS,*
 *featuring a detailed build in "HResult Lookup tool", the "Windows System Error Code Lookup Tool" and*
-*the "System.SysUtils.SysErrorMessage" function.*
+*the "System.SysUtils.SysErrorMessage" function, that provides the localized translation (language of your OS) of the HResult.*
 
 ![](https://github.com/FactoryXCode/MfPack/blob/Master/MfPack/Pic/HResultLookUpToolApp.png) 
  

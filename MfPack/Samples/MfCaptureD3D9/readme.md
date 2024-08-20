@@ -1,9 +1,9 @@
 # MfCaptureD3D9
-Version: X 3.1.5
+Version: X 3.1.7
 
 NOTES: 
  - This release is updated for compiler version 17 up to 35.
- - SDK version 10.0.22621.0 (Win 11)
+ - SDK version: 10.0.26100.0 (Win 11)
  - Requires Windows 7 or later.
  - Minimum supported MfPack version: 3.1.5
 
@@ -16,6 +16,6 @@ Project location: https://github.com/FactoryXCode/MfPack
                   https://sourceforge.net/projects/MFPack
 
 First release date: 06-02-2019
-Final release date: 18/07/2023
+Final release date: 30-05-2024
 
 Copyright © FactoryX. All rights reserved.

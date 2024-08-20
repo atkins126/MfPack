@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Media Foundation basic control-layer interfaces.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 01/08/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -523,37 +523,37 @@ const
   PRESENTATION_CURRENT_POSITION = $7FFFFFFFFFFFFFFF;
   {$EXTERNALSYM PRESENTATION_CURRENT_POSITION}
 
-  MF_PD_PMPHOST_CONTEXT                         : TGUID = '{6c990d31-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_PMPHOST_CONTEXT                         : TGUID = '{6c990d31-bb8e-477a-8598-0d5d96fcd88a}';   // IUnknown
   {$EXTERNALSYM MF_PD_PMPHOST_CONTEXT}
-  MF_PD_APP_CONTEXT                             : TGUID = '{6c990d32-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_APP_CONTEXT                             : TGUID = '{6c990d32-bb8e-477a-8598-0d5d96fcd88a}';   // IUnknown
   {$EXTERNALSYM MF_PD_APP_CONTEXT}
 
-  MF_PD_DURATION                                : TGUID = '{6c990d33-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_DURATION                                : TGUID = '{6c990d33-bb8e-477a-8598-0d5d96fcd88a}';   // UINT64
   {$EXTERNALSYM MF_PD_DURATION}
-  MF_PD_TOTAL_FILE_SIZE                         : TGUID = '{6c990d34-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_TOTAL_FILE_SIZE                         : TGUID = '{6c990d34-bb8e-477a-8598-0d5d96fcd88a}';   // UINT64
   {$EXTERNALSYM MF_PD_TOTAL_FILE_SIZE}
-  MF_PD_AUDIO_ENCODING_BITRATE                  : TGUID = '{6c990d35-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_AUDIO_ENCODING_BITRATE                  : TGUID = '{6c990d35-bb8e-477a-8598-0d5d96fcd88a}';   // UINT32
   {$EXTERNALSYM MF_PD_AUDIO_ENCODING_BITRATE}
-  MF_PD_VIDEO_ENCODING_BITRATE                  : TGUID = '{6c990d36-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_VIDEO_ENCODING_BITRATE                  : TGUID = '{6c990d36-bb8e-477a-8598-0d5d96fcd88a}';   // UINT32
   {$EXTERNALSYM MF_PD_VIDEO_ENCODING_BITRATE}
-  MF_PD_MIME_TYPE                               : TGUID = '{6c990d37-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_MIME_TYPE                               : TGUID = '{6c990d37-bb8e-477a-8598-0d5d96fcd88a}';   // Wide-character string
   {$EXTERNALSYM MF_PD_MIME_TYPE}
-  MF_PD_LAST_MODIFIED_TIME                      : TGUID = '{6c990d38-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_LAST_MODIFIED_TIME                      : TGUID = '{6c990d38-bb8e-477a-8598-0d5d96fcd88a}';   // Byte array
   {$EXTERNALSYM MF_PD_LAST_MODIFIED_TIME}
 
 //#if (WINVER >= _WIN32_WINNT_WIN7)
-  MF_PD_PLAYBACK_ELEMENT_ID                     : TGUID = '{6c990d39-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_PLAYBACK_ELEMENT_ID                     : TGUID = '{6c990d39-bb8e-477a-8598-0d5d96fcd88a}';   // UINT32
   {$EXTERNALSYM MF_PD_PLAYBACK_ELEMENT_ID}
-  MF_PD_PREFERRED_LANGUAGE                      : TGUID = '{6c990d3A-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_PREFERRED_LANGUAGE                      : TGUID = '{6c990d3A-bb8e-477a-8598-0d5d96fcd88a}';   // WCHAR
   {$EXTERNALSYM MF_PD_PREFERRED_LANGUAGE}
-  MF_PD_PLAYBACK_BOUNDARY_TIME                  : TGUID = '{6c990d3b-bb8e-477a-8598-0d5d96fcd88a}';
+  MF_PD_PLAYBACK_BOUNDARY_TIME                  : TGUID = '{6c990d3b-bb8e-477a-8598-0d5d96fcd88a}';   // UINT64
   {$EXTERNALSYM MF_PD_PLAYBACK_BOUNDARY_TIME}
-  MF_PD_AUDIO_ISVARIABLEBITRATE                 : TGUID = '{33026ee0-e387-4582-ae0a-34a2ad3baa18}';
+  MF_PD_AUDIO_ISVARIABLEBITRATE                 : TGUID = '{33026ee0-e387-4582-ae0a-34a2ad3baa18}';   // UINT32
   {$EXTERNALSYM MF_PD_AUDIO_ISVARIABLEBITRATE}
 //#endif // (WINVER >= _WIN32_WINNT_WIN7)
 
 //#if (WINVER >= _WIN32_WINNT_WINTHRESHOLD)
-  MF_PD_ADAPTIVE_STREAMING                      : TGUID = '{EA0D5D97-29F9-488B-AE6B-7D6B4136112B}';
+  MF_PD_ADAPTIVE_STREAMING                      : TGUID = '{EA0D5D97-29F9-488B-AE6B-7D6B4136112B}';   // UINT32 (treat as BOOL)
   {$EXTERNALSYM MF_PD_ADAPTIVE_STREAMING}
 //#endif // (WINVER >= _WIN32_WINNT_WINTHRESHOLD)
 
@@ -741,7 +741,7 @@ const
   // MF_TIME_FORMAT_SEGMENT_OFFSET can be used as the pguidTimeFormat argument
   // to IMFMediaSession.Start and IMFMediaSource.Start to indicate that
   // playback should start at a given offset relative to a sequencer element.
-  // The associated PROPVARIANT (TMfPPROPVARIANT) can be created by calling
+  // The associated PROPVARIANT (PROPVARIANT) can be created by calling
   // MFCreateSequencerSegmentOffset.
 
 
@@ -1125,24 +1125,28 @@ const
   // can be obtained from the PKEY_PNPX_XAddrs from a KSCATEGORY_NETWORK_CAMERA
   // or Web Services on Devices (WSD) xaddrs parameter, currently only supports ONVIF cameras.
   MF_DEVSOURCE_ATTRIBUTE_SOURCE_XADDRESS : TGUID = '{BCA0BE52-C327-44C7-9B7D-7FA8D9B5BCDA}';
+  {$EXTERNALSYM MF_DEVSOURCE_ATTRIBUTE_SOURCE_XADDRESS}
 
   // MF_DEVSOURCE_ATTRIBUTE_SOURCE_RTSP_URL
   // {9D7B40D2-3617-4043-93E3-8D6DA9BB3492}
   // Data type: STRING
   // Currently only RTSP urls are supported as an initialization parameter.
   MF_DEVSOURCE_ATTRIBUTE_SOURCE_STREAM_URL : TGUID = '{9D7B40D2-3617-4043-93E3-8D6DA9BB3492}';
+  {$EXTERNALSYM MF_DEVSOURCE_ATTRIBUTE_SOURCE_STREAM_URL}
 
   // MF_DEVSOURCE_ATTRIBUTE_SOURCE_USERNAME
   // {05D01ADD-949F-46EB-BC8E-8B0D2B32D79D}
   // Data type: STRING
   // Attribute contains a username to use for authentication.
   MF_DEVSOURCE_ATTRIBUTE_SOURCE_USERNAME :  TGUID = '{05D01ADD-949F-46EB-BC8E-8B0D2B32D79D}';
+  {$EXTERNALSYM MF_DEVSOURCE_ATTRIBUTE_SOURCE_USERNAME}
 
   // MF_DEVSOURCE_ATTRIBUTE_SOURCE_PASSWORD
   // {A0FD7E16-42D9-49DF-84C0-E82C5EAB8874}
   // Data type: STRING
   // Attribute contains a password to use for authentication.
   MF_DEVSOURCE_ATTRIBUTE_SOURCE_PASSWORD :  TGUID = '{A0FD7E16-42D9-49DF-84C0-E82C5EAB8874}';
+  {$EXTERNALSYM MF_DEVSOURCE_ATTRIBUTE_SOURCE_PASSWORD}
 
   // {7A213AA7-866F-414A-8C1A-275C7283A395}
   // CLSID_FrameServerNetworkCameraSource
@@ -1151,6 +1155,7 @@ const
   // CLSID_FrameServerNetworkCameraSource is only supported using the Windows service FrameServer
   // and requires FrameServer for control and media flow, all other uses are not supported.
   CLSID_FrameServerNetworkCameraSource :  TGUID = '{7A213AA7-866F-414A-8C1A-275C7283A395}';
+  {$EXTERNALSYM CLSID_FrameServerNetworkCameraSource}
 
   // CLSID_CameraConfigurationManager
   //
@@ -1159,6 +1164,7 @@ const
   //
   // {6C92B540-5854-4A17-92B6-AC89C96E9683}
   CLSID_CameraConfigurationManager : TGUID = '{6C92B540-5854-4A17-92B6-AC89C96E9683}';
+  {$EXTERNALSYM CLSID_CameraConfigurationManager}
 
 
   MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_GUID            : TGUID = '{14dd9a1c-7cff-41be-b1b9-ba1ac6ecb571}';
@@ -1472,6 +1478,37 @@ const
 //#endif // (WINVER >= _WIN32_WINNT_WIN7)
 
 
+/// <summary>
+///     ID for topology node.
+/// </summary>
+type
+  TOPOID = UInt64;
+  {$EXTERNALSYM TOPOID}
+
+  // #if (NTDDI_VERSION >= NTDDI_WIN11_ZN)
+  /// <summary>
+  /// Use this service GUID to retrieve the IAcousticEchoCancellationControl interface through the capture MFMediaSource's
+  /// IMFGetService::GetService
+  /// </summary>
+const
+  MF_ACOUSTIC_ECHO_CANCELLATION_CONTROL_SERVICE : TGUID = (D1: $7f6c3b29;
+                                                           D2: $2d12;
+                                                           D3: $4f6f;
+                                                           D4: ($ac, $05, $c1, $a8, $9b, $8d, $52, $88));
+  {$EXTERNALSYM MF_ACOUSTIC_ECHO_CANCELLATION_CONTROL_SERVICE}
+
+  /// <summary>
+  /// Use this service GUID to retrieve the IAudioEffectsManager interface through the capture MFMediaSource's
+  /// IMFGetService.GetService
+  /// </summary>
+const
+  MF_AUDIO_EFFECTS_MANAGER_SERVICE : TGUID = (D1: $1f541943;
+                                              D2: $d5df;
+                                              D3: $455e;
+                                              D4: ($a2, $e5, $7d, $64, $d3, $bb, $bd, $b5));
+  {$EXTERNALSYM MF_AUDIO_EFFECTS_MANAGER_SERVICE}
+
+
 type
   PMFSequencerTopologyFlags = ^MFSequencerTopologyFlags;
   _MFSequencerTopologyFlags     = DWord;
@@ -1572,7 +1609,7 @@ const
 
 
 type
-  // typedef unsigned __int64 TOPOID; >> WinApi.WinApiTypes.pas
+  // typedef unsigned __Int64 TOPOID; >> WinApi.WinApiTypes.pas
 
   // Forward interface definitions
 
@@ -1614,25 +1651,35 @@ type
     // A normal session-end where all resources, references and queued presentations are cleared,
     // would go like this to make sure no memory leaks will be created.
     //
-    //  1 MySession.Stop()      This method is asynchronous. When the operation completes, the Media Session sends an MESessionStopped event.
+    //  1 MySession.Stop()  This method is asynchronous. When the operation completes, the Media Session sends an MESessionStopped event.
     //  2 MySession.ClearTopologies()  See comments on ClearTopologies.
     //  3 MySession.Shutdown()  See comments on ShutDown.
-    //  4 MySession := Nil or SafeRelease(MySession)  Calls IUnknown._Release.
+    //  4 MySession := nil or SafeRelease(MySession)  Calls IUnknown._Release.
     //
     function ClearTopologies(): HResult; stdcall; // Clears all of the presentations that are queued for playback in the Media Session.
 
     function Start(const pguidTimeFormat: TGUID;
                    const pvarStartPosition: PROPVARIANT): HResult; stdcall;
+    // Starts the Media Session.
+    // When this method is called, the Media Session starts the presentation clock and begins to process media samples.
+    // This method is asynchronous.
+    // When the method completes, the Media Session sends an MESessionStarted event.
 
-    function Pause(): HResult; stdcall;
+    function Pause(): HResult; stdcall;  // Pauses the Media Session.
+                                         // This method pauses the presentation clock.
+                                         // This method is asynchronous.
+                                         // When the operation completes, the Media Session sends an MESessionPaused event.
+                                         // Note: This method fails if the Media Session is stopped!
 
-    function Stop(): HResult; stdcall;
+    function Stop(): HResult; stdcall;   // Stops the mediasession. This method is asynchronous.
+                                         // When the operation completes, the Media Session sends an MESessionStopped event.
 
     function Close(): HResult; stdcall;  // Closes the Media Session and releases all of the resources it is using.
 
     function Shutdown(): HResult; stdcall;  // Shuts down the Media Session and releases all the resources used by the Media Session.
                                             // Call this method when you are done using the Media Session, before the final call to IUnknown._Release.
                                             // Otherwise, your application will leak memory.
+
     function GetClock(out ppClock: IMFClock): HResult; stdcall;
 
     function GetSessionCapabilities(out pdwCaps: DWord): HResult; stdcall;
@@ -1666,20 +1713,20 @@ type
       function CreateObjectFromURL(const pwszURL: LPCWSTR;
                                    dwFlags: DWord;
                                    pProps: IPropertyStore; // can be nil
-                                   var pObjectType: MF_OBJECT_TYPE;
+                                   {out} var pObjectType: MF_OBJECT_TYPE;
                                    out ppObject: IUnknown): HResult; stdcall;
 
       function CreateObjectFromByteStream(pByteStream: IMFByteStream;
                                           const pwszURL: LPCWSTR; // can be nil
                                           dwFlags: DWord;
                                           pProps: IPropertyStore; // can be nil
-                                          var pObjectType: MF_OBJECT_TYPE;
+                                          out pObjectType: MF_OBJECT_TYPE;
                                           out ppObject: IUnknown): HResult; stdcall;
 
       function BeginCreateObjectFromURL(const pwszURL: LPCWSTR;
                                         dwFlags: DWord;
                                         pProps: IPropertyStore; // can be nil
-                                        var ppIUnknownCancelCookie: IUnknown;
+                                        out ppIUnknownCancelCookie: IUnknown;
                                         pCallback: IMFAsyncCallback;
                                         punkState: IUnknown): HResult; stdcall;
 
@@ -1745,11 +1792,17 @@ type
     ['{3C9B2EB9-86D5-4514-A394-F56664F9F0D8}']
 
       function GetSourceAttributes(out ppAttributes: IMFAttributes): HResult; stdcall;
+      // Gets an attribute store for the media source.
 
       function GetStreamAttributes(const dwStreamIdentifier: DWORD;
                                    out ppAttributes: IMFAttributes): HResult; stdcall;
+      // Gets an attribute store for a stream on the media source.
 
-      function SetD3DManager(var pManager: IUnknown): HResult; stdcall;
+      function SetD3DManager(pManager: IUnknown): HResult; stdcall;
+      // Sets a pointer to the Microsoft DirectX Graphics Infrastructure (DXGI) Device Manager on the media source.
+      // [in] pManager
+      // A pointer to the IUnknown interface of the DXGI Manager.
+      // The media source should query this pointer for the IMFDXGIDeviceManager interface.
 
    end;
   IID_IMFMediaSourceEx = IMFMediaSourceEx;
@@ -1785,16 +1838,21 @@ type
 
   // Interface IMFMediaStream
   // ========================
+  // Streams are created when a media source is started.
+  // For each stream, the media source sends an MENewStream event with a pointer to the stream's IMFMediaStream interface.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFMediaStream);'}
   {$EXTERNALSYM IMFMediaStream}
   IMFMediaStream = interface(IMFMediaEventGenerator)
   ['{D182108F-4EC6-443f-AA42-A71106EC825F}']
 
     function GetMediaSource(out ppMediaSource: IMFMediaSource): HResult; stdcall;
+    // Retrieves a pointer to the media source that created this media stream.
 
     function GetStreamDescriptor(out ppStreamDescriptor: IMFStreamDescriptor): HResult; stdcall;
+    // Retrieves a stream descriptor for this media stream.
 
     function RequestSample(pToken: IUnknown): HResult; stdcall;
+    // Requests a sample from the media source.
 
   end;
   IID_IMFMediaStream = IMFMediaStream;
@@ -2093,8 +2151,8 @@ type
   // Interface IMFVideoRendererEffectControl
   // Configuration interface for Video Renderer Effects
   // ==================================================
-  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFVideoProcessorControl3);'}
-  {$EXTERNALSYM IMFVideoProcessorControl3}
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFVideoRendererEffectControl);'}
+  {$EXTERNALSYM IMFVideoRendererEffectControl}
   IMFVideoRendererEffectControl = interface(IUnknown)
     ['{604D33D7-CF23-41d5-8224-5BBBB1A87475}']
     // <summary>
@@ -2177,17 +2235,17 @@ type
 
   PMF_TOPOLOGY_TYPE = ^MF_TOPOLOGY_TYPE;
   MF_TOPOLOGY_TYPE                = (
-    MF_TOPOLOGY_OUTPUT_NODE       = 0,   // Output node. Represents a media sink in the topology.
-    MF_TOPOLOGY_SOURCESTREAM_NODE = (MF_TOPOLOGY_OUTPUT_NODE + 1), // Source node. Represents a media stream in the topology.
-    MF_TOPOLOGY_TRANSFORM_NODE    = (MF_TOPOLOGY_SOURCESTREAM_NODE + 1), // Transform node. Represents a Media Foundation Transform (MFT) in the topology.
-    MF_TOPOLOGY_TEE_NODE          = (MF_TOPOLOGY_TRANSFORM_NODE + 1), // Tee node.
+    MF_TOPOLOGY_OUTPUT_NODE       =  0,   // Output node. Represents a media sink in the topology.
+    MF_TOPOLOGY_SOURCESTREAM_NODE =  (MF_TOPOLOGY_OUTPUT_NODE + 1), // Source node. Represents a media stream in the topology.
+    MF_TOPOLOGY_TRANSFORM_NODE    =  (MF_TOPOLOGY_SOURCESTREAM_NODE + 1), // Transform node. Represents a Media Foundation Transform (MFT) in the topology.
+    MF_TOPOLOGY_TEE_NODE          =  (MF_TOPOLOGY_TRANSFORM_NODE + 1), // Tee node.
                                                                       // A tee node does not hold a pointer to an object.
                                                                       // Instead, it represents a fork in the stream.
                                                                       // A tee node has one input and multiple outputs,
                                                                       // and samples from the upstream node are delivered to
                                                                       // all of the downstream nodes.
 
-    MF_TOPOLOGY_MAX               = MAXDWORD // $ffffffff   Reserved.
+    MF_TOPOLOGY_MAX               =  MAXDWORD // $ffffffff   Reserved.
   );
   {$EXTERNALSYM MF_TOPOLOGY_TYPE}
 
@@ -3036,27 +3094,35 @@ type
 
   // Interface IMFQualityManager
   // ===========================
+  // Adjusts playback quality.
+  // This interface is exposed by the quality manager.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFQualityManager);'}
   {$EXTERNALSYM IMFQualityManager}
   IMFQualityManager = interface(IUnknown)
   ['{8D009D86-5B9F-4115-B1FC-9F80D52AB8AB}']
 
     function NotifyTopology(pTopology: IMFTopology): HResult; stdcall;
+    // Called when the Media Session is about to start playing a new topology.
 
     function NotifyPresentationClock(pClock: IMFPresentationClock): HResult; stdcall;
+    // Called when the Media Session selects a presentation clock.
 
     function NotifyProcessInput(pNode: IMFTopologyNode;
                                 lInputIndex: Long;
                                 pSample: IMFSample): HResult; stdcall;
+    // Called when the media processor is about to deliver an input sample to a pipeline component.
 
     function NotifyProcessOutput(pNode: IMFTopologyNode;
                                  lOutputIndex: Long;
                                  pSample: IMFSample): HResult; stdcall;
+    // Called after the media processor gets an output sample from a pipeline component.
 
     function NotifyQualityEvent(pObject: IUnknown;
                                 pEvent: IMFMediaEvent): HResult; stdcall;
+    // Called when a pipeline component sends an MEQualityNotify event.
 
     function Shutdown(): HResult; stdcall;
+    // Called when the Media Session is shutting down.
 
   end;
   IID_IMFQualityManager = IMFQualityManager;
@@ -3117,6 +3183,8 @@ type
 
   // Interface IMFRealTimeClient
   // ===========================
+  // Notifies a pipeline object to register itself with the Multimedia Class Scheduler Service (MMCSS).
+  // Any pipeline object that creates worker threads should implement this interface.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFRealTimeClient);'}
   {$EXTERNALSYM IMFRealTimeClient}
   IMFRealTimeClient = interface(IUnknown)
@@ -3223,6 +3291,8 @@ type
 
 
   // Specifies a new attribute value for a topology node.
+  // This structure is used in IMFTopologyNodeAttributeEditor.UpdateNodeAttributes.
+  // NodeId indicate which node's attributes to update.
   PMFTOPONODE_ATTRIBUTE_UPDATE = ^MFTOPONODE_ATTRIBUTE_UPDATE;
   _MFTOPONODE_ATTRIBUTE_UPDATE = record
       NodeId:           TOPOID;   // The identifier of the topology node to update. To get the identifier of a topology node, call IMFTopologyNode.GetTopoNodeID.
@@ -3230,7 +3300,7 @@ type
       attrType:         MF_ATTRIBUTE_TYPE;  // Attribute type, specified as a member of the MF_ATTRIBUTE_TYPE enumeration.
       case Integer of
         Ord(MF_ATTRIBUTE_UINT32): (u32: UINT32); // Attribute value (unsigned 32-bit integer). This member is used when attrType equals MF_ATTRIBUTE_UINT32.
-        Ord(MF_ATTRIBUTE_UINT64): (u64: UINT64); // Attribute value (unsigned 32-bit integer). This member is used when attrType equals MF_ATTRIBUTE_UINT64. See Remarks.
+        Ord(MF_ATTRIBUTE_UINT64): (u64: UINT64); // Attribute value (unsigned 64-bit integer). This member is used when attrType equals MF_ATTRIBUTE_UINT64. See Remarks.
         Ord(MF_ATTRIBUTE_DOUBLE): (d: Double);   // Attribute value (floating point). This member is used when attrType equals MF_ATTRIBUTE_DOUBLE.
       end;
   {$EXTERNALSYM _MFTOPONODE_ATTRIBUTE_UPDATE}
@@ -4068,15 +4138,20 @@ type
 
   // Interface IMFRemoteProxy
   // ========================
+  // Exposed by objects that act as a proxy for a remote object.
+  // To obtain a pointer to this interface,
+  // call IMFGetService.GetService with the service identifier MF_REMOTE_PROXY.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFRemoteProxy);'}
   IMFRemoteProxy = interface(IUnknown)
     ['{994e23ad-1cc2-493c-b9fa-46f1cb040fa4}']
 
       function GetRemoteObject(const riid: REFIID;
                                out ppv: Pointer): HResult; stdcall;
+      // Retrieves a pointer to the remote object for which this object is a proxy.
 
       function GetRemoteHost(const riid: REFIID;
                              out ppv: Pointer): HResult; stdcall;
+      // Retrieves a pointer to the object that is hosting this proxy.
 
   end;
   {$EXTERNALSYM IMFRemoteProxy}
@@ -4200,6 +4275,14 @@ type
 
   // Interface IMFTranscodeProfile
   // =============================
+  // Implemented by the transcode profile object.
+  // The transcode profile stores configuration settings that the
+  // topology builder uses to generate the transcode topology for the output file.
+  // These configuration settings are specified by the caller and include audio and
+  // video stream properties, encoder settings and container settings that are specified by the caller.
+  // To create the transcode profile object, call MFCreateTranscodeProfile.
+  // The configured transcode profile is passed to MFCreateTranscodeTopology,
+  // which creates the transcode topology with the appropriate settings.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFTranscodeProfile);'}
   IMFTranscodeProfile = interface(IUnknown)
   ['{4ADFDBA3-7AB0-4953-A62B-461E7FF3DA1E}']
@@ -4375,11 +4458,15 @@ type
 
   // Interface IMFPMPClientApp
   // =========================
+  // Provides a mechanism for a media source to implement content protection functionality
+  // in a Windows Store apps.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFPMPClientApp);'}
   IMFPMPClientApp = interface(IUnknown)
     ['{c004f646-be2c-48f3-93a2-a0983eba1108}']
 
       function SetPMPHost(pPMPHost: IMFPMPHostApp): HResult; stdcall;
+      // Sets a pointer to the IMFPMPHostApp interface allowing a media source to
+      // create objects in the PMP process.
 
   end;
   {$EXTERNALSYM IMFPMPClientApp}
@@ -4619,7 +4706,7 @@ type
   // The Media Foundation network code uses these client callbacks to implement and enforce cross origin downloads.
   //  * GetCrossOriginPolicy() returns the client's current cross origin policy to apply to the download session.
   //  * GetSourceOrigin() returns the W3C origin of the HTML5 media element.  Use CoTaskMemFree to free the string.
-  //  * IsSameOrigin() returns true when the specified URL has the same origin as the HTML5 media element.
+  //  * IsSameOrigin() returns True when the specified URL has the same origin as the HTML5 media element.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFNetCrossOriginSupport);'}
   IMFNetCrossOriginSupport = interface(IUnknown)
   ['{bc2b7d44-a72d-49d5-8376-1480dee58b22}']
@@ -4802,6 +4889,7 @@ type
 //endif // (WINVER >= _WIN32_WINNT_WINTHRESHOLD)
 
 // WIN10  April 2018 update
+// __MIDL___MIDL_itf_mfidl_0000_0114_0001
   PSENSORPROFILEID = ^SENSORPROFILEID;
   SENSORPROFILEID = record
     _Type: TGUID;
@@ -6460,7 +6548,7 @@ type
     /// result in all the existing control defaults being cleared.
     function SaveDefaults(configurations: IMFCameraControlDefaultsCollection): HResult; stdcall;
 
-    /// Shutdown the configuration manager.  Subsequent calls to
+    /// Shutdown the configuration manager. Subsequent calls to
     /// LoadDefaults/SaveDefaults after the
     /// IMFCameraConfigurationManager is shutdown will result in
     /// MF_E_SHUTDOWN error.
@@ -6470,6 +6558,129 @@ type
   {$EXTERNALSYM IMFCameraConfigurationManager}
   IID_IMFCameraConfigurationManager = IMFCameraConfigurationManager;
   {$EXTERNALSYM IID_IMFCameraConfigurationManager}
+
+
+
+  // #if (NTDDI_VERSION >= NTDDI_WIN11_ZN)
+
+  PDetectedFaceBound = ^DetectedFaceBound;
+  DetectedFaceBound = record
+    sizeInBytes: DWORD;              // Size in bytes to next DetectedFaceBound
+    normalizedXPosition: Single;     // Normalized between 0.0 - 1.0
+    normalizedYPosition: Single;     // Normalized between 0.0 - 1.0
+    normalizedWidth: Single;         // Normalized between 0.0 - 1.0
+    normalizedHeight: Single;        // Normalized between 0.0 - 1.0
+    confidenceValue: LONG;           // Normalized between 0 - 100
+    flags: ULONGLONG;
+  end;
+  {$EXTERNALSYM DetectedFaceBound}
+
+
+  // Interface IMFFaceDetectionTransformCallback
+  //============================================
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFFaceDetectionTransformCallback);'}
+  IMFFaceDetectionTransformCallback = interface(IUnknown)
+    ['{0BFD1ADE-0421-4909-ACB7-7A7125416881}']
+
+    procedure OnFaceDetectionResult(countOfBounds: ULONG;
+                                    detectedFaceBounds: PDetectedFaceBound);
+
+  end;
+  {$EXTERNALSYM IMFFaceDetectionTransformCallback}
+  IID_IMFFaceDetectionTransformCallback = IMFFaceDetectionTransformCallback;
+  {$EXTERNALSYM IID_IMFFaceDetectionTransformCallback}
+
+
+  // Interface IMFFaceDetectionTransform
+  //====================================
+  //
+  {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IMFFaceDetectionTransform);'}
+  IMFFaceDetectionTransform = interface(IUnknown)
+    ['{DDD59578-D0E7-46E2-BE8C-1CE76AD147C0}']
+
+    function SetDetectionCallback(callback: IMFFaceDetectionTransformCallback;
+                                  out callbackToken: Pointer): HResult; stdcall;
+
+    function ClearDetectionCallback(callbackToken: Pointer): HResult; stdcall;
+
+  end;
+  {$EXTERNALSYM IMFFaceDetectionTransform}
+  IID_IMFFaceDetectionTransform = IMFFaceDetectionTransform;
+  {$EXTERNALSYM IID_IMFFaceDetectionTransform}
+
+
+const
+  /// CLSID_FaceDetectionMFT
+  ///
+  /// Data type: GUID CLSID for creating Face Detection
+  /// IMFTransform.  Also implements the IMFFaceDetectionTransform
+  /// interface.
+  ///
+  /// {C1E565E2-F2DE-4537-9612-2F30A160EB5C}
+  CLSID_FaceDetectionMFT : TGUID = '{c1e565e2-f2de-4537-9612-2f30a160eb5c}';
+  {$EXTERNALSYM CLSID_FaceDetectionMFT}
+
+  /// CLSID_FrameServerClassFactory
+  ///
+  /// Data type: GUID CLSID for creating the
+  /// IMFActivate from the Frame Server.
+  ///
+  /// NOTE:  This CLSID may only be CoCreated from
+  /// Frame Server service process.  Any attempts to
+  /// instantiate this CLSID from a non-Frame Server
+  /// service process will fail with access denied.
+  ///
+  /// It is recommended that applications use
+  /// MFCreateDeviceSource or MFEnumDeviceSources to
+  /// create an IMFMediaSource for the camera.
+  ///
+  /// {9A93092C-9CDC-49B8-8349-CBCF3145FE0A}
+  CLSID_FrameServerClassFactory : TGUID = '{9A93092C-9CDC-49B8-8349-CBCF3145FE0A}';
+  {$EXTERNALSYM CLSID_FrameServerClassFactory}
+
+  /// MF_CAMERASOURCE_PROVIDE_SELECTED_PROFILE_ON_START
+  ///
+  /// Data type: UINT32 - Set to non-zero to have pipeline provide
+  /// the selected camera profile on the first stream start
+  /// on the source. Setting the value to 0 will be treatd as if
+  /// the attribute was not set: the selected profile is sent during
+  /// client initialization.  Multiple clients may initialize the
+  /// same source so the selected profile may be issued independent
+  /// of the start operation.
+  ///
+  /// Setting this attribute enables an optimization
+  /// (reducing the number of profile changes), but the KsEvent
+  /// and KsProperty methods handling  still need to handle the case where
+  /// the optimization is not available. If the new
+  /// PROFILE_ON_START property is honored, then the KsEvent and
+  /// KsProperty methods are called less often, avoiding
+  /// unnecessary profile changes.
+  ///
+  /// {A9B46058-82F2-4E5C-BF6E-25B4B09F22ED}
+  MF_CAMERASOURCE_PROVIDE_SELECTED_PROFILE_ON_START : TGUID = '{A9B46058-82F2-4E5C-BF6E-25B4B09F22ED}';
+  {$EXTERNALSYM MF_CAMERASOURCE_PROVIDE_SELECTED_PROFILE_ON_START}
+
+  /// MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE
+  ///
+  /// Attribute used during MFCreateDeviceSource or
+  /// IMFActivate::ActivateObject to create an instance of
+  /// IMFMediaSource in shared mode.
+  ///
+  /// Shared mode allows multiple shared mode applications to
+  /// stream from the same camera without the ability to change
+  /// the extended camera controls nor change media types.
+  ///
+  /// Data type: UINT32
+  ///
+  /// 0 or not set - Default non-shared mdoe instance.
+  ///
+  /// 1 - Shared mode instance.
+  ///
+  /// {44d1a9bc-2999-4238-ae43-0730ceb2ab1b}
+  MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE : TGUID = '{44d1a9bc-2999-4238-ae43-0730ceb2ab1b}';
+  {$EXTERNALSYM MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE}
+
 
 // if NTDDI_VERSION >= NTDDI_WIN10_NI
 
@@ -6645,128 +6856,127 @@ const
 
 ///// INTERNAL FUNCTIONS ///////////////////////////////////////////////////////
 
-  function MAKE_MFPROTECTIONDATA_DISABLE(const Disable: BOOL): DWORD; inline;
-    begin
-      if (Disable = True) then
-        Result:= $00000001
-      else
-        Result:= 0;
-    end;
+function MAKE_MFPROTECTIONDATA_DISABLE(const Disable: BOOL): DWORD; inline;
+begin
+  if (Disable = True) then
+    Result:= $00000001
+  else
+    Result := 0;
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_DISABLE_ON(Data: DWORD): BOOL; inline;
-    begin
-      Result:= BOOL((Data and $00000001) <> 0);
-    end;
+function EXTRACT_MFPROTECTIONDATA_DISABLE_ON(Data: DWORD): BOOL; inline;
+begin
+  Result := BOOL((Data and $00000001) <> 0);
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_DISABLE_RESERVED(Data: DWORD): DWORD; inline;
-    begin
-      Result:= ((Data and $FFFFFFFE) shr 1);
-    end;
+function EXTRACT_MFPROTECTIONDATA_DISABLE_RESERVED(Data: DWORD): DWORD; inline;
+begin
+  Result := ((Data and $FFFFFFFE) shr 1);
+end;
 
 
-  function MAKE_MFPROTECTIONDATA_CONSTRICTAUDIO(Level: DWORD): DWORD; inline;
-    begin
-      Result:= Level;
-    end;
+function MAKE_MFPROTECTIONDATA_CONSTRICTAUDIO(Level: DWORD): DWORD; inline;
+begin
+  Result := Level;
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_CONSTRICTAUDIO_LEVEL(Data: DWORD): DWORD; inline;
-    begin
-      Result:= Data and $000000FF;
-    end;
+function EXTRACT_MFPROTECTIONDATA_CONSTRICTAUDIO_LEVEL(Data: DWORD): DWORD; inline;
+begin
+  Result := Data and $000000FF;
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_CONSTRICTAUDIO_RESERVED(Data: DWORD): DWORD; inline;
-    begin
-      Result:= (Data and $FFFFFF00) shr 8;
-    end;
+function EXTRACT_MFPROTECTIONDATA_CONSTRICTAUDIO_RESERVED(Data: DWORD): DWORD; inline;
+begin
+  Result := (Data and $FFFFFF00) shr 8;
+end;
 
 
-  function MAKE_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS(TestCertificateEnable: BOOL;
+function MAKE_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS(TestCertificateEnable: BOOL;
                                                      DigitalOutputDisable: BOOL;
                                                      DrmLevel: DWORD): DWORD; inline;
-    begin
-      Result:= 0;   //init
+begin
+  Result := 0;   //init
 
-      if (TestCertificateEnable = True) then
-        Result:= $20000;
+  if (TestCertificateEnable = True) then
+    Result := $20000;
 
-      if (DigitalOutputDisable = True) then
-        Result:= Result or $10000;
-      //final
-      Result:= Result or DrmLevel;
+  if (DigitalOutputDisable = True) then
+    Result := Result or $10000;
+  //final
+  Result := Result or DrmLevel;
+end;
 
-    end;
 
-
-  function MAKE_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS2(TestCertificateEnable: BOOL;
+function MAKE_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS2(TestCertificateEnable: BOOL;
                                                       DigitalOutputDisable: BOOL;
                                                       CopyOK: BOOL;
                                                       DrmLevel: DWORD): DWORD; inline;
-    begin
-      Result:= 0; //init
+begin
+  Result := 0; // init
 
-      if (TestCertificateEnable = True) then
-        Result:= $20000;
+  if (TestCertificateEnable = True) then
+    Result:= $20000;
 
-      if (DigitalOutputDisable = True) then
-        Result:= Result or $10000;
+  if (DigitalOutputDisable = True) then
+    Result:= Result or $10000;
 
-      if (CopyOK = True) then
-        Result:= Result or $40000;
+  if (CopyOK = True) then
+    Result:= Result or $40000;
 
-        //final
-      Result:= Result or DrmLevel;
-    end;
-
-
-  function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_DRMLEVEL(Data: DWORD): DWORD; inline;
-    begin
-      Result:= (Data and $0000FFFF);
-    end;
+  // final
+  Result := Result or DrmLevel;
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_DIGITALOUTPUTDISABLE(Data: DWORD): BOOL; inline;
-    begin
-      Result:= BOOL(0 <> (Data and $10000));
-    end;
+function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_DRMLEVEL(Data: DWORD): DWORD; inline;
+begin
+  Result := (Data and $0000FFFF);
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_TESTCERTIFICATEENABLE(Data: DWORD): BOOL; inline;
-    begin
-      Result:= BOOL(0 <> (Data and $20000));
-    end;
+function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_DIGITALOUTPUTDISABLE(Data: DWORD): BOOL; inline;
+begin
+  Result := BOOL(0 <> (Data and $10000));
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_COPYOK(Data: DWORD): BOOL; inline;
-    begin
-      Result:= BOOL(0 <> (Data and $40000));
-    end;
+function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_TESTCERTIFICATEENABLE(Data: DWORD): BOOL; inline;
+begin
+  Result := BOOL(0 <> (Data and $20000));
+end;
 
 
-  function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_RESERVED(Data: DWORD): DWORD; inline;
-    begin
-      Result:= ((Data and $FFF80000) shr 19);
-    end;
+function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_COPYOK(Data: DWORD): BOOL; inline;
+begin
+  Result := BOOL(0 <> (Data and $40000));
+end;
 
-  // Else
 
-  function _EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_RESERVED(Data: DWORD): DWORD; inline;
-    begin
-      Result:= ((Data and $FFF80000) shr 18);
-    end;
+function EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_RESERVED(Data: DWORD): DWORD; inline;
+begin
+  Result := ((Data and $FFF80000) shr 19);
+end;
+
+// Else
+
+function _EXTRACT_MFPROTECTIONDATA_TRUSTEDAUDIODRIVERS_RESERVED(Data: DWORD): DWORD; inline;
+begin
+  Result := ((Data and $FFF80000) shr 18);
+end;
 
 
 procedure MFCLOCK_PROPERTIES.Copy(out destProps: MFCLOCK_PROPERTIES);
-  begin
-    destProps.qwCorrelationRate := qwCorrelationRate;
-    destProps.guidClockId := guidClockId;
-    destProps.dwClockFlags := dwClockFlags;
-    destProps.qwClockFrequency := qwClockFrequency;
-    destProps.dwClockTolerance := dwClockTolerance;
-    destProps.dwClockJitter := dwClockJitter;
-  end;
+begin
+  destProps.qwCorrelationRate := qwCorrelationRate;
+  destProps.guidClockId := guidClockId;
+  destProps.dwClockFlags := dwClockFlags;
+  destProps.qwClockFrequency := qwClockFrequency;
+  destProps.dwClockTolerance := dwClockTolerance;
+  destProps.dwClockJitter := dwClockJitter;
+end;
 
 end.

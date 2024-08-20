@@ -10,7 +10,7 @@
 // Release date: 25-11-2022
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 // Description: UI for example of how to use the SinkWriter.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or later.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -96,8 +96,10 @@ type
     procedure cbxEncodingFormatCloseUp(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+
   private
     { Private declarations }
+    FSampleSinkWriter: TSampleSinkWriter;
     tgEncodingFormat: TGuid;
     sEncodingFormat: string;
     sExtension: string;
@@ -117,7 +119,6 @@ implementation
 
 procedure TMainForm.butExecuteClick(Sender: TObject);
 begin
-  FSampleSinkWriter := TSampleSinkWriter.Create();
 
   cbxOutputFormatCloseUp(Self);
   cbxEncodingFormatCloseUp(Self);
@@ -127,7 +128,8 @@ begin
                                                tgEncodingFormat)) then
     lblInfo.Caption := 'File is succesfully created!'
   else
-    lblInfo.Caption := 'Oops, something went wrong :-('
+    lblInfo.Caption := 'Oops, something went wrong :-(';
+
 end;
 
 // Choose the output format
@@ -204,16 +206,37 @@ end;
 procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := False;
-  FreeAndNil(FSampleSinkWriter);
+  if Assigned(FSampleSinkWriter) then
+    FreeAndNil(FSampleSinkWriter);
   CanClose := True;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-
+  FSampleSinkWriter := TSampleSinkWriter.Create();
   cbxOutputFormat.ItemIndex := 0;
   cbxOutputFormatCloseUp(Self);
   cbxEncodingFormatCloseUp(Self);
 end;
+
+
+// initialization and finalization =============================================
+
+
+initialization
+
+  if FAILED(MFStartup(MF_VERSION,
+                      MFSTARTUP_LITE)) then
+      begin
+        MessageBox(0,
+                   lpcwstr('Your computer does not support this Media Foundation API version ' +
+                           IntToStr(MF_VERSION) + '.'),
+                   lpcwstr('MFStartup Failure!'),
+                           MB_ICONSTOP);
+      end;
+
+finalization
+
+  MFShutdown();
 
 end.

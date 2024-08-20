@@ -10,7 +10,7 @@
 // Release date: 12-10-2015
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description:
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Build 22000 or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -128,7 +128,7 @@ const
   // value camera effects will be enabled.  If the camera being
   // created does not have
   // DEVPKEY_DeviceInterface_IsWindowsCameraEffectAvailable
-  // property set to true, setting this attribute during camera
+  // property set to True, setting this attribute during camera
   // initialization will result in an MF_E_INVALIDREQUEST
   // failure.
   MF_DEVSOURCE_ATTRIBUTE_ENABLE_MS_CAMERA_EFFECTS            : TGUID = '{28A5531A-57DD-4FD5-AAA7-385ABF57D785}';

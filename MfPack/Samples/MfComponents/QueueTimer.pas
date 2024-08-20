@@ -10,7 +10,7 @@
 // Release date: 25-02-2016
 // Language: ENU
 //
-// Version: 3.1.3
+// Version: 3.1.6
 // Description:
 //              This is the basic class of a queue timer,
 //              Use this timer when less overhead
@@ -24,7 +24,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
@@ -32,11 +32,11 @@
 //          use the ThreadedQueueTimer instead.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -135,7 +135,7 @@ type
     gTimerID: TGuid;
 
     { Protected methods }
-    procedure QueueTimerHandler; virtual; // called every elTime milliseconds
+    procedure QueueTimerHandler(); virtual; // called every elTime milliseconds
 
   public
     { Public declarations }
@@ -206,13 +206,15 @@ begin
   uiPeriod := 100;
 
   // Create the contextID, in this case a unique guid during runtime
-  if Succeeded( CreateGuid(gTimerID) ) then
+  if SUCCEEDED(CreateGuid(gTimerID)) then
     stmp := GuidToString(gTimerID)
   else // this should not happen!
     stmp := '{4C68E633-53BF-4609-B7DC-0E4FDBCC585E}';
 
   // Create a unique msgId by the given name of the qtimer object
-  MsgId := RegisterWindowMessage( StringToWideChar(stmp, wcmp, Length(wcmp)) );
+  MsgId := RegisterWindowMessage(StringToWideChar(stmp,
+                                                  wcmp,
+                                                  Length(wcmp)));
 end;
 
 
@@ -247,7 +249,7 @@ begin
           // Removes a timer from the timer queue and optionally waits
           // for currently running timer callback functions to
           // complete before deleting the timer.
-          // See: https://docs.microsoft.com/en-us/windows/win32/sync/using-timer-queues
+          // See: https://learn.microsoft.com/en-us/windows/win32/sync/using-timer-queues
           //      about how and when to use timer queues.
 	        if DeleteTimerQueueTimer(0,
                                    hTimerHandle,
@@ -285,7 +287,7 @@ begin
 end;
 
 
-procedure TQTimer.QueueTimerHandler;
+procedure TQTimer.QueueTimerHandler();
 begin
 try
   // Check if the timer is enabled in the primary thread

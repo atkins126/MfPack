@@ -10,7 +10,7 @@
 // Release date: 13-08-2022
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: D3D11 Shader Types and APIs.
 //
 // Organisation: FactoryX
@@ -21,18 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
-// 31/08/2022                     Updated to latest D3D11 SDK 10.0.22621.0 version.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Embarcadero's <= Delphi 10.4 D3D11 is outdated!
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -73,7 +72,6 @@ uses
   {DirectX}
   WinApi.DirectX.D3DCommon;
 
-  {$WEAKPACKAGEUNIT ON}
   {$ALIGN ON}
   {$MINENUMSIZE 4}
 
@@ -323,7 +321,7 @@ type
     RequiredFeatureFlags: UINT64;         // Required feature flags
     Name: PAnsiChar;                      // Function name
     FunctionParameterCount: INT;          // Number of logical parameters in the function signature (not including return)
-    HasReturn: BOOL;                      // TRUE, if function returns a value, false - it is a subroutine
+    HasReturn: BOOL;                      // TRUE, if function returns a value, False - it is a subroutine
     Has10Level9VertexShader: BOOL;        // TRUE, if there is a 10L9 VS blob
     Has10Level9PixelShader: BOOL;         // TRUE, if there is a 10L9 PS blob
   end;

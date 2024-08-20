@@ -10,7 +10,7 @@
 // Release date: 29-05-2018
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: SpatialAudioClient API interface definition.
 //              of the Core Audio Interfaces
 //
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 RedStone 1 or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -72,7 +72,7 @@ uses
   {WinApi}
   WinApi.PropSys,
   WinApi.WinApiTypes,
-  WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMeApi,
   {ActiveX}
   {$IFDEF USE_EMBARCADERO_DEF}
   WinApi.ActiveX,
@@ -83,7 +83,6 @@ uses
   WinApi.CoreAudioApi.AudioClient,
   WinApi.CoreAudioApi.Audiosessiontypes;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -243,7 +242,7 @@ type
     // resources available in future passes
     
     function IsActive(out isActive: BOOL): HRESULT; stdcall;
-    // When isActive is false, the object cannot be used anymore and Release() should be called
+    // When isActive is False, the object cannot be used anymore and Release() should be called
     // to make this audio object resource available in the future
     // This happens after SetEndOfStream is called explicitly or implicitly on the audio object
     // SetEndOfStream will be implicitly called if GetBuffer is not called during any processing pass

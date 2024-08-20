@@ -10,7 +10,7 @@
 // Release date: 25-02-2016
 // Language: ENU
 //
-// Version: 3.1.3
+// Version: 3.1.6
 // Description: This is the basic class of a threaded queue timer,
 //              Use this timer when less overhead
 //              and high presicion is needed with critical sections.
@@ -23,17 +23,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -95,7 +95,7 @@ type
                                  Flags: LongWord): Boolean; stdcall;
   // Important:
   // Wrong implementations can lock up your system!
-  // Please read https://msdn.microsoft.com/en-us/library/windows/desktop/ms682569
+  // Please read https://learn.microsoft.com/nl-nl/windows/win32/api/threadpoollegacyapiset/nf-threadpoollegacyapiset-deletetimerqueuetimer
   function DeleteTimerQueueTimer(TimerQueue: THandle;
                                  Timer: THandle;
                                  CompletionEvent: THandle): Boolean; stdcall;
@@ -217,13 +217,15 @@ begin
   uiPeriod := 100;
 
   // Create the contextID, in this case a unique guid during runtime
-  if Succeeded( CreateGuid(gTimerID) ) then
+  if Succeeded(CreateGuid(gTimerID)) then
     stmp := GuidToString(gTimerID)
   else // this should not happen!
     stmp := '{6A6E25F2-A09C-4E30-8E10-DDF3020F6620}';
 
   // Create a unique msgId by the given name of the qtimer object
-  MsgId := RegisterWindowMessage( StringToWideChar(stmp, wcmp, Length(wcmp)) );
+  MsgId := RegisterWindowMessage(StringToWideChar(stmp,
+                                                  wcmp,
+                                                  Length(wcmp)));
 end;
 
 
@@ -312,7 +314,7 @@ begin
   if Assigned(FQTimerThread) then
     begin
       FQTimerThread.Terminate();
-      FQTimerThread := Nil;
+      FQTimerThread := nil;
     end;
 
   if Enabled then

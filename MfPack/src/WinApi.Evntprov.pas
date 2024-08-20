@@ -10,7 +10,7 @@
 // Release date: 18-12-2016
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: This defines the unified provider side user mode API.
 //
 // Organisation: FactoryX
@@ -21,17 +21,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 // 
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -71,7 +71,6 @@ uses
   Winapi.Windows,
   WinApi.WinApiTypes;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -378,7 +377,7 @@ type
         Event consumers can use keyword masks to determine which events should
         be included in the log. A session can define a KeywordAny mask and
         a KeywordAll mask. An event will pass the session's keyword filtering
-        if the following expression is true:
+        if the following expression is True:
         event.Keyword == 0 || (
         (event.Keyword  session.KeywordAny) != 0
         (event.Keyword  session.KeywordAll) == session.KeywordAll).

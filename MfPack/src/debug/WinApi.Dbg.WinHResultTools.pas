@@ -9,7 +9,7 @@
 // Release date: 09-07-2023
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: The main unit to explore the Windows HResult codes.
 //
 // Organisation: FactoryX
@@ -20,17 +20,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 09/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Please read the readme.md about how to use this tool.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -173,6 +173,8 @@ uses
   WinApi.Dbg.WinError32,
   WinApi.Dbg.WinMfError,
   WinApi.Dbg.D3DError,
+  WinApi.Dbg.StiErr,
+  WinApi.Dbg.XAudio2Err,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfUtils;
 
@@ -225,7 +227,7 @@ begin
       else
         rHrContent.Clear();
 
-
+      // WIN32ERR API Errors.
       // If it's not a positive response code, check if its a win32 error code.
       hr := GetErr32Description(aHResult,
                                 rHrContent.hrStr,
@@ -244,8 +246,9 @@ begin
       else
         rHrContent.Clear();
 
-      // if it's not a wwin32 error, check if it is a Media Foundation error code.
-      // Note that the facility code is "Media Server"
+      // Media Foundation API errors.
+      // If it's not a win32 error, check if it is a Media Foundation error code.
+      // Note that the facility code is "Media Server".
       hr := GetMFHResultDescription(aHResult,
                                     rHrContent.hrStr,
                                     rHrContent.hrDescr,
@@ -263,6 +266,7 @@ begin
       else
         rHrContent.Clear();
 
+      // D3D API Errors
       hr := GetD3DErrorDescription(aHResult,
                                    rHrContent.hrStr,
                                    rHrContent.hrDescr,
@@ -279,7 +283,45 @@ begin
         end
       else
         rHrContent.Clear();
+
+      // Still Image APIs errors
+      hr := GetStiErrorDescription(aHResult,
+                                   rHrContent.hrStr,
+                                   rHrContent.hrDescr,
+                                   rHrContent.hrRegionDescr,
+                                   rHrContent.HeaderFile,
+                                   rHrContent.Reference);
+      if SUCCEEDED(hr) then
+        begin
+          hr := GetStiErrorRegion(aHResult,
+                                  rHrContent.hrRegionDescr);
+          if (hr <> S_OK) then
+            rHrContent.hrRegionDescr := 'Unknown Still Image API error region.';
+            goto done_HLD;
+        end
+      else
+        rHrContent.Clear();
+
+      // XAudio2 API Errors.
+      hr := GetXAudio2ErrorDescription(aHResult,
+                                       rHrContent.hrStr,
+                                       rHrContent.hrDescr,
+                                       rHrContent.hrRegionDescr,
+                                       rHrContent.HeaderFile,
+                                       rHrContent.Reference);
+      if SUCCEEDED(hr) then
+        begin
+          hr := GetXAudio2ErrorRegion(aHResult,
+                                      rHrContent.hrRegionDescr);
+          if (hr <> S_OK) then
+            rHrContent.hrRegionDescr := 'Unknown XAudio2 API error region.';
+            goto done_HLD;
+        end
+      else
+        rHrContent.Clear();
+
     end;
+
 
 done_HLD:
 

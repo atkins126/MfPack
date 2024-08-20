@@ -9,7 +9,7 @@
 // Release date: 09-07-2023
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Error codes from Media Foundation.
 //
 // Organisation: FactoryX
@@ -20,17 +20,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 09/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 31/07/2023 All                 Morrissey release  SDK 10.0.22621.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -63,12 +63,9 @@ unit WinApi.Dbg.WinMfError;
 interface
 
 uses
-  {WinApi}
   WinApi.Windows,
   WinApi.WinError,
-  {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfError,
-  {WinApiDebug}
   WinApi.Dbg.WinHResultTools;
 
 
@@ -147,8 +144,6 @@ begin
 
   HeaderFile := 'mferror.h';
   Reference[0] := 'https://learn.microsoft.com/en-us/windows/win32/medfound/media-foundation-programming-reference';
-  Reference[1] := 'https://learn.microsoft.com/en-us/windows/win32/api/winerror';
-  Reference[2] := '';
 
   case aHResult of
 

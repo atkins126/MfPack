@@ -3,8 +3,8 @@ object frmLoopBackCapture: TfrmLoopBackCapture
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Loopback Capture Sample'
-  ClientHeight = 438
+  Caption = 'Loopback Capture Sample 1'
+  ClientHeight = 376
   ClientWidth = 472
   Color = clBtnFace
   DoubleBuffered = True
@@ -13,43 +13,48 @@ object frmLoopBackCapture: TfrmLoopBackCapture
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
+  OldCreateOrder = True
   Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lblMsg: TLabel
-    Left = 0
-    Top = 414
-    Width = 472
-    Height = 24
-    Margins.Left = 6
-    Align = alBottom
-    AutoSize = False
-    Caption = 'Start Capture'
-    Layout = tlCenter
-    ExplicitLeft = 8
-    ExplicitTop = 460
-    ExplicitWidth = 451
-  end
   object Bevel1: TBevel
     Left = 0
-    Top = 413
+    Top = 351
     Width = 472
     Height = 1
     Align = alBottom
     Shape = bsTopLine
-    ExplicitTop = 434
+    ExplicitTop = 439
+  end
+  object lblStatus: TLabel
+    AlignWithMargins = True
+    Left = 3
+    Top = 355
+    Width = 466
+    Height = 18
+    Align = alBottom
+    AutoSize = False
+    Caption = 'Start Capture'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    Layout = tlCenter
+    ExplicitTop = 443
   end
   object Panel3: TPanel
-    Left = 8
-    Top = 215
-    Width = 454
-    Height = 70
+    Left = 0
+    Top = 149
+    Width = 472
+    Height = 82
     Hint = 
       'The capture buffersize depending on the audiodevice specs and so' +
       'urce latency '
+    Align = alTop
     Alignment = taLeftJustify
     BevelOuter = bvLowered
     Caption = '  Capture Buffer'
@@ -59,14 +64,14 @@ object frmLoopBackCapture: TfrmLoopBackCapture
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 2
     VerticalAlignment = taAlignTop
     object lblBufferDuration: TLabel
-      Left = 8
-      Top = 26
-      Width = 188
+      Left = 65
+      Top = 51
+      Width = 195
       Height = 13
-      Caption = 'Capture Buffer Length : 10 milliseconds'
+      Caption = 'Capture buffer duration : 10 milliseconds'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
@@ -74,39 +79,67 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       Font.Style = []
       ParentFont = False
     end
-    object tbBufferDuration: TTrackBar
-      Left = 0
-      Top = 41
-      Width = 455
-      Height = 25
-      Max = 20
-      Position = 5
+    object lblCaptureBufferDuration: TLabel
+      Left = 114
+      Top = 25
+      Width = 216
+      Height = 13
+      Caption = 'Auto capture buffer duration: 10 milliseconds'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGrayText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsItalic]
+      ParentFont = False
+    end
+    object cbxAutoBufferSize: TCheckBox
+      Left = 8
+      Top = 24
+      Width = 100
+      Height = 16
+      Caption = 'Auto buffer size.'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 0
-      OnChange = tbBufferDurationChange
+      OnClick = cbxAutoBufferSizeClick
+    end
+    object sedBufferSize: TSpinEdit
+      Left = 7
+      Top = 48
+      Width = 52
+      Height = 22
+      MaxValue = 1000
+      MinValue = 0
+      TabOrder = 1
+      Value = 10
     end
   end
   object butStart: TButton
     Left = 8
-    Top = 380
+    Top = 318
     Width = 85
     Height = 27
-    Caption = 'Start Capture'
-    TabOrder = 0
+    Caption = 'Start capture'
+    TabOrder = 4
     OnClick = butStartClick
   end
   object butStop: TButton
     Left = 99
-    Top = 381
+    Top = 318
     Width = 85
     Height = 27
-    Caption = 'Stop Capture'
+    Caption = 'Stop capture'
     Enabled = False
-    TabOrder = 1
+    TabOrder = 5
     OnClick = butStopClick
   end
   object butPlayData: TButton
     Left = 190
-    Top = 381
+    Top = 318
     Width = 80
     Height = 27
     Hint = 'Play recorded data.'
@@ -114,14 +147,15 @@ object frmLoopBackCapture: TfrmLoopBackCapture
     Enabled = False
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 2
+    TabOrder = 6
     OnClick = butPlayDataClick
   end
   object Panel1: TPanel
-    Left = 8
-    Top = 33
-    Width = 454
-    Height = 72
+    Left = 0
+    Top = 0
+    Width = 472
+    Height = 51
+    Align = alTop
     Alignment = taLeftJustify
     BevelOuter = bvLowered
     Caption = '   AudioEndpoint'
@@ -131,15 +165,15 @@ object frmLoopBackCapture: TfrmLoopBackCapture
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 0
     VerticalAlignment = taAlignTop
     object rbRenderingDevice: TRadioButton
-      Left = 8
+      Left = 7
       Top = 22
       Width = 145
       Height = 17
       Hint = 'Render'
-      Caption = 'Audio Rendering Stream.'
+      Caption = 'Audio rendering EndPoint.'
       Checked = True
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -153,12 +187,12 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       TabStop = True
     end
     object rbCaptureDevice: TRadioButton
-      Left = 8
-      Top = 45
+      Left = 168
+      Top = 22
       Width = 145
       Height = 17
       Hint = 'Capture'
-      Caption = 'Audio Capture Stream.'
+      Caption = 'Audio capture EndPoint.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
@@ -169,12 +203,24 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       ShowHint = True
       TabOrder = 1
     end
+    object butShowdlgDevices: TButton
+      Left = 367
+      Top = 20
+      Width = 97
+      Height = 25
+      Caption = 'Select Device'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 2
+      OnClick = butShowdlgDevicesClick
+    end
   end
   object Panel2: TPanel
-    Left = 8
-    Top = 111
-    Width = 455
+    Left = 0
+    Top = 51
+    Width = 472
     Height = 98
+    Align = alTop
     Alignment = taLeftJustify
     BevelOuter = bvLowered
     Caption = '  Data-flow Direction'
@@ -184,11 +230,11 @@ object frmLoopBackCapture: TfrmLoopBackCapture
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 1
     VerticalAlignment = taAlignTop
     object rbConsole: TRadioButton
       Left = 8
-      Top = 23
+      Top = 24
       Width = 315
       Height = 17
       Hint = 'Console'
@@ -203,10 +249,11 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
+      OnMouseUp = rbConsoleMouseUp
     end
     object rbMultimedia: TRadioButton
       Left = 8
-      Top = 46
+      Top = 47
       Width = 315
       Height = 17
       Hint = 'Multimedia'
@@ -222,10 +269,11 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       ShowHint = True
       TabOrder = 1
       TabStop = True
+      OnMouseUp = rbConsoleMouseUp
     end
     object rbCommunications: TRadioButton
       Left = 8
-      Top = 69
+      Top = 70
       Width = 315
       Height = 17
       Hint = 'Communications'
@@ -239,37 +287,17 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
+      OnMouseUp = rbConsoleMouseUp
     end
   end
-  object cbxStayOnTop: TCheckBox
-    Left = 16
-    Top = 8
-    Width = 189
-    Height = 15
-    Caption = 'Stay On Top'
-    ParentShowHint = False
-    ShowHint = False
-    TabOrder = 5
-    OnClick = cbxStayOnTopClick
-  end
-  object butShowdlgDevices: TButton
-    Left = 365
-    Top = 5
-    Width = 97
-    Height = 25
-    Caption = 'Show Devices'
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 6
-    OnClick = butShowdlgDevicesClick
-  end
   object Panel4: TPanel
-    Left = 8
-    Top = 293
-    Width = 454
+    Left = 0
+    Top = 231
+    Width = 472
     Height = 81
+    Align = alTop
     BevelOuter = bvLowered
-    TabOrder = 8
+    TabOrder = 3
     object Label1: TLabel
       Left = 10
       Top = 32
@@ -288,9 +316,9 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       ShowHint = True
     end
     object lblFileExt: TLabel
-      Left = 274
+      Left = 405
       Top = 51
-      Width = 50
+      Width = 44
       Height = 21
       Hint = 'Enter a file name without extension.'
       AutoSize = False
@@ -306,9 +334,9 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       Transparent = False
     end
     object edFileName: TEdit
-      Left = 9
+      Left = 8
       Top = 51
-      Width = 265
+      Width = 395
       Height = 21
       Alignment = taRightJustify
       AutoSize = False
@@ -321,8 +349,9 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      TabOrder = 0
+      TabOrder = 1
       Text = 'loopback-capture'
+      OnKeyUp = edFileNameKeyUp
     end
     object cbxDontOverWrite: TCheckBox
       Left = 9
@@ -330,12 +359,35 @@ object frmLoopBackCapture: TfrmLoopBackCapture
       Width = 189
       Height = 15
       Hint = 'Do not overwrite files with the same name.'
-      Caption = 'Don'#39't Overwrite Excisting Files'
+      Caption = 'Don'#39't overwrite excisting files'
       Checked = True
       ParentShowHint = False
       ShowHint = True
       State = cbChecked
-      TabOrder = 1
+      TabOrder = 0
     end
+    object cbxStayOnTop: TCheckBox
+      Left = 186
+      Top = 11
+      Width = 106
+      Height = 15
+      Caption = 'Stay On Top'
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 2
+      OnClick = cbxStayOnTopClick
+    end
+  end
+  object butResetEngine: TButton
+    Left = 384
+    Top = 318
+    Width = 80
+    Height = 27
+    Hint = 'Reset the engine when having issues.'
+    Caption = 'Reset engine'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 7
+    OnClick = butResetEngineClick
   end
 end

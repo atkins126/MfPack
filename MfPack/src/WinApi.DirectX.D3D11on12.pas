@@ -10,7 +10,7 @@
 // Release date: 27-08-2022
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: D3D11On12 is a mapping layer, which maps graphics commands from D3D11 to D3D12.
 //              D3D11On12 is not an implementation of the D3D11 API,
 //              but is instead an implementation of the D3D11 usermode DDI (device driver interface).
@@ -24,17 +24,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -81,6 +81,7 @@ uses
 
 
   {$MINENUMSIZE 4}
+
   {$IFDEF WIN32}
     {$ALIGN 1}
   {$ELSE}

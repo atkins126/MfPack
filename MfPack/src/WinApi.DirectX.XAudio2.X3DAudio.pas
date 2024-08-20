@@ -10,7 +10,7 @@
 // Release date: 07-07-2018
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: X3DAudio is an API used with XAudio2 to position sound in 3D space
 //              to create the illusion of sound coming from a point in space
 //              relative to the position of the camera.
@@ -23,7 +23,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks:
@@ -62,12 +62,16 @@
 // 
 //          See https://docs.microsoft.com/en-gb/windows/desktop/xaudio2/x3daudio how to
 //
+//          This version of XAudio2 is available only in Windows 8 or later.
+//          Use the XAudio2 headers and libraries from the DirectX SDK with
+//          applications that target Windows 7 and earlier versions.
+//
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -109,7 +113,14 @@ uses
   {WinApi, Clootie's DX or MfPack}
   WinApi.DirectX.D3D9Types;
 
-  {$WEAKPACKAGEUNIT ON}
+  {$MINENUMSIZE 4}
+
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
+
   {$I 'WinApiTypes.inc'}
   {$I 'XAudio2.inc'}
 
@@ -118,7 +129,8 @@ uses
 
 const
 
-  // speaker geometry configuration flags, specifies assignment of channels to speaker positions, defined as per WAVEFORMATEXTENSIBLE.dwChannelMask
+  // Speaker geometry configuration flags, specifies assignment of channels to
+  // speaker positions, defined as per WAVEFORMATEXTENSIBLE.dwChannelMask.
 {$IFNDEF _SPEAKER_POSITIONS_}
   {$DEFINE _SPEAKER_POSITIONS_}
 
@@ -164,41 +176,78 @@ const
   {$EXTERNALSYM SPEAKER_ALL}
 {$ENDIF}
 
-  // standard speaker geometry configurations, used with X3DAudioInitialize
+  // Standard speaker geometry configurations, used with X3DAudioInitialize.
 {$IFNDEF SPEAKER_MONO}
   SPEAKER_MONO                        = SPEAKER_FRONT_CENTER;
   {$EXTERNALSYM SPEAKER_MONO}
-  SPEAKER_STEREO                      = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT);
+  SPEAKER_STEREO                      = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT);
   {$EXTERNALSYM SPEAKER_STEREO}
-  SPEAKER_2POINT1                     = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_LOW_FREQUENCY);
+  SPEAKER_2POINT1                     = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_LOW_FREQUENCY);
   {$EXTERNALSYM SPEAKER_2POINT1}
-  SPEAKER_SURROUND                    = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_FRONT_CENTER or SPEAKER_BACK_CENTER);
+  SPEAKER_SURROUND                    = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_FRONT_CENTER or
+                                         SPEAKER_BACK_CENTER);
   {$EXTERNALSYM SPEAKER_SURROUND}
-  SPEAKER_QUAD                        = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_BACK_LEFT or SPEAKER_BACK_RIGHT);
+  SPEAKER_QUAD                        = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_BACK_LEFT or
+                                         SPEAKER_BACK_RIGHT);
   {$EXTERNALSYM SPEAKER_QUAD}
-  SPEAKER_4POINT1                     = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_LOW_FREQUENCY or SPEAKER_BACK_LEFT or SPEAKER_BACK_RIGHT);
+  SPEAKER_4POINT1                     = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_LOW_FREQUENCY or
+                                         SPEAKER_BACK_LEFT or
+                                         SPEAKER_BACK_RIGHT);
   {$EXTERNALSYM SPEAKER_4POINT1}
-  SPEAKER_5POINT1                     = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_FRONT_CENTER or SPEAKER_LOW_FREQUENCY or SPEAKER_BACK_LEFT or SPEAKER_BACK_RIGHT);
+  SPEAKER_5POINT1                     = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_FRONT_CENTER or
+                                         SPEAKER_LOW_FREQUENCY or
+                                         SPEAKER_BACK_LEFT or
+                                         SPEAKER_BACK_RIGHT);
   {$EXTERNALSYM SPEAKER_5POINT1}
-  SPEAKER_7POINT1                     = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_FRONT_CENTER or SPEAKER_LOW_FREQUENCY or SPEAKER_BACK_LEFT or SPEAKER_BACK_RIGHT or SPEAKER_FRONT_LEFT_OF_CENTER or SPEAKER_FRONT_RIGHT_OF_CENTER);
+  SPEAKER_7POINT1                     = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_FRONT_CENTER or
+                                         SPEAKER_LOW_FREQUENCY or
+                                         SPEAKER_BACK_LEFT or
+                                         SPEAKER_BACK_RIGHT or
+                                         SPEAKER_FRONT_LEFT_OF_CENTER or
+                                         SPEAKER_FRONT_RIGHT_OF_CENTER);
   {$EXTERNALSYM SPEAKER_7POINT1}
-  SPEAKER_5POINT1_SURROUND            = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_FRONT_CENTER or SPEAKER_LOW_FREQUENCY or SPEAKER_SIDE_LEFT or SPEAKER_SIDE_RIGHT);
+  SPEAKER_5POINT1_SURROUND            = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_FRONT_CENTER or
+                                         SPEAKER_LOW_FREQUENCY or
+                                         SPEAKER_SIDE_LEFT or
+                                         SPEAKER_SIDE_RIGHT);
   {$EXTERNALSYM SPEAKER_5POINT1_SURROUND}
-  SPEAKER_7POINT1_SURROUND            = (SPEAKER_FRONT_LEFT or SPEAKER_FRONT_RIGHT or SPEAKER_FRONT_CENTER or SPEAKER_LOW_FREQUENCY or SPEAKER_BACK_LEFT or SPEAKER_BACK_RIGHT or SPEAKER_SIDE_LEFT or SPEAKER_SIDE_RIGHT);
+  SPEAKER_7POINT1_SURROUND            = (SPEAKER_FRONT_LEFT or
+                                         SPEAKER_FRONT_RIGHT or
+                                         SPEAKER_FRONT_CENTER or
+                                         SPEAKER_LOW_FREQUENCY or
+                                         SPEAKER_BACK_LEFT or
+                                         SPEAKER_BACK_RIGHT or
+                                         SPEAKER_SIDE_LEFT or
+                                         SPEAKER_SIDE_RIGHT);
   {$EXTERNALSYM SPEAKER_7POINT1_SURROUND}
 {$ENDIF}
 
-  // size of instance handle in bytes
+  // Size of instance handle in bytes.
   X3DAUDIO_HANDLE_BYTESIZE            = 20;
   {$EXTERNALSYM X3DAUDIO_HANDLE_BYTESIZE}
 
-  // float math constants
+  // Float math constants.
   X3DAUDIO_PI                         = Pi;
   {$EXTERNALSYM X3DAUDIO_PI}
   X3DAUDIO_2PI                        = Pi * 2;
   {$EXTERNALSYM X3DAUDIO_2PI}
 
-  // speed of sound in meters per second for dry air at approximately 20C, used with X3DAudioInitialize
+  // Speed of sound in meters per second for dry air at approximately 20C, used with X3DAudioInitialize.
   X3DAUDIO_SPEED_OF_SOUND             = 343.5;
   {$EXTERNALSYM X3DAUDIO_SPEED_OF_SOUND}
 

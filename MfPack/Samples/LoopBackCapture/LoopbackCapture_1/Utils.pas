@@ -10,7 +10,7 @@
 // Release date: 12-03-2023
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 //
 // Description:
 //   This unit contains helper methods for the LoopBack sample.
@@ -23,7 +23,8 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 12/03/2023 Tony                PiL release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
+// 25/04/2004 Tony                Updated to a more stable and crack free version.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
@@ -32,7 +33,7 @@
 // Related projects: MfPack/Samples/LoopbackCapture
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -137,7 +138,7 @@ try
     Result := Format('%2.2d%s%2.2d%s%2.2d', [hours, DelimiterFormat, mins, DelimiterFormat, secs]);
 
 except
-  on exception do Result:= '00:00:00,000';
+  on exception do Result:= Format('00:00:00%s000', [DelimiterFormat]);
 end;
 end;
 

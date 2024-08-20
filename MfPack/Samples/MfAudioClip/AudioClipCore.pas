@@ -9,7 +9,7 @@
 // Release date: 21-11-2019
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 // Description:
 //   This application demonstrates using the Media Foundation
 //   source reader to extract decoded audio from an audio/video file.
@@ -31,18 +31,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 02/02/2023 Tony                Changed IMFSourceReader.ReadSample parameters.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later.
 //
 // Related objects: -
-// Related projects: MfPackX314
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -80,7 +79,8 @@ uses
   WinApi.WinError,
   WinApi.WinApiTypes,
   WinApi.ComBaseApi,
-  WinApi.WinMM.MMReg,
+  {WinMM}
+  WinApi.WinMM.MMeApi,
   {System}
   System.SysUtils,
   System.Math,
@@ -174,7 +174,7 @@ begin
   hFile := INVALID_HANDLE_VALUE;
 
   // Initialize the COM library.
-  hr := CoInitializeEx(Nil,
+  hr := CoInitializeEx(nil,
                        COINIT_APARTMENTTHREADED or COINIT_DISABLE_OLE1DDE);
 
   // Intialize the Media Foundation platform.
@@ -546,7 +546,7 @@ begin
         Continue;
 
       // Get a pointer to the audio data in the sample.
-      hr := pSample.ConvertToContiguousBuffer(pBuffer);
+      hr := pSample.ConvertToContiguousBuffer(@pBuffer);
 
       if FAILED(hr) then
         Break;

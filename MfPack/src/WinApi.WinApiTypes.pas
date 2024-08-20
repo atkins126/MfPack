@@ -10,7 +10,7 @@
 // Release date: 29-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Generic converted Windows (c/cpp) types for Win32 / Win64 compatibility
 //              used by DirectX, Media Foundation, Core Audio etc.
 //
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -170,6 +170,14 @@ const
 //#define MFP_OLEGUID(name, l, w1, w2) MFP_GUID(name, l, w1, w2, 0xC0,0,0,0,0,0,0,0x46)
 //***********************************************************************************************
 
+{$IFDEF MFP_WFT}
+
+// Wave Format.
+type WaveFormatType = (wftPCM,
+                       wftFLOAT);
+{$ENDIF}
+
+
 type
 
 {$IFDEF MFP_DWORD}
@@ -271,7 +279,7 @@ type
     Hyper = System.Int64;  // Signed or...
     {$EXTERNALSYM Hyper}
   {$ELSE}
-    Hyper = System.Uint64; // unsigned 64 bit
+    Hyper = System.UInt64; // unsigned 64 bit
     {$EXTERNALSYM Hyper}
   {$ENDIF}
 {$ENDIF}
@@ -357,13 +365,13 @@ type
   PULONGLONG = ^ULONGLONG;
   PLONGLONG = ^LONGLONG;
   LONGLONG = Int64;
-  {$IF COMPILERVERSION >= 11.0}
+  {$IF COMPILERVERSION > 18}
     {$IFDEF WIN64}
       ULONGLONG = UInt64;
       {$EXTERNALSYM ULONGLONG}
     {$ENDIF}
     {$IFDEF WIN32}
-      ULONGLONG = Int64;
+      ULONGLONG = UInt64;
       {$EXTERNALSYM ULONGLONG}
     {$ENDIF}
   {$ELSE}
@@ -677,6 +685,7 @@ type
   CLSCTX = tagCLSCTX;
   {$EXTERNALSYM CLSCTX}
 
+// WinTypesBase.h
 const
   CLSCTX_INPROC_SERVER          = CLSCTX($1);
   {$EXTERNALSYM CLSCTX_INPROC_SERVER}
@@ -724,7 +733,7 @@ const
   {$EXTERNALSYM CLSCTX_APPCONTAINER}
   CLSCTX_ACTIVATE_AAA_AS_IU     = CLSCTX($800000);
   {$EXTERNALSYM CLSCTX_ACTIVATE_AAA_AS_IU}
-  CLSCTX_PS_DLL                 = integer($80000000);
+  CLSCTX_PS_DLL                 = Integer($80000000);
   {$EXTERNALSYM CLSCTX_PS_DLL}
 {$ENDIF}
 
@@ -943,8 +952,8 @@ type
   PBLOB = ^BLOB;
   LPBLOB = ^tagBLOB;
   tagBLOB = record
-    cbSize: ULONG; // In delphi up to ver 10.4 this is defined as Longint.
-    pBlobData: Pointer {PByte}; // In delphi up to ver 10.4 this is defined as Pointer.
+    cbSize: ULONG; // In delphi up to ver 10.4, this is defined as Longint.
+    pBlobData: Pointer {PByte}; // In delphi up to ver 10.4, this is defined as Pointer.
   end;
   {$EXTERNALSYM tagBLOB}
   BLOB = tagBLOB;
@@ -1596,7 +1605,7 @@ type
   wireCLIPFORMAT = ^userCLIPFORMAT;
   _userCLIPFORMAT = record
   fContext: LongInt;
-    case integer of
+    case Integer of
       0: (dwValue: DWORD;);
       1: (pwszName: PWideChar;);
     end;
@@ -1616,7 +1625,7 @@ type
 {$IFDEF MFP_GDI_NONREMOTE}
   _GDI_NONREMOTE = record
     fContext: LongInt;
-    case integer of
+    case Integer of
       0: (hInproc: LongInt;);
       1: (hRemote: PDWORD_BLOB;);
     end;
@@ -1645,7 +1654,7 @@ type
   PuserHMETAFILE = ^userHMETAFILE;
   _userHMETAFILE = record
     fContext: LongInt;
-    case integer of
+    case Integer of
       0: (hInproc: LongInt;);
       1: (hRemote: PBYTE_BLOB;);
       2: (hInproc64: Int64;);
@@ -1687,7 +1696,7 @@ type
 {$IFDEF MFP_userHENHMETAFILE}
   _userHENHMETAFILE = record
     fContext: LongInt;
-    case integer of
+    case Integer of
       0: (hInproc: LongInt; );
       1: (hRemote: PBYTE_BLOB; );
       2: (hInproc64: Int64; );
@@ -1720,7 +1729,7 @@ type
   PuserHBITMAP = ^userHBITMAP;
   _userHBITMAP = record
   fContext: LongInt;
-    case integer of
+    case Integer of
       0: (hInproc: LongInt;);
       1: (hRemote: PuserBITMAP;);
       2: (hInproc64: Int64;);
@@ -1735,7 +1744,7 @@ type
   PuserHPALETTE = ^userHPALETTE;
   _userHPALETTE = record
   fContext: LongInt;
-    case integer of
+    case Integer of
       0: (hInproc: LongInt; );
       1: (hRemote: PLOGPALETTE; );
       2: (hInproc64: Int64; );
@@ -1938,7 +1947,7 @@ const
   {$EXTERNALSYM DECIMAL_NEG}
 {$ENDIF}
 
-  //procedure DECIMAL_SETZERO(var dec: DECIMAL); Moved to MfpUtils.
+  //procedure DECIMAL_SETZERO(var dec: DECIMAL); Moved to MfUtils.
 
 
 type
@@ -2094,7 +2103,7 @@ const
     VT_BSTR = 8;                 // A string.
     VT_DISPATCH = 9;             // An IDispatch pointer.
     VT_ERROR = 10;               // An SCODE value.
-    VT_BOOL = 11;                // A Boolean value. True is -1 and false is 0.
+    VT_BOOL = 11;                // A Boolean value. True is -1 and False is 0.
     VT_VARIANT = 12;             // A variant pointer.
     VT_UNKNOWN = 13;             // An IUnknown pointer.
     VT_DECIMAL = 14;             // A 16-byte fixed-pointer value.
@@ -2243,7 +2252,7 @@ type
   PuCLSSPEC = ^uCLSSPEC;
   uCLSSPEC = record
     tyspec: DWORD;
-    case {DUMMYNAME} integer of
+    case {DUMMYNAME} Integer of
       0: (clsid: CLSID);
       1: (pFileExt: PWideChar);
       2: (pMimeType: PWideChar);
@@ -2396,10 +2405,10 @@ type
 {$IFDEF MFP_ULONG64}
   PULONG64 = ^ULONG64;
   {$IF COMPILERVERSION >= 11.0}
-    ULONG64 = System.Uint64;
+    ULONG64 = System.UInt64;
     {$EXTERNALSYM ULONG64}
   {$ELSE}
-    ULONG64 = System.int64;
+    ULONG64 = System.Int64;
     {$EXTERNALSYM ULONG64}
   {$ENDIF}
 {$ENDIF}
@@ -2447,7 +2456,7 @@ type
 
 {$IFDEF MFP_TOPOID}
   {$IF COMPILERVERSION >= 11.0}
-    TOPOID = System.Uint64;
+    TOPOID = System.UInt64;
     {$EXTERNALSYM TOPOID}
   {$ELSE}
     TOPOID = System.Int64;
@@ -2476,25 +2485,18 @@ type
 
 {$IFDEF MFP_MFTIME}
   {$IF COMPILERVERSION >= 11.0}
-    {$IFDEF WIN64}
-      MFTIME = System.UInt64; // Time in 100 nanosecond slices
-      {$EXTERNALSYM MFTIME}
-    {$ENDIF}
-
-    {$IFDEF WIN32}
-      MFTIME = System.UInt64;
-      {$EXTERNALSYM MFTIME}
-    {$ENDIF}
-  {$ELSE}
-    {$IFDEF WIN64}
-      MFTIME = System.UInt64;
-      {$EXTERNALSYM MFTIME}
-    {$ENDIF}
-
-    {$IFDEF WIN32}
-      MFTIME = System.Int64;
-      {$EXTERNALSYM MFTIME}
-    {$ENDIF}
+    MFTIME = System.UInt64; // Time in 100 nanosecond slices
+    {$EXTERNALSYM MFTIME}
+  {$ENDIF}
+{$ELSE}
+  {$IFDEF WIN32}
+    MFTIME = System.Int64;
+    {$EXTERNALSYM MFTIME}
+  {$ENDIF}
+{$ELSE}
+  {$IFDEF WIN64}
+    MFTIME = System.UInt64;
+    {$EXTERNALSYM MFTIME}
   {$ENDIF}
 {$ENDIF}
 
@@ -2549,19 +2551,26 @@ type
 
 {$IFDEF MFP_PIDispatch}
   PIDispatch = ^IDispatch;
+  {$EXTERNALSYM PIDispatch}
 {$ENDIF}
 
 
 {$IFDEF MFP_MEDIATYPE_NULL}
 const
-  MEDIATYPE_NULL : TGUID = (D1:$00000000;D2:$0000;D3:$0000;D4:($00,$00,$00,$00,$00,$00,$00,$00));
+  MEDIATYPE_NULL : TGUID = (D1:$00000000;
+                            D2:$0000;
+                            D3:$0000;
+                            D4:($00,$00,$00,$00,$00,$00,$00,$00));
   {$EXTERNALSYM MEDIATYPE_NULL}
 {$ENDIF}
 
 
 {$IFDEF MFP_MEDIASUBTYPE_NULL}
 const
-  MEDIASUBTYPE_NULL : TGUID = (D1:$00000000;D2:$0000;D3:$0000;D4:($00,$00,$00,$00,$00,$00,$00,$00));
+  MEDIASUBTYPE_NULL : TGUID = (D1:$00000000;
+                               D2:$0000;
+                               D3:$0000;
+                               D4:($00,$00,$00,$00,$00,$00,$00,$00));
   {$EXTERNALSYM MEDIASUBTYPE_NULL}
 {$ENDIF}
 
@@ -2595,7 +2604,7 @@ type
 
 {$IFDEF MFP_REFERENCE_TIME}
   PREFERENCE_TIME = ^REFERENCE_TIME;
-  REFERENCE_TIME = LONGLONG; // UINT64
+  REFERENCE_TIME = LONGLONG; // INT64
   {$EXTERNALSYM REFERENCE_TIME}
   PReferenceTime = ^ReferenceTime;
   ReferenceTime = REFERENCE_TIME;
@@ -2858,7 +2867,7 @@ const
   {$ENDIF}
 
   {$IFDEF MFP_SSIZE_MAX}
-  SSIZE_MAX      = LONG_MAX; // max value for a ssize_t
+  SSIZE_MAX      = LONG_MAX; // Max value for a ssize_t.
   {$EXTERNALSYM SSIZE_MAX}
   {$ENDIF}
   {$IFDEF MFP_WORD_BIT}
@@ -2866,7 +2875,7 @@ const
   {$EXTERNALSYM WORD_BIT}
   {$ENDIF}
   {$IFDEF MFP_SIZE_T_MAX}
-  SIZE_T_MAX     = ULONG_MAX; // max value for a size_t
+  SIZE_T_MAX     = ULONG_MAX; // Max value for a size_t.
   {$EXTERNALSYM SIZE_T_MAX}
   {$ENDIF}
   {$IFDEF MFP_UQUAD_MAX}
@@ -2970,7 +2979,7 @@ const
 
  {MfApi}
  // Keep this name convention for backward compatibilly.
- INTSAFE_E_ARITHMETIC_OVERFLOW : HRESULT = integer($80070216);
+ INTSAFE_E_ARITHMETIC_OVERFLOW : HRESULT = Integer($80070216);
 
 // wingdi.h
 
@@ -3089,6 +3098,7 @@ const ONE_MSEC_SECOND  = 1000;                  // One second = 1,000 ms
 const ONE_MHZ          = 1000000;               // One MegaHertz = 1,000,000 Hertz
 const ONE_GHZ          = ONE_MHZ * 1000;        // One GigaHertz = 1,000 MegaHertz
 
+const BITS_PER_BYTE = 8;
 
 type
   _HTMLColors = record
@@ -3099,7 +3109,7 @@ type
   THTMLColors = _HTMLColors;
 
 const
-  // We don't use the delphi colornames, because of version compatibility
+  // We don't use the Delphi colornames, because of version compatibility
   HTMLColorNames: array [0..142] of _HTMLColors = (
     (ClrName: 'ALICEBLUE'; DelphiClr: TColor($FFF8F0)),
     (ClrName: 'ANTIQUEWHITE'; DelphiClr: TColor($D7EBFA)),
@@ -3269,11 +3279,10 @@ type
 type
   SNB = ^LPOLESTR;
 
-  // End of Additional P rototypes
+  // End of Additional Prototypes
 
 implementation
 
   // Implement Additional Prototypes here.
 
 end.
-

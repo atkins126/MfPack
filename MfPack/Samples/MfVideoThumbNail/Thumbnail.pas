@@ -10,7 +10,7 @@
 // Release date: 08-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Videothumbnail generator.
 //
 // Organisation: FactoryX
@@ -21,13 +21,13 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
@@ -279,7 +279,7 @@ begin
       SafeRelease(pSample);
       pSample := pSampleTmp;
 
-      if (SUCCEEDED(pSample.GetSampleTime(hnsTimeStamp))) then
+      if (SUCCEEDED(pSample.GetSampleTime(@hnsTimeStamp))) then
         begin
           // Keep going until we get a frame that is within tolerance of the
           // desired seek position, or until we skip MAX_FRAMES_TO_SKIP frames.
@@ -311,13 +311,13 @@ begin
       // Direct2D bitmap object. Then use the Direct2D bitmap to
       // initialize the sprite.
 
-      hr := pSample.ConvertToContiguousBuffer(pBuffer);
+      hr := pSample.ConvertToContiguousBuffer(@pBuffer);
 
       if FAILED(hr) then
         goto done;
 
       // get the frame time of the sample
-      hr := pSample.GetSampleTime(llSampleTime);
+      hr := pSample.GetSampleTime(@llSampleTime);
 
       if (FAILED(hr)) then
         goto done;

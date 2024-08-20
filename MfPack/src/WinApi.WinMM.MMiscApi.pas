@@ -10,7 +10,7 @@
 // Release date: 15-09-2020
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: ApiSet Contract for api-ms-win-mm-misc-l1-1
 //              This header is used by Windows Multimedia.
 //              For more information, see: https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/
@@ -23,18 +23,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
-// 12/03/2023 Tony                Updated mmio
+// 19/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -65,7 +64,7 @@
 unit WinApi.WinMM.MMiscApi;
 
   {$MINENUMSIZE 4}
-  {$WEAKPACKAGEUNIT}
+
   {$IFDEF WIN32}
     {$ALIGN 1}
   {$ELSE}
@@ -549,16 +548,16 @@ const
 
   { standard four character codes }
 
-  FOURCC_RIFF = ord('R') or ord('I') shl 8 or (ord('F') shl 16) or (ord('F') shl 24);
+  FOURCC_RIFF = FOURCC(ord('R') or ord('I') shl 8 or (ord('F') shl 16) or (ord('F') shl 24));
   {$EXTERNALSYM FOURCC_RIFF}
-  FOURCC_LIST = ord('L') or ord('I') shl 8 or (ord('S') shl 16) or (ord('T') shl 24);
+  FOURCC_LIST = FOURCC(ord('L') or ord('I') shl 8 or (ord('S') shl 16) or (ord('T') shl 24));
   {$EXTERNALSYM FOURCC_LIST}
 
   { four character codes used to identify standard built-in I/O procedures }
 
-  FOURCC_DOS  =  ord('D') or ord('O') shl 8 or (ord('S') shl 16) or (ord(' ') shl 24);
+  FOURCC_DOS  =  FOURCC(ord('D') or ord('O') shl 8 or (ord('S') shl 16) or (ord(' ') shl 24));
   {$EXTERNALSYM FOURCC_DOS}
-  FOURCC_MEM  = ord('M') or ord('E') shl 8 or (ord('M') shl 16) or (ord(' ') shl 24);
+  FOURCC_MEM  = FOURCC(ord('M') or ord('E') shl 8 or (ord('M') shl 16) or (ord(' ') shl 24));
   {$EXTERNALSYM FOURCC_MEM}
 
 

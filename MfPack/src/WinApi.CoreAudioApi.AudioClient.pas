@@ -10,7 +10,7 @@
 // Release date: 04-05-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: AudioClient API interface definition.
 //
 // Organisation: FactoryX
@@ -21,17 +21,22 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 31/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 19/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 8 or later.
+//          Note that IAudioClients are directly accessing the WAS.
+//          So, if a vendor did not implement one or more of these interfaces or one or more owned methods,
+//          we get error E_NOINTERFACE when the interface is not supported or
+//          E_NOT_IMPLEMENTED when accessing a not implemented method.
+//          Try to get the latest audiodrivers to solve these issues.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -71,14 +76,12 @@ uses
   WinApi.WinApiTypes,
   WinApi.WinError,
   {WinMM}
-  //WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMReg,
   WinApi.WinMM.MMeApi,
   {CoreAudioApi}
   WinApi.CoreAudioApi.AudioMediaType,
   WinApi.CoreAudioApi.AudioSessionTypes;
 
-
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -99,12 +102,11 @@ const
   //    The clock exposed by this object runs at a fixed frequency.
   //
 
-type
-
-  //Private
-  PReferenceTime = ^REFERENCE_TIME;
-  REFERENCE_TIME = LONGLONG;
-  {$EXTERNALSYM REFERENCE_TIME}
+//type
+  //Private  Defined in WinApi.WinApiTypes.pas
+  //PReferenceTime = ^REFERENCE_TIME;
+  //REFERENCE_TIME = LONGLONG;
+  //{$EXTERNALSYM REFERENCE_TIME}
 
 type
   //-------------------------------------------------------------------------
@@ -143,6 +145,9 @@ type
   //     AUDCLNT_STREAMOPTIONS_AMBISONICS - The client is requesting the audio client to insert  
   //                                  Ambisonics renderer and configure the pipeline to match Ambisonics format types 
   //
+  //     AUDCLNT_STREAMOPTIONS_POST_VOLUME_LOOPBACK - The client is requesting that the loopback stream capture
+  //                                  the audio data after volume and/or mute processing has been applied.
+
 
   PAudclntStreamoptions = ^AUDCLNT_STREAMOPTIONS;
   PAUDCLNT_STREAMOPTIONS = ^AUDCLNT_STREAMOPTIONS;
@@ -150,7 +155,11 @@ type
     AUDCLNT_STREAMOPTIONS_NONE         = $00,
     AUDCLNT_STREAMOPTIONS_RAW          = $01,
     AUDCLNT_STREAMOPTIONS_MATCH_FORMAT = $02, // Supported in Windows 10 and later.
-    AUDCLNT_STREAMOPTIONS_AMBISONICS   = $04
+    AUDCLNT_STREAMOPTIONS_AMBISONICS   = $04,
+    // #if(NTDDI_VERSION > NTDDI_WIN11_ZN)
+    AUDCLNT_STREAMOPTIONS_POST_VOLUME_LOOPBACK = $08
+    //#endif
+
   );
   {$EXTERNALSYM AUDCLNT_STREAMOPTIONS}
 
@@ -277,7 +286,8 @@ type
                         hnsBufferDuration: REFERENCE_TIME;
                         hnsPeriodicity: REFERENCE_TIME;
                         pFormat: PWAVEFORMATEX;
-                        {optional, can be Nil or a pointer to GUID_NULL} const AudioSessionGuid: LPCGUID): HResult; stdcall;
+                        const AudioSessionGuid: LPCGUID {optional, can be nil or a pointer to GUID_NULL}
+                       ): HResult; stdcall;
     // Description:
     //
     //  Initializes the audio stream by creating a connection to the Windows Audio System (WAS)
@@ -385,7 +395,7 @@ type
     //  data in the format returned by IsFormatSupported before calling Initialize. Basically, the
     //  format the application has to support is either the source format or a "closest match" format
     //  returned by IsFormatSupported. The Assumption that the mix format returned by GetMixFormat
-    //  can be streamed is not always true. To stream the closest match to the mix format, call
+    //  can be streamed is not always True. To stream the closest match to the mix format, call
     //  first GetMixFormat followed by IsFormatSupported passing in the mix format. If streaming the
     //  mix format is supported by the system effect, IsFormatSupported will return S_OK.
     //
@@ -499,8 +509,8 @@ type
     //
 
     function IsFormatSupported(ShareMode: AUDCLNT_SHAREMODE;
-                               const pFormat: PWaveFormatEx;
-                               [ref] const ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to Nil.
+                               pFormat: PWaveFormatEx;
+                               {out}var  ppClosestMatch: PWaveFormatEx // Exclusive mode can't suggest a "closest match", you have to set this param to nil.
                               ): HResult; stdcall;
     // Description:
     //
@@ -545,7 +555,7 @@ type
     //  This method does not require that the Initialize method be called first.
     //
 
-    function GetMixFormat([ref] const ppDeviceFormat: PWAVEFORMATEX): HResult; stdcall;
+    function GetMixFormat({out} [ref] const ppDeviceFormat: PWAVEFORMATEX): HResult; stdcall;
     // Description:
     //
     //  The GetMixFormat method retrieves the stream format that the audio engine uses for its
@@ -559,7 +569,7 @@ type
     //    The method writes the address of a WAVEFORMATEX (or WAVEFORMATEXTENSIBLE) structure to this variable.
     //    The method allocates the storage for the structure.
     //    The caller is responsible for freeing the storage, when it is no longer needed, by calling the CoTaskMemFree function.
-    //    If the GetMixFormat call fails, *ppDeviceFormat is Nil.
+    //    If the GetMixFormat call fails, *ppDeviceFormat is nil.
     //    For information about WAVEFORMATEX, WAVEFORMATEXTENSIBLE, and CoTaskMemFree, see the Windows SDK documentation.
     //
     // Return Values:
@@ -602,8 +612,8 @@ type
     //   For more information about WAVEFORMATEX and WAVEFORMATEXTENSIBLE, see the Windows DDK documentation.
     //
 
-    function GetDevicePeriod({out_opt} phnsDefaultDevicePeriod: REFERENCE_TIME = 0;
-                             {out_opt} phnsMinimumDevicePeriod: REFERENCE_TIME = 0): HResult; stdcall;
+    function GetDevicePeriod(out phnsDefaultDevicePeriod: REFERENCE_TIME;
+                             out phnsMinimumDevicePeriod: REFERENCE_TIME): HResult; stdcall;
     // Description:
     //
     //  Returns the periodicity of the WAS engine, in 100-nanosecond units.
@@ -617,7 +627,7 @@ type
     //    100-nanosecond units. This is a device method which doesn't require prior audio
     //    stream initialization.
     //
-    //    phnsMinDevicePeriod - [out]
+    //  phnsMinDevicePeriod - [out]
     //    Returns pointer to duration of the minimum WAS period,
     //    in 100-nanosecond units.  This is the minimum periodicity (frames/ packet) that the
     //    driver supports. This value is the minimum periodicity that is supported in the
@@ -791,7 +801,8 @@ type
 
   // Interface IAudioClient2
   // =======================
-  //
+  // Note: Your audio driver needs to support this interface.
+  //       When not, you will get error messages like E_NOTIMPL calling methods of this interface.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioClient2);'}
   {$EXTERNALSYM IAudioClient2}
   IAudioClient2 = interface(IAudioClient)
@@ -845,8 +856,8 @@ type
     // the AudioClientProperties to TRUE, you must specify the AUDCLNT_STREAMFLAGS_EVENTCALLBACK flag in
     // the StreamFlags parameter to IAudioClient.Initialize.
 
-    function GetBufferSizeLimits(pFormat: PWAVEFORMATEX;
-                                 bEventDriven: BOOL;
+    function GetBufferSizeLimits({[ref] const} pFormat: PWAVEFORMATEX;
+                                 const bEventDriven: BOOL;
                                  out phnsMinBufferDuration: REFERENCE_TIME;
                                  out phnsMaxBufferDuration: REFERENCE_TIME): HResult; stdcall;
     // Description:
@@ -876,7 +887,8 @@ type
     //
     // Remarks:
     //
-    //  This method may be called at any time but depending on the resource usage situation, it  might not return the same value
+    //  This method may be called at any time but depending on the resource usage situation,
+    //  it might not return the same value.
     //
 
   end;
@@ -910,7 +922,8 @@ type
 
   // Interface IAudioClient3
   // =======================
-  //
+  // Note: Your audio driver needs to support this interface.
+  //       When not, you will get error messages like E_NOTIMPL calling methods of this interface.
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioClient3);'}
   {$EXTERNALSYM IAudioClient3}
   IAudioClient3 = interface(IAudioClient2)
@@ -959,10 +972,10 @@ type
     //  Note that this is an instantaneous value that may be outdated as soon as this call returns.
     //
 
-    function InitializeSharedAudioStream(StreamFlags: DWORD;
+    function InitializeSharedAudioStream(const StreamFlags: DWORD;
                                          PeriodInFrames: UINT32;
-                                         pFormat: PWAVEFORMATEX;
-                                         {optional} AudioSessionGuid: LPCGUID): HResult; stdcall;
+                                         const pFormat: PWAVEFORMATEX;
+                                         {optional} const AudioSessionGuid: LPCGUID): HResult; stdcall;
     // Description:
     //
     //  Initializes a shared stream with the specified periodicity.
@@ -1208,7 +1221,8 @@ type
     function GetNextPacketSize(out pNumFramesInNextPacket: UINT32): HResult; stdcall;
     // Description:
     //
-    //  Returns the number of frames in the next capture buffer packet. Capture applications must read in frames on a packet-by-packet basis.
+    //  Returns the number of frames in the next capture buffer packet.
+    //  Capture applications must read in frames on a packet-by-packet basis.
     //
     // Parameters:
     //
@@ -1236,8 +1250,8 @@ type
 
   // Interface IAudioClock
   // =====================
-  //>=Vista
-  //Enables a client to monitor a stream's data rate and the current position in the stream.
+  // >=Vista
+  // Enables a client to monitor a stream's data rate and the current position in the stream.
   //
   {$HPPEMIT 'DECLARE_DINTERFACE_TYPE(IAudioClock);'}
   {$EXTERNALSYM IAudioClock}
@@ -1363,7 +1377,7 @@ type
     //  QPCPosition - [out]
     //    If S_OK, returns the QueryPerformanceCounter position corresponding to the
     //    position argument.
-    //    This value may be NULL if a correlated system position isn't needed.
+    //    This value may be nil if a correlated system position isn't needed.
     //
     // Return values:
     //
@@ -2071,6 +2085,9 @@ const
   {$EXTERNALSYM AUDCLNT_E_EFFECT_NOT_AVAILABLE}
   AUDCLNT_E_EFFECT_STATE_READ_ONLY        = $88890042;  //AUDCLNT_ERR($042)
   {$EXTERNALSYM AUDCLNT_E_EFFECT_STATE_READ_ONLY}
+  AUDCLNT_E_POST_VOLUME_LOOPBACK_UNSUPPORTED = $88890043; //AUDCLNT_ERR($043)
+  {$EXTERNALSYM AUDCLNT_E_POST_VOLUME_LOOPBACK_UNSUPPORTED}
+
 
   AUDCLNT_S_BUFFER_EMPTY                  = $88890001;  //AUDCLNT_SUCCESS($001)
   {$EXTERNALSYM AUDCLNT_S_BUFFER_EMPTY}
@@ -2101,15 +2118,19 @@ implementation
   //Implement Additional functions here.
 
 
-  //ERROR HANDLING
-  function AUDCLNT_ERR(n: LongInt): HRESULT;
+//ERROR HANDLING
+function AUDCLNT_ERR(n: LongInt): HRESULT;
   begin
-    Result:= MAKE_HRESULT(SEVERITY_ERROR, FACILITY_AUDCLNT, n);
+    Result:= MAKE_HRESULT(SEVERITY_ERROR,
+                          FACILITY_AUDCLNT,
+                          n);
   end;
 
-  function AUDCLNT_SUCCESS(n: LongInt): HRESULT;
+function AUDCLNT_SUCCESS(n: LongInt): HRESULT;
   begin
-    Result:= MAKE_SCODE(SEVERITY_SUCCESS, FACILITY_AUDCLNT, n);
+    Result:= MAKE_SCODE(SEVERITY_SUCCESS,
+                        FACILITY_AUDCLNT,
+                        n);
   end;
 
 end.

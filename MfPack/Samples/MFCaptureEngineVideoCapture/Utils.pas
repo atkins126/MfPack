@@ -10,10 +10,10 @@
 // Release date: 18-11-2022
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 //
 // Description:
-//   Helpers for the MFCaptureEngineVideoCapture
+//   Helpers for the MFCaptureEngineVideoCapture.
 //
 // Organisation: FactoryX
 // Initiator(s): Tony (maXcomX)
@@ -23,17 +23,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 20/02/2023 Tony                Fixed switching camera issue that results in Access Denied error.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX314/Samples/MFCaptureEngineVideoCapture
+// Related projects: MfPackX317/Samples/MFCaptureEngineVideoCapture
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -162,8 +161,8 @@ type
 
 
   function CloneVideoMediaType(pSrcMediaType: IMFMediaType;
-                             const guidSubType: REFGUID;
-                             out ppNewMediaType: IMFMediaType): HResult;
+                               const guidSubType: REFGUID;
+                               out ppNewMediaType: IMFMediaType): HResult;
 
   function CopyAttribute(pSrc: IMFAttributes;
                          pDest: IMFAttributes;
@@ -339,12 +338,23 @@ try
 
 
   if ShowMilliSeconds then
-    Result := Format('%2.2d%s%2.2d%s%2.2d,%3.3d', [hours, DelimiterFormat, mins, DelimiterFormat, secs, DelimiterFormat, millisec])
+    Result := Format('%2.2d%s%2.2d%s%2.2d,%3.3d', [hours,
+                                                   DelimiterFormat,
+                                                   mins,
+                                                   DelimiterFormat,
+                                                   secs,
+                                                   DelimiterFormat,
+                                                   millisec])
   else
-    Result := Format('%2.2d%s%2.2d%s%2.2d', [hours, DelimiterFormat, mins, DelimiterFormat, secs]);
+    Result := Format('%2.2d%s%2.2d%s%2.2d', [hours,
+                                             DelimiterFormat,
+                                             mins,
+                                             DelimiterFormat,
+                                             secs]);
 
 except
-  on exception do Result:= '00:00:00,000';
+  on exception do
+    Result:= '00:00:00,000';
 end;
 end;
 
@@ -374,19 +384,27 @@ begin
   if FAILED(hr) then
     goto done;
 
-  hr := CopyAttribute(pSrcMediaType, pNewMediaType, MF_MT_FRAME_SIZE);
+  hr := CopyAttribute(pSrcMediaType,
+                      pNewMediaType,
+                      MF_MT_FRAME_SIZE);
   if FAILED(hr) then
     goto done;
 
-  hr := CopyAttribute(pSrcMediaType, pNewMediaType, MF_MT_FRAME_RATE);
+  hr := CopyAttribute(pSrcMediaType,
+                      pNewMediaType,
+                      MF_MT_FRAME_RATE);
   if FAILED(hr) then
     goto done;
 
-  hr := CopyAttribute(pSrcMediaType, pNewMediaType, MF_MT_PIXEL_ASPECT_RATIO);
+  hr := CopyAttribute(pSrcMediaType,
+                      pNewMediaType,
+                      MF_MT_PIXEL_ASPECT_RATIO);
   if FAILED(hr) then
     goto done;
 
-  hr := CopyAttribute(pSrcMediaType, pNewMediaType, MF_MT_INTERLACE_MODE);
+  hr := CopyAttribute(pSrcMediaType,
+                      pNewMediaType,
+                      MF_MT_INTERLACE_MODE);
   if FAILED(hr) then
     goto done;
 

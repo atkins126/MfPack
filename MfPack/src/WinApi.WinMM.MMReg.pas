@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Multimedia Registration
 //
 // Organisation: FactoryX
@@ -21,18 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Delphi : The IUnknown entries of functions should be casted like this:
 //          IUnknown(Pointer), IUnknown(Object), IUnknown(Nil) etc.
 // 
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -62,7 +62,6 @@
 // =============================================================================
 unit WinApi.WinMM.MMReg;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -4019,6 +4018,12 @@ const
 
   WAVE_FORMAT_UNKNOWN                 = $0000;  { Microsoft Corporation }
   {$EXTERNALSYM WAVE_FORMAT_UNKNOWN}
+
+  // Declared afer the declaration of waveformat_tag. (See below)
+  //WAVE_FORMAT_PCM                     = $0001;  { Microsoft Corporation }
+  //{$EXTERNALSYM WAVE_FORMAT_PCM}
+
+
   WAVE_FORMAT_ADPCM                   = $0002;  { Microsoft Corporation }
   {$EXTERNALSYM WAVE_FORMAT_ADPCM}
   WAVE_FORMAT_IEEE_FLOAT              = $0003;  { Microsoft Corporation }
@@ -4603,42 +4608,18 @@ type
 
 
 {$DEFINE _WAVE_FORMAT_PCM_DEFINED}
-const WAVE_FORMAT_PCM = 1;
+const
+  WAVE_FORMAT_PCM = $0001;   { Microsoft Corporation }
+  {$EXTERNALSYM WAVE_FORMAT_PCM}
 {$ENDIF} // WAVE_FORMAT_PCM
 
 
-
-  // General extended waveform format structure
-  // Use this for all NON PCM formats
-  // (information common to all formats)
-
-{$IFNDEF _WAVEFORMATEX_}
-{$DEFINE _WAVEFORMATEX_}
-type
-
-  PWAVEFORMATEX = ^tWAVEFORMATEX;
-  {$EXTERNALSYM PWAVEFORMATEX}
-  tWAVEFORMATEX = record
-    wFormatTag: WORD;               { format type }
-    nChannels: WORD;                { number of channels (i.e. mono, stereo...) }
-    nSamplesPerSec: DWORD;          { sample rate }
-    nAvgBytesPerSec: DWORD;         { for buffer estimation }
-    nBlockAlign: WORD;              { block size of data }
-    wBitsPerSample: WORD;           { number of bits per sample of mono data }
-    cbSize: WORD;                   { the count in bytes of the size of }
-                                    { extra information (after cbSize) }
-  end;
-  {$EXTERNALSYM tWAVEFORMATEX}
-  WAVEFORMATEX = tWAVEFORMATEX;
-  {$EXTERNALSYM WAVEFORMATEX}
-  NPWAVEFORMATEX = ^WAVEFORMATEX;
-  {$EXTERNALSYM NPWAVEFORMATEX}
-  LPWAVEFORMATEX = ^WAVEFORMATEX;
-  {$EXTERNALSYM LPWAVEFORMATEX}
-  LPCWAVEFORMATEX = ^WAVEFORMATEX;
-  {$EXTERNALSYM LPCWAVEFORMATEX}
-
-{$ENDIF} // _WAVEFORMATEX_
+// Note: The WAVEFORMATEX structure is defined in WinApi.WinMM.MMeApi.
+//  PWAVEFORMATEX = ^tWAVEFORMATEX;
+//  WAVEFORMATEX = tWAVEFORMATEX;
+//  NPWAVEFORMATEX = ^WAVEFORMATEX;
+//  LPWAVEFORMATEX = ^WAVEFORMATEX;
+//  LPCWAVEFORMATEX = ^WAVEFORMATEX;
 
 const
 
@@ -4756,10 +4737,10 @@ const
   {$EXTERNALSYM SPEAKER_TOP_BACK_CENTER}
   SPEAKER_TOP_BACK_RIGHT              = $20000;
   {$EXTERNALSYM SPEAKER_TOP_BACK_RIGHT}
-  // Bit mask locations reserved for future use
+  // Bit mask locations reserved for future use.
   SPEAKER_RESERVED                    = $7FFC0000;
   {$EXTERNALSYM SPEAKER_RESERVED}
-  // Used to specify that any possible permutation of speaker configurations
+  // Used to specify that any possible permutation of speaker configurations.
   SPEAKER_ALL                         = $80000000;
   {$EXTERNALSYM SPEAKER_ALL}
 {$DEFINE __SPEAKER_POSITIONS__DEFINED}
@@ -5008,16 +4989,16 @@ type
   //
   //      for WAVE_FORMAT_DSPGROUP_TRUESPEECH   ($0022)
 
-  PTRUESPEECHWAVEFORMAT = ^truespeechwaveformat_tag;
+  PTRUESPEECHWAVEFORMAT = ^Truespeechwaveformat_tag;
   {$EXTERNALSYM PTRUESPEECHWAVEFORMAT}
-  truespeechwaveformat_tag = record
+  Truespeechwaveformat_tag = record
     wfx: WaveFormatEx;
     wRevision: Word;
     wSamplesPerBlock: Word;
     abReserved: array [0 .. 27] of Byte;
   end;
-  {$EXTERNALSYM truespeechwaveformat_tag}
-  TrueSpeechWaveFormat = truespeechwaveformat_tag;
+  {$EXTERNALSYM Truespeechwaveformat_tag}
+  TrueSpeechWaveFormat = Truespeechwaveformat_tag;
   {$EXTERNALSYM TrueSpeechWaveFormat}
   NPTRUESPEECHWAVEFORMAT = ^TrueSpeechWaveFormat;
   {$EXTERNALSYM NPTRUESPEECHWAVEFORMAT}
@@ -6200,8 +6181,69 @@ const
   {$EXTERNALSYM MIXERCONTROL_CONTROLTYPE_SRS_SYNTHSELECT}
 
 
-
   // Additional Prototypes for ALL interfaces
+
+const
+
+  // Standard speaker geometry configurations, used with X3DAudioInitialize and
+  // MFT's.
+  SPEAKER_MONO             = SPEAKER_FRONT_CENTER;
+
+  SPEAKER_STEREO           = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT);
+
+  SPEAKER_2POINT1          = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_LOW_FREQUENCY);
+
+  SPEAKER_SURROUND         = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_FRONT_CENTER or
+                              SPEAKER_BACK_CENTER);
+
+  SPEAKER_QUAD             = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_BACK_LEFT or
+                              SPEAKER_BACK_RIGHT);
+
+  SPEAKER_4POINT1          = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_LOW_FREQUENCY or
+                              SPEAKER_BACK_LEFT or
+                              SPEAKER_BACK_RIGHT);
+
+  SPEAKER_5POINT1          = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_FRONT_CENTER or
+                              SPEAKER_LOW_FREQUENCY or
+                              SPEAKER_BACK_LEFT or
+                              SPEAKER_BACK_RIGHT);
+
+  SPEAKER_7POINT1          = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_FRONT_CENTER or
+                              SPEAKER_LOW_FREQUENCY or
+                              SPEAKER_BACK_LEFT or
+                              SPEAKER_BACK_RIGHT or
+                              SPEAKER_FRONT_LEFT_OF_CENTER or
+                              SPEAKER_FRONT_RIGHT_OF_CENTER);
+
+  SPEAKER_5POINT1_SURROUND = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_FRONT_CENTER or
+                              SPEAKER_LOW_FREQUENCY or
+                              SPEAKER_SIDE_LEFT or
+                              SPEAKER_SIDE_RIGHT);
+
+  SPEAKER_7POINT1_SURROUND = (SPEAKER_FRONT_LEFT or
+                              SPEAKER_FRONT_RIGHT or
+                              SPEAKER_FRONT_CENTER or
+                              SPEAKER_LOW_FREQUENCY or
+                              SPEAKER_BACK_LEFT or
+                              SPEAKER_BACK_RIGHT or
+                              SPEAKER_SIDE_LEFT or
+                              SPEAKER_SIDE_RIGHT);
+
 
   function GETFOURCC(frcc: FOURCC): WideString;
 

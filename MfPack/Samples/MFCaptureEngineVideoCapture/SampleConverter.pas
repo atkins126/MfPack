@@ -10,7 +10,7 @@
 // Release date: 18-11-2022
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 //
 // Description:
 //   This unit returns a IMFSample to BMP and stores the bitmap in to a memory stream.
@@ -23,17 +23,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 20/02/2023 Tony                Fixed switching camera issue that results in Access Denied error.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX314/Samples/MFCaptureEngineVideoCapture
+// Related projects: MfPackX317/Samples/MFCaptureEngineVideoCapture
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -192,8 +191,8 @@ end;
 function TSampleConverter.IndexOf(const AInput: TGUID;
                                   const AValues: array of TGUID): Integer;
 begin
-  Result := high(AValues);
-  while (Result >= low(AValues)) and
+  Result := High(AValues);
+  while (Result >= Low(AValues)) and
         (AInput <> AValues[Result]) do
     Dec(Result);
 end;
@@ -224,8 +223,7 @@ begin
       if SUCCEEDED(hr) then
         begin
           // Converts a sample with multiple buffers into a sample with a single buffer.
-          hr := pConvertedSample.ConvertToContiguousBuffer(pBuffer);
-
+          hr := pConvertedSample.ConvertToContiguousBuffer(@pBuffer);
         end;
     end
   else
@@ -238,7 +236,7 @@ begin
                          nil,
                          @cbBitmapData);
       if FAILED(hr) then
-        goto done;  // No need to unlock
+        goto done;  // No need to unlock.
 
 
       // For full frame capture, use the buffer dimensions for the data size check
@@ -271,16 +269,14 @@ done:
 end;
 
 
-
 function TSampleConverter.GetBMPFileHeader(): BITMAPFILEHEADER;
 begin
   Result.bfType := Ord('B') or (Ord('M') shl 8); // Type is "BM" for BitMap
-  Result.bfSize := sizeof(Result.bfOffBits) + sizeof(RGBTRIPLE);
+  Result.bfSize := SizeOf(Result.bfOffBits) + sizeof(RGBTRIPLE);
   Result.bfReserved1 := 0;
   Result.bfReserved2 := 0;
   Result.bfOffBits := sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 end;
-
 
 
 function TSampleConverter.GetBMPFileInfo(const AVideoInfo: TVideoFormatInfo): BITMAPINFOHEADER;

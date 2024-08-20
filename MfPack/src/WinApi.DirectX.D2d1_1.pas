@@ -10,28 +10,31 @@
 // Release date: 30-04-2019
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: -
 //
 // Organisation: FactoryX
 // Initiator(s): Tony (maXcomX), Peter (OzShips)
-// Contributor(s): Tony Kalf (maXcomX), Peter Larson (ozships), Tilo Güldner (TiloGueldner).
-//
+// Contributor(s): Tony Kalf (maXcomX),
+//                 Peter Larson (ozships),
+//                 Tilo Güldner (TiloGueldner),
+//                 (wsandor)
+//                                                                                                 f
 //------------------------------------------------------------------------------
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: -
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -79,8 +82,13 @@ uses
   WinApi.DirectX.DWrite,
   WinApi.DirectX.DocumentTarget;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
+
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
 
 
 const
@@ -779,11 +787,11 @@ type
                            strokeStyle: ID2D1StrokeStyle): HResult; stdcall;
 
     function DrawBitmap(bitmap: ID2D1Bitmap;
-                        destinationRectangle: D2D1_RECT_F;
+                        destinationRectangle: PD2D1_RECT_F;
                         opacity: Single;
                         interpolationMode: D2D1_INTERPOLATION_MODE;
-                        sourceRectangle: D2D1_RECT_F;
-                        perspectiveTransform: D2D1_MATRIX_4X4_F): HResult; stdcall;
+                        sourceRectangle: PD2D1_RECT_F;
+                        perspectiveTransform: PD2D1_MATRIX_4X4_F): HResult; stdcall;
 
     function DrawImage(image: ID2D1Image;
                        targetOffset: D2D1_POINT_2F;

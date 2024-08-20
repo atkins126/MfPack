@@ -10,30 +10,30 @@
 // Release date: 18-11-2022
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 //
 // Description:
 //   This unit contains the captureengine.
 //
 // Organisation: FactoryX
 // Initiator(s): Tony (maXcomX)
-// Contributor(s): Tony (maXcomX)
+// Contributor(s): Ciaran, Tony (maXcomX)
 //
 //------------------------------------------------------------------------------
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 20/02/2023 Tony                Fixed switching camera issue that results in Access Denied error.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
+// 28/06/2024 Tony                Solved some issues when recapturing with same formats.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX314/Samples/MFCaptureEngineVideoCapture
+// Related projects: MfPackX317/Samples/MFCaptureEngineVideoCapture
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -65,7 +65,7 @@ unit CaptureEngine;
 interface
 
   // Undefine this when not needed!
-  {$DEFINE SAVE_DEBUG_REPORT}
+  //{$DEFINE SAVE_DEBUG_REPORT}
 
 uses
   {WinApi}
@@ -102,7 +102,7 @@ uses
   DeviceExplorer,
   Utils;
 
-{$DEFINE LOGDEBUG}
+ // {$DEFINE LOGDEBUG}
 
 
 const
@@ -156,13 +156,17 @@ type
   // CaptureManager class
   // Wraps the capture engine and implements the event callback and OnSampleCallback in a nested class.
 type
-  TCaptureManager = class(TObject)
-  private
 
+  TCaptureManager = class(TObject)
+  protected
+    FhEvent: THandle;
+
+  private
     FCaptureEngine: IMFCaptureEngine;
     FCapturePreviewSink: IMFCapturePreviewSink;
     m_pEventCallback: CaptureEngineCB;
     m_pOnSampleCallBack: CaptureEngineSCB;
+    FRecordingMediaType: IMFMediaType;
 
     {$IFDEF SAVE_DEBUG_REPORT}
       FMediaTypeDebug: TMediaTypeDebug;
@@ -177,6 +181,7 @@ type
     bPhotoTaken: Boolean;
     bEngineIsInitialized: Boolean;
     bCaptureSinkReady: Boolean;
+
     FSnapShotOptions: TSnapShotOptions;
     FCritSec: TMFCritSec;
 
@@ -197,17 +202,18 @@ type
     procedure WaitForResult();
 
   public
-    FhEvent: THandle;
+
 
     constructor Create(hEvent: HWND); reintroduce;
     destructor Destroy(); override;
 
     function InitializeCaptureManager(const hPreviewObject: HWND;
                                       const hMainForm: HWND;
-                                      Unk: IUnknown): HResult;
+                                      Unk: IUnknown;
+                                      pCleanUp: Boolean): HResult;
 
-    function OnCaptureEvent(aWParam: WPARAM;
-                            aLParam: LPARAM): Hresult;
+    function OnCaptureEvent(pWParam: WPARAM;
+                            pLParam: LPARAM): Hresult;
 
     function UpdateVideo(pSrc: PMFVideoNormalizedRect): HResult;
 
@@ -216,24 +222,22 @@ type
     function SetMediaType(pMediaType: IMFMediaType): HResult;
     function GetCurrentFormat(): TVideoFormatInfo;
 
-    function StartPreview(): HResult;
+    function StartPreview(pNewPeviewSink: Boolean): HResult;
     function StopPreview(): HResult;
-    function StartRecording(pszDestinationFile: PCWSTR): HResult;
+    function StartRecording(pszDestinationFile: PCWSTR;
+                            pSinkWriterConfigSet: Boolean): HResult;
     function StopRecording(): HResult;
-    function TakePhoto(ASnapShotOption: TSnapShotOptions;
+    function TakePhoto(pSnapShotOption: TSnapShotOptions;
                        pMediaType: IMFMediaType): HResult;
 
     procedure ResetCaptureManager();
 
-    property IsRecording: Boolean read bRecording write bRecording;
-    property IsPreviewing: Boolean read bPreviewing write bPreviewing;
-    property IsPhotoPending: Boolean read bPhotoPending write bPhotoPending;
-    property IsPhotoTaken: Boolean read bPhotoTaken write bPhotoTaken;
-    property IsInitialized: Boolean read bEngineIsInitialized;
-
+    property IsPreviewing: Boolean read bPreviewing;
+    property IsRecording: Boolean read bRecording;
     property SnapShotOption: TSnapShotOptions read FSnapShotOptions write FSnapShotOptions;
     property PreviewHandle: HWND read hwndPreviewWindow write hwndPreviewWindow;
-    property EventHandle: HWND read hwndMainForm;
+    property MainFormEventHandle: HWND read hwndMainForm;
+    property HandlerEvent: THandle read FhEvent;
 
   end;
 
@@ -401,7 +405,8 @@ end;
 
 function TCaptureManager.InitializeCaptureManager(const hPreviewObject: HWND;
                                                   const hMainForm: HWND;
-                                                  Unk: IUnknown): HResult;
+                                                  Unk: IUnknown;
+                                                  pCleanUp: Boolean): HResult;
 var
   hr: HResult;
   mfAttributes: IMFAttributes;
@@ -412,20 +417,24 @@ label
 
 begin
 
-  DestroyCaptureEngine();
+  if pCleanUp then
+    DestroyCaptureEngine();
 
-  FhEvent := CreateEvent(nil,
-                         False,
-                         False,
-                         nil);
-
+  // Note: CreateEventEx was introduced in compiler version 29.
+  //       To use this function < 29,
+  //       the unit WinAPI.MediaFoundationApi.MfUtils must be in the uses clause,
+  //
+  FhEvent := CreateEventEx(nil,
+                           nil,
+                           0,
+                           EVENT_MODIFY_STATE or SYNCHRONIZE);
   if (FhEvent = 0) then
     begin
       hr := HRESULT_FROM_WIN32(GetLastError());
       goto done;
     end;
 
-  m_pEventCallback :=  CaptureEngineCB.Create(hMainForm);
+  m_pEventCallback := CaptureEngineCB.Create(hMainForm);
   if not Assigned(m_pEventCallback) then
     begin
         hr := E_OUTOFMEMORY;
@@ -547,7 +556,7 @@ begin
   SafeRelease(FCapturePreviewSink);
   SafeRelease(FCaptureEngine);
 
-  // to destroy the object, we need to call SafeDelete.
+  // To destroy the object, we need to call SafeDelete.
   FreeAndNil(m_pEventCallback);
   FreeAndNil(m_pOnSampleCallback);
   // ========================================================
@@ -562,19 +571,15 @@ begin
   SafeRelease(g_pDX11Device);
   SafeRelease(g_pDXGIMan);
 
-  IsPreviewing := False;
-  IsRecording := False;
-  IsPhotoPending := False;
   bEngineIsInitialized := False;
-
 end;
 
 
 // OnCaptureEvent
 // Handle an event from the capture engine.
 // NOTE: This method is called from the application's UI thread.
-function TCaptureManager.OnCaptureEvent(aWParam: WPARAM;
-                                        aLParam: LPARAM): HResult;
+function TCaptureManager.OnCaptureEvent(pWParam: WPARAM;
+                                        pLParam: LPARAM): HResult;
 var
   guidType: TGUID;
   hrStatus: HResult;
@@ -583,7 +588,7 @@ var
 
 begin
 
-  pEvent := IMFMediaEvent(aWParam);
+  pEvent := IMFMediaEvent(pWParam);
 
   hr := pEvent.GetStatus(hrStatus);
   if FAILED(hr) then
@@ -593,39 +598,56 @@ begin
   if SUCCEEDED(hr) then
     begin
 
-      if (guidType = MF_CAPTURE_ENGINE_INITIALIZED) then
+      if IsEqualGuid(guidType,
+                     MF_CAPTURE_ENGINE_INITIALIZED) then
         OnCaptureEngineInitialized(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_PREVIEW_STARTED) then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_PREVIEW_STARTED) then
         OnPreviewStarted(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_PREVIEW_STOPPED) then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_PREVIEW_STOPPED) then
         OnPreviewStopped(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_OUTPUT_MEDIA_TYPE_SET) then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_OUTPUT_MEDIA_TYPE_SET) then
         OnCaptureEngineOutputMediaTypeSet(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_RECORD_STARTED)  then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_RECORD_STARTED)  then
         OnRecordStarted(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_RECORD_STOPPED) then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_RECORD_STOPPED) then
         OnRecordStopped(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_PHOTO_TAKEN) then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_PHOTO_TAKEN) then
         OnPhotoTaken(hrStatus)
-      else if guidType = MF_CAPTURE_SINK_PREPARED then
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_SINK_PREPARED) then
         OnCaptureSinkPrepared(hrStatus)
-      else if (guidType = MF_CAPTURE_ENGINE_ERROR) then
-        DestroyCaptureEngine()
-      else if (hrstatus = MF_E_INVALIDREQUEST) then
-        ErrMsg('OnCaptureEvent: Invalid request',
-               hr)
+      else if IsEqualGuid(guidType,
+                          MF_CAPTURE_ENGINE_ERROR) then
+        DestroyCaptureEngine();
+
+      // Check others.
+      if (hrstatus = MF_E_INVALIDREQUEST) then
+        begin
+          ErrMsg('OnCaptureEvent: Invalid request',
+                 hr);
+          DestroyCaptureEngine();
+        end
       else if (FAILED(hrStatus)) then
-        ErrMsg('OnCaptureEvent: Unexpected error',
-               hr);
+        begin
+          ErrMsg('OnCaptureEvent: Unexpected error',
+                 hrStatus);
+          DestroyCaptureEngine();
+        end;
+      SetEvent(FhEvent);
     end;
 
-   SetEvent(FhEvent);
+  // Send status update to the mainform.
+  SendMessage(hwndMainForm,
+              WM_APP_CAPTURE_EVENT_HANDLED,
+              WPARAM(hr),
+              LPARAM(@guidType));
 
-   // Send statusupdate to the mainform.
-   SendMessage(hwndMainForm,
-               WM_APP_CAPTURE_EVENT_HANDLED,
-               WParam(hrStatus),
-               LPARAM(0));
    Result := hr;
 end;
 
@@ -636,6 +658,7 @@ procedure TCaptureManager.OnCaptureEngineInitialized(hrStatus: HResult);
 begin
   if (hrStatus = MF_E_NO_CAPTURE_DEVICES_AVAILABLE) then
     hrStatus := S_OK;  // No capture device. Not an application error.
+
   bEngineIsInitialized := SUCCEEDED(hrStatus);
 
   if FAILED(hrStatus) then
@@ -647,7 +670,7 @@ end;
 // OnPreviewStarted
 procedure TCaptureManager.OnPreviewStarted(hrStatus: HResult);
 begin
-  IsPreviewing := SUCCEEDED(hrStatus);
+  bPreviewing := SUCCEEDED(hrStatus);
   if FAILED(hrStatus) then
     begin
       ErrMsg('OnPreviewStarted: ' + ERR_PREVIEW,
@@ -660,10 +683,14 @@ end;
 // OnPreviewStopped
 procedure TCaptureManager.OnPreviewStopped(hrStatus: HResult);
 begin
-  IsPreviewing := False;
+
   if FAILED(hrStatus) then
-    ErrMsg('OnPreviewStopped: ' + ERR_PREVIEW,
-           hrStatus);
+    begin
+      ErrMsg('OnPreviewStopped: ' + ERR_PREVIEW,
+             hrStatus);
+    end
+  else
+    bPreviewing := False;
 end;
 
 // OnCaptureEngineOutputMediaTypeSet
@@ -678,7 +705,7 @@ end;
 // OnRecordStarted
 procedure TCaptureManager.OnRecordStarted(hrStatus: HResult);
 begin
-  IsRecording := SUCCEEDED(hrStatus);
+  bRecording := SUCCEEDED(hrStatus);
   if FAILED(hrStatus) then
     ErrMsg('OnRecordStarted: ' + ERR_RECORD,
            hrStatus);
@@ -688,10 +715,12 @@ end;
 // OnRecordStopped
 procedure TCaptureManager.OnRecordStopped(hrStatus: HResult);
 begin
-  IsRecording := not SUCCEEDED(hrStatus);
+
   if FAILED(hrStatus) then
     ErrMsg('OnRecordStopped: ' + ERR_RECORD,
-           hrStatus);
+           hrStatus)
+  else
+    bRecording := False;
 end;
 
 
@@ -720,7 +749,10 @@ end;
 
 
 // StartPreview
-function TCaptureManager.StartPreview(): HResult;
+// NOTE: When needed a new previewsink,
+//       for example when using another source (camera),
+//       set pNewPeviewSink to True.
+function TCaptureManager.StartPreview(pNewPeviewSink: Boolean): HResult;
 var
   pCaptureSink: IMFCaptureSink;
   pMediaType: IMFMediaType;
@@ -740,13 +772,13 @@ begin
       goto Done;
     end;
 
-  if IsPreviewing then
+  if bPreviewing then
     begin
       hr := S_OK;
       goto Done;
     end;
 
-  // Get a pointer to the preview sink.
+  // Get a pointer to the preview sink, if not created yet.
   if not Assigned(FCapturePreviewSink) then
     begin
 
@@ -755,16 +787,15 @@ begin
       if FAILED(hr) then
         goto Done;
 
-
       hr := pCaptureSink.QueryInterface(IID_IMFCapturePreviewSink,
                                         FCapturePreviewSink);
       if FAILED(hr) then
         goto Done;
 
+
       hr := FCapturePreviewSink.SetRenderHandle(hwndPreviewWindow);
       if FAILED(hr) then
         goto Done;
-
 
       hr := FCaptureEngine.GetSource(pCaptureSource);
       if FAILED(hr) then
@@ -777,7 +808,7 @@ begin
         goto Done;
 
       // Configure the video format for the preview sink.
-      hr := pCaptureSource.GetCurrentDeviceMediaType(DWord(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW),
+      hr := pCaptureSource.GetCurrentDeviceMediaType(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW,
                                                      pMediaType);
       if FAILED(hr) then
         goto Done;
@@ -797,14 +828,10 @@ begin
       if FAILED(hr) then
         goto Done;
 
-
-      //FDeviceExplorer.MediaType := pMediaType2;
-
       hr := pMediaType2.SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT,
                                   UINT(1) { = UINT(True)});
       if FAILED(hr) then
         goto Done;
-
 
       {$IFDEF SAVE_DEBUG_REPORT}
       FMediaTypeDebug.LogMediaType(pMediaType2);
@@ -812,15 +839,15 @@ begin
       {$ENDIF}
 
       // Connect the video stream to the preview sink.
-      hr := FCapturePreviewSink.AddStream(DWord(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW),
+      hr := FCapturePreviewSink.AddStream(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW,
                                           pMediaType2,
                                           nil,
                                           dwSinkStreamIndex);
       if FAILED(hr) then
         goto Done;
-
     end;
 
+  // We are done, start preview.
   hr := FCaptureEngine.StartPreview();
   WaitForResult();
 
@@ -850,7 +877,7 @@ begin
       goto Done;
     end;
 
-  if not IsPreviewing then
+  if not bPreviewing then
     begin
       hr := S_OK;
       goto Done;
@@ -859,8 +886,6 @@ begin
   hr := FCaptureEngine.StopPreview();
   if FAILED(hr) then
     goto Done;
-
-  //WaitForResult();
 
 done:
   if FAILED(hr) then
@@ -873,7 +898,8 @@ end;
 
 // StartRecord
 // Start recording to file
-function TCaptureManager.StartRecording(pszDestinationFile: PCWSTR): HResult;
+function TCaptureManager.StartRecording(pszDestinationFile: PCWSTR;
+                                        pSinkWriterConfigSet: Boolean): HResult;
 var
   pszExt: string;
   guidVideoEncoding: TGUID;
@@ -894,7 +920,7 @@ begin
       goto Done;
     end;
 
-  if (IsRecording = True) then
+  if (bRecording = True) then
     begin
       hr := MF_E_INVALIDREQUEST;
       goto Done;
@@ -902,7 +928,7 @@ begin
 
   pszExt := ExtractFileExt(pszDestinationFile);
 
-  // Check extension to match the proper formats
+  // Check extension to match the proper formats.
   if LowerCase(pszExt) = '.mp4' then
     begin
       guidVideoEncoding := MFVideoFormat_H264;
@@ -913,15 +939,15 @@ begin
       guidVideoEncoding := MFVideoFormat_WMV3;
       guidAudioEncoding := MFAudioFormat_WMAudioV9;
     end
-  else if LowerCase(pszExt) = '.wma' then
+  else if LowerCase(pszExt) = '.avi' then
     begin
-      guidVideoEncoding := GUID_NULL;
-      guidAudioEncoding := MFAudioFormat_WMAudioV9;
+      guidVideoEncoding := MFVideoFormat_H264;
+      guidAudioEncoding := MFAudioFormat_AAC;
     end
   else
     begin
       hr := MF_E_INVALIDMEDIATYPE;
-      goto Done;
+        goto Done;
     end;
 
   hr := FCaptureEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE_RECORD,
@@ -935,37 +961,47 @@ begin
     goto Done;
 
   hr := FCaptureEngine.GetSource(pSource);
-  if FAILED(hr) then
-    goto Done;
+    if FAILED(hr) then
+      goto Done;
 
   hr := pRecord.SetOutputFileName(pszDestinationFile);
-  if FAILED(hr) then
-    goto Done;
+    if FAILED(hr) then
+      goto Done;
 
-  // Configure the video and/or audio streams.
-  if (guidVideoEncoding <> GUID_NULL) then
+  // When we run the same video device over and over again, we skip the configuration.
+  if not pSinkWriterConfigSet then
     begin
-      hr := ConfigureVideoEncoding(pSource,
-                                   pRecord,
-                                   guidVideoEncoding);
-      if FAILED(hr) then
-        goto Done;
-    end;
 
-  if (guidAudioEncoding <> GUID_NULL) then
-    begin
-      hr := ConfigureAudioEncoding(pSource,
-                                   pRecord,
-                                   guidAudioEncoding);
-      if FAILED(hr) then
-        goto Done;
+      // Configure the video and/or audio streams.
+
+      // Video
+      if not IsEqualGuid(guidVideoEncoding,
+                         GUID_NULL) then
+        begin
+          // Note: ConfigureVideoEncoding can be using the default of the camera or the one we picked.
+          hr := ConfigureVideoEncoding(pSource,
+                                       pRecord,
+                                       guidVideoEncoding,
+                                       FRecordingMediaType);
+          if FAILED(hr) then
+            goto Done;
+        end;
+
+      // Audio
+      if not IsEqualGuid(guidAudioEncoding,
+                         GUID_NULL) then
+        begin
+          hr := ConfigureAudioEncoding(pSource,
+                                       pRecord,
+                                       guidAudioEncoding);
+          if FAILED(hr) then
+            goto Done;
+        end;
     end;
 
   hr := FCaptureEngine.StartRecord();
   if FAILED(hr) then
     goto Done;
-
-  IsRecording := True;
 
 done:
   if FAILED(hr) then
@@ -983,7 +1019,7 @@ var
 begin
   hr := S_OK;
 
-  if IsRecording then
+  if bRecording then
     begin
       hr := FCaptureEngine.StopRecord(True,
                                       False);
@@ -998,14 +1034,13 @@ begin
 end;
 
 
-function TCaptureManager.TakePhoto(ASnapShotOption: TSnapShotOptions;
+function TCaptureManager.TakePhoto(pSnapShotOption: TSnapShotOptions;
                                    pMediaType: IMFMediaType): HResult;
 var
   hr: HResult;
   pSource: IMFCaptureSource;
   pCaptureSink: IMFCaptureSink;
   pCapturePhotoSink: IMFCapturePhotoSink;
-  //bHasPhotoStream: Boolean;
   dwSinkStreamIndex: DWORD;
   pMediaType2: IMFMediaType;
 
@@ -1013,7 +1048,7 @@ label
   done;
 
 begin
-  SnapShotOption := ASnapShotOption;
+  SnapShotOption := pSnapShotOption;
 
   {$IFDEF SAVE_DEBUG_REPORT}
   FMediaTypeDebug.LogMediaType(pMediaType);
@@ -1108,8 +1143,6 @@ begin
       goto done;
     end;
 
-  IsPhotoPending := True;
-
 done:
   if FAILED(hr) then
     ErrMsg('function TCaptureManager.TakePhoto',
@@ -1118,7 +1151,7 @@ done:
 end;
 
 
-// call this method before initiating a new engine.
+// Call this method before initiating a new engine!
 procedure TCaptureManager.ResetCaptureManager();
 begin
   DestroyCaptureEngine();
@@ -1156,7 +1189,7 @@ begin
 end;
 
 
-// SetMediaType
+// SetMediaType for preview and recording
 function TCaptureManager.SetMediaType(pMediaType: IMFMediaType): HResult;
 var
   mfCaptureSource: IMFCaptureSource;
@@ -1170,11 +1203,19 @@ begin
   {$ENDIF}
 
   hr := FCaptureEngine.GetSource(mfCaptureSource);
-  if SUCCEEDED(hr) then
-    hr := mfCaptureSource.SetCurrentDeviceMediaType(DWord(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW),
-                                                    pMediaType);
-  Result := hr;
 
+  if SUCCEEDED(hr) then
+    // Preview
+    hr := mfCaptureSource.SetCurrentDeviceMediaType(MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW,
+                                                      pMediaType);
+
+  // Recording
+  if SUCCEEDED(hr) then
+    hr := CloneVideoMediaType(pMediaType,
+                              MFVideoFormat_RGB32,
+                              FRecordingMediaType);
+
+  Result := hr;
 end;
 
 

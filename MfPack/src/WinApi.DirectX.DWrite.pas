@@ -10,7 +10,7 @@
 // Release date: 30-04-2019
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 //
 // Description: DirectX Typography Services public API definitions.
 //
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: - Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -74,7 +74,13 @@ uses
   {DirectX}
   WinApi.DirectX.DCommon;
 
-  {$WEAKPACKAGEUNIT ON}
+  {$MINENUMSIZE 4}
+
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
 
 const
 
@@ -406,7 +412,7 @@ type
   DWRITE_GLYPH_METRICS = record
     // Specifies the X offset from the glyph origin to the left edge of the black box.
     // The glyph origin is the current horizontal writing position.
-    // A negative value means the black box extends to the left of the origin (often true for lowercase italic 'f').
+    // A negative value means the black box extends to the left of the origin (often True for lowercase italic 'f').
     leftSideBearing: INT32;
 
     // Specifies the X offset from the origin of the current glyph to the origin of the next glyph when writing horizontally.
@@ -1361,10 +1367,10 @@ type
     // <param name="glyphAdvances">Optional array of glyph advances in DIPs.</param>
     // <param name="glyphOffsets">Optional array of glyph offsets.</param>
     // <param name="glyphCount">Number of glyphs.</param>
-    // <param name="isSideways">If true, specifies that glyphs are rotated 90 degrees to the left and vertical metrics are used.
-    // A client can render a vertical run by specifying isSideways = true and rotating the resulting geometry 90 degrees to the
+    // <param name="isSideways">If True, specifies that glyphs are rotated 90 degrees to the left and vertical metrics are used.
+    // A client can render a vertical run by specifying isSideways = True and rotating the resulting geometry 90 degrees to the
     // right using a transform.</param>
-    // <param name="isRightToLeft">If true, specifies that the advance direction is right to left. By default, the advance direction
+    // <param name="isRightToLeft">If True, specifies that the advance direction is right to left. By default, the advance direction
     // is left to right.</param>
     // <param name="geometrySink">Interface the function calls back to draw each element of the geometry.</param>
     // <returns>
@@ -2463,7 +2469,7 @@ type
     // <param name="textString">The string to convert to glyphs.</param>
     // <param name="textLength">The length of textString.</param>
     // <param name="fontFace">The font face to get glyphs from.</param>
-    // <param name="isSideways">Set to true if the text is intended to be
+    // <param name="isSideways">Set to True if the text is intended to be
     // drawn vertically.</param>
     // <param name="isRightToLeft">Set to TRUE for right-to-left text.</param>
     // <param name="scriptAnalysis">Script analysis result from AnalyzeScript.</param>
@@ -2533,7 +2539,7 @@ type
     // <param name="glyphCount">The number of glyphs.</param>
     // <param name="fontFace">The font face the glyphs came from.</param>
     // <param name="fontEmSize">Logical font size in DIP's.</param>
-    // <param name="isSideways">Set to true if the text is intended to be
+    // <param name="isSideways">Set to True if the text is intended to be
     // drawn vertically.</param>
     // <param name="isRightToLeft">Set to TRUE for right-to-left text.</param>
     // <param name="scriptAnalysis">Script analysis result from AnalyzeScript.</param>
@@ -2591,7 +2597,7 @@ type
     // When set to TRUE, the metrics are the same as the metrics of text measured by GDI using a font
     // created with CLEARTYPE_NATURAL_QUALITY.
     // </param>
-    // <param name="isSideways">Set to true if the text is intended to be
+    // <param name="isSideways">Set to True if the text is intended to be
     // drawn vertically.</param>
     // <param name="isRightToLeft">Set to TRUE for right-to-left text.</param>
     // <param name="scriptAnalysis">Script analysis result from AnalyzeScript.</param>
@@ -2651,9 +2657,9 @@ type
     glyphAdvances: Single;
     // Glyph offsets.
     glyphOffsets: DWRITE_GLYPH_OFFSET;
-    // If true, specifies that glyphs are rotated 90 degrees to the left and
+    // If True, specifies that glyphs are rotated 90 degrees to the left and
     // vertical metrics are used. Vertical writing is achieved by specifying
-    // isSideways = true and rotating the entire run 90 degrees to the right
+    // isSideways = True and rotating the entire run 90 degrees to the right
     // via a rotate transform.
     isSideways: BOOL;
     // The implicit resolved bidi level of the run. Odd levels indicate
@@ -3553,17 +3559,17 @@ type
     // this returns the corresponding hit-test metrics of the text string where
     // the hit-test has occurred. This is useful for mapping mouse clicks to caret
     // positions. When the given coordinate is outside the text string, the function
-    // sets the output value *isInside to false but returns the nearest character
+    // sets the output value *isInside to False but returns the nearest character
     // position.
     // <param name="pointX">X coordinate to hit-test, relative to the top-left location of the layout box.</param>
     // <param name="pointY">Y coordinate to hit-test, relative to the top-left location of the layout box.</param>
     // <param name="isTrailingHit">Output flag indicating whether the hit-test location is at the leading or the trailing
-    //     side of the character. When the output *isInside value is set to false, this value is set according to the output
+    //     side of the character. When the output *isInside value is set to False, this value is set according to the output
     //     *position value to represent the edge closest to the hit-test location. </param>
     // <param name="isInside">Output flag indicating whether the hit-test location is inside the text string.
-    //     When false, the position nearest the text's edge is returned.</param>
+    //     When False, the position nearest the text's edge is returned.</param>
     // <param name="hitTestMetrics">Output geometry fully enclosing the hit-test location. When the output *isInside value
-    //     is set to false, this structure represents the geometry enclosing the edge closest to the hit-test location.</param>
+    //     is set to False, this structure represents the geometry enclosing the edge closest to the hit-test location.</param>
     // <returns>
     // Standard HRESULT error code.
     // </returns>

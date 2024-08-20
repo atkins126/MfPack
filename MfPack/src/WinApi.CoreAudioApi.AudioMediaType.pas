@@ -10,7 +10,7 @@
 // Release date: 24-09-2015
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: IAudioMediaType definition.
 //
 // Organisation: FactoryX
@@ -21,7 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Pay close attention for supported platforms (ie Vista or Win 7/8/8.1/10).
@@ -33,11 +33,11 @@
 //          Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -77,10 +77,10 @@ uses
   WinApi.Windows,
   {WinMM}
   WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMeApi,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfObjects;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -121,7 +121,8 @@ type
     dwChannelMask: DWORD;
   end;
   {$EXTERNALSYM _UNCOMPRESSEDAUDIOFORMAT}
-  UNCOMPRESSEDAUDIOFORMAT  = _UNCOMPRESSEDAUDIOFORMAT;
+  UNCOMPRESSEDAUDIOFORMAT = _UNCOMPRESSEDAUDIOFORMAT;
+  {$EXTERNALSYM UNCOMPRESSEDAUDIOFORMAT}
 
 
 type

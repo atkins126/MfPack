@@ -10,7 +10,7 @@
 // Release date: 02-04-2023
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Helpers.
 //
 // Organisation: FactoryX
@@ -21,17 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 31/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
+// 25/04/2004 Tony                Updated to a more stable and glitch free version.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -78,9 +79,6 @@ uses
   // Undefine this when not needed!
   {$DEFINE SHOW_IN_MESSAGES_IDE}
 
-const
-  AUDIO_BUFFER_FMT = 10000;
-
   // Simple error message handler that reports by default in the IDE Messages screen or
   // shows a messagedialog at runtime.
   procedure ErrMsg(pErrMsg: string;
@@ -96,7 +94,6 @@ const
   procedure SortStringgrid(Grid: TStringGrid;
                            byColumn: LongInt;
                            ascending: Boolean );
-
 
 
 implementation

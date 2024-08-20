@@ -10,7 +10,7 @@
 // Release date: 27-06-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: -
 //
 // Organisation: FactoryX
@@ -21,8 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
-// 02/02/2023 Tony                Changed IMFSourceReader.ReadSample parameters.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 7 or later (See: Remarks).
@@ -31,11 +30,11 @@
 //                   IUnknown(Pointer), IUnknown(Object), IUnknown(Nil) etc.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -86,8 +85,6 @@ uses
   WinApi.MediaFoundationApi.MfIdl,
   WinApi.MediaFoundationApi.MfTransform;
 
-
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -132,13 +129,13 @@ const
 
   MF_SOURCE_READER_INVALID_STREAM_INDEX  = MAXDW; // $ffffffff;
   {$EXTERNALSYM MF_SOURCE_READER_INVALID_STREAM_INDEX}
-  MF_SOURCE_READER_ALL_STREAMS           = DWord($fffffffe);
+  MF_SOURCE_READER_ALL_STREAMS           = DWORD($fffffffe);
   {$EXTERNALSYM MF_SOURCE_READER_ALL_STREAMS}
-  MF_SOURCE_READER_ANY_STREAM            = DWord($fffffffe);
+  MF_SOURCE_READER_ANY_STREAM            = DWORD($fffffffe);
   {$EXTERNALSYM MF_SOURCE_READER_ANY_STREAM}
-  MF_SOURCE_READER_FIRST_AUDIO_STREAM    = DWord($fffffffd);
+  MF_SOURCE_READER_FIRST_AUDIO_STREAM    = DWORD($fffffffd);
   {$EXTERNALSYM MF_SOURCE_READER_FIRST_AUDIO_STREAM}
-  MF_SOURCE_READER_FIRST_VIDEO_STREAM    = DWord($fffffffc);
+  MF_SOURCE_READER_FIRST_VIDEO_STREAM    = DWORD($fffffffc);
   {$EXTERNALSYM MF_SOURCE_READER_FIRST_VIDEO_STREAM}
   MF_SOURCE_READER_MEDIASOURCE           = MAXDW; // $ffffffff;
   {$EXTERNALSYM MF_SOURCE_READER_MEDIASOURCE}
@@ -237,6 +234,8 @@ type
   MF_SOURCE_READER_CONTROL_FLAG   = cwMF_SOURCE_READER_CONTROL_FLAG;
   {$EXTERNALSYM MF_SOURCE_READER_CONTROL_FLAG}
 const
+  // Retrieve any pending samples, but do not request any more samples from the media source.
+  // To get all of the pending samples, call ReadSample with this flag until the method returns a nil media sample pointer.
   MF_SOURCE_READER_CONTROLF_DRAIN = MF_SOURCE_READER_CONTROL_FLAG($00000001);
   {$EXTERNALSYM MF_SOURCE_READER_CONTROLF_DRAIN}
 
@@ -343,19 +342,20 @@ type
   IMFSourceReader = interface(IUnknown)
   ['{70ae66f2-c809-4e4f-8915-bdcb406b7993}']
 
-    function GetStreamSelection(dwStreamIndex: DWORD;
+    function GetStreamSelection(const dwStreamIndex: DWORD;
                                 out pfSelected: Boolean): HResult; stdcall;
 
-    function SetStreamSelection(dwStreamIndex: DWORD;
+    function SetStreamSelection(const dwStreamIndex: DWORD;
                                 const fSelected: Boolean): HResult; stdcall;
 
     // Gets a format that is supported natively by the media source.
-    // Note: To check if a format is supported by Media Foundation see: https://docs.microsoft.com/en-us/windows/win32/medfound/supported-media-formats-in-media-foundation
-    function GetNativeMediaType(dwStreamIndex: DWORD;
+    // Note: To check if a format is supported by Media Foundation see:
+    // https://docs.microsoft.com/en-us/windows/win32/medfound/supported-media-formats-in-media-foundation
+    function GetNativeMediaType(const dwStreamIndex: DWORD;
                                 dwMediaTypeIndex: DWORD;
                                 out ppMediaType: IMFMediaType): HResult; stdcall;
 
-    function GetCurrentMediaType(dwStreamIndex: DWORD;
+    function GetCurrentMediaType(const dwStreamIndex: DWORD;
                                  out ppMediaType: IMFMediaType): HResult; stdcall;
 
     function SetCurrentMediaType(dwStreamIndex: DWORD;
@@ -365,7 +365,7 @@ type
     function SetCurrentPosition(const guidTimeFormat: TGUID;
                                 const varPosition: PROPVARIANT): HResult; stdcall;
 
-    function ReadSample(dwStreamIndex: DWORD;   // The stream to pull data from.
+    function ReadSample(const dwStreamIndex: DWORD;   // The stream to pull data from.
                         dwControlFlags: DWORD;  // A bitwise OR of zero or more flags from the MF_SOURCE_READER_CONTROL_FLAG enumeration.
         {out, optional} pdwActualStreamIndex: PDWORD;  // Receives the zero-based index of the stream.
         {out, optional} pdwStreamFlags: PDWORD;        // Receives a bitwise OR of zero or more flags from the MF_SOURCE_READER_FLAG enumeration.
@@ -412,7 +412,7 @@ type
 
     function Flush(dwStreamIndex: DWord): HResult; stdcall;
 
-    function GetServiceForStream(dwStreamIndex: DWORD;
+    function GetServiceForStream(const dwStreamIndex: DWORD;
                                  const guidService: REFGUID;
                                  const riid: REFIID;
                                  out ppvObject: Pointer {LPVOID}): HResult; stdcall;
@@ -438,16 +438,16 @@ type
   IMFSourceReaderEx = interface(IMFSourceReader)
   ['{7b981cf0-560e-4116-9875-b099895f23d7}']
 
-    function SetNativeMediaType(dwStreamIndex: DWORD;
+    function SetNativeMediaType(const dwStreamIndex: DWORD;
                                 pMediaType: IMFMediaType;
                                 out pdwStreamFlags: DWORD): HResult; stdcall;
 
-    function AddTransformForStream(dwStreamIndex: DWORD;
+    function AddTransformForStream(const dwStreamIndex: DWORD;
                                    pTransformOrActivate: IUnknown): HResult; stdcall;
 
     function RemoveAllTransformsForStream(dwStreamIndex: DWORD): HResult; stdcall;
 
-    function GetTransformForStream(dwStreamIndex: DWORD;
+    function GetTransformForStream(const dwStreamIndex: DWORD;
                                    dwTransformIndex: DWORD;
                                    out pGuidCategory: TGUID;
                                    out ppTransform: IMFTransform): HResult; stdcall;
@@ -542,19 +542,19 @@ type
     function AddStream(pTargetMediaType: IMFMediaType;
                        out pdwStreamIndex: DWord): HResult; stdcall;
 
-    function SetInputMediaType(dwStreamIndex: DWord;
+    function SetInputMediaType(const dwStreamIndex: DWord;
                                pInputMediaType: IMFMediaType;
                                pEncodingParameters: IMFAttributes): HResult; stdcall;
 
     function BeginWriting(): HResult; stdcall;
 
-    function WriteSample(dwStreamIndex: DWord;
+    function WriteSample(const dwStreamIndex: DWord;
                          pSample: IMFSample): HResult; stdcall;
 
-    function SendStreamTick(dwStreamIndex: DWord;
+    function SendStreamTick(const dwStreamIndex: DWord;
                             llTimestamp: LONGLONG): HResult; stdcall;
 
-    function PlaceMarker(dwStreamIndex: DWord;
+    function PlaceMarker(const dwStreamIndex: DWord;
                          pvContex: Pointer): HResult; stdcall;
 
     function NotifyEndOfSegment(dwStreamIndex: DWord): HResult; stdcall;
@@ -563,12 +563,12 @@ type
 
     function Finalize(): HResult; stdcall;
 
-    function GetServiceForStream(dwStreamIndex: DWord;
+    function GetServiceForStream(const dwStreamIndex: DWord;
                                  const guidService: REFGUID;
                                  const riid: REFIID;
                                  out ppvObject: Pointer {LPVOID}): HResult; stdcall;
 
-    function GetStatistics(dwStreamIndex: DWord;
+    function GetStatistics(const dwStreamIndex: DWord;
                            out pStats: MF_SINK_WRITER_STATISTICS): HResult; stdcall;
   end;
   IID_IMFSinkWriter = IMFSinkWriter;

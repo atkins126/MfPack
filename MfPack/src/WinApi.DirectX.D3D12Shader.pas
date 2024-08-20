@@ -10,7 +10,7 @@
 // Release date: 13-08-2022
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: D3D12 Shader Types and APIs.
 //
 // Organisation: FactoryX
@@ -21,17 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 19/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Embarcadero's <= Delphi 10.4 D3D12 is outdated!
+//          Search "Update May 2024", to find updates until May 2024.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -75,6 +76,13 @@ uses
   WinApi.DirectX.D3DCommon,
   WinApi.DirectX.D3D12;
 
+  {$MINENUMSIZE 4}
+
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
 
 type
   PD3D12_SHADER_VERSION_TYPE = ^D3D12_SHADER_VERSION_TYPE;
@@ -337,6 +345,19 @@ const
   D3D_SHADER_REQUIRES_ATOMIC_INT64_ON_DESCRIPTOR_HEAP_RESOURCE      = $10000000;
   {$EXTERNALSYM D3D_SHADER_REQUIRES_ATOMIC_INT64_ON_DESCRIPTOR_HEAP_RESOURCE}
 
+  // Update May 2024
+  D3D_SHADER_REQUIRES_ADVANCED_TEXTURE_OPS                          = $20000000;
+  {$EXTERNALSYM D3D_SHADER_REQUIRES_ADVANCED_TEXTURE_OPS}
+  D3D_SHADER_REQUIRES_WRITEABLE_MSAA_TEXTURES                       = $40000000;
+  {$EXTERNALSYM D3D_SHADER_REQUIRES_WRITEABLE_MSAA_TEXTURES}
+  D3D_SHADER_REQUIRES_SAMPLE_CMP_GRADIENT_OR_BIAS                   = $80000000;
+  {$EXTERNALSYM D3D_SHADER_REQUIRES_SAMPLE_CMP_GRADIENT_OR_BIAS}
+  D3D_SHADER_REQUIRES_EXTENDED_COMMAND_INFO                         = $100000000;
+  {$EXTERNALSYM D3D_SHADER_REQUIRES_EXTENDED_COMMAND_INFO}
+
+  // ==
+
+
 type
 
   PD3D12_LIBRARY_DESC = ^D3D12_LIBRARY_DESC;
@@ -382,7 +403,7 @@ type
     RequiredFeatureFlags: UINT64;         // Required feature flags
     Name: PAnsiChar;                      // Function name
     FunctionParameterCount: INT;          // Number of logical parameters in the function signature (not including return)
-    HasReturn: BOOL;                      // TRUE, if function returns a value, false - it is a subroutine
+    HasReturn: BOOL;                      // TRUE, if function returns a value, False - it is a subroutine
     Has10Level9VertexShader: BOOL;        // TRUE, if there is a 10L9 VS blob
     Has10Level9PixelShader: BOOL;         // TRUE, if there is a 10L9 PS blob
   end;

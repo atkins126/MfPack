@@ -10,7 +10,7 @@
 // Release date: 31-08-2022
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 //
 // Description: Contains interface definitions for the D3D11.2 API.
 //              Microsoft DirectX D3D11 used by Media Foundation.
@@ -25,17 +25,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 31/08/2022 All                 Mercury release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks:  Requires Windows 10 or higher.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -81,7 +81,6 @@ uses
   WinApi.DirectX.DXGIFormat,
   WinApi.DirectX.DXGI1_3;
 
-  {$WEAKPACKAGEUNIT ON}
   {$ALIGN ON}
   {$MINENUMSIZE 4}
 

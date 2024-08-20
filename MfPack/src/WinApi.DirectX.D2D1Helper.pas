@@ -10,7 +10,7 @@
 // Release date: 29-03-2019
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Helper files over the D2D interfaces and APIs.
 //
 // Organisation: FactoryX
@@ -21,7 +21,7 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Because Delphi does not accept complex types (like functions) as default values,
@@ -32,11 +32,11 @@
 //
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -668,7 +668,7 @@ type
 
     //
     // Functions for convertion from the base D2D1_MATRIX_3X2_F to this type
-    // without making a copy
+    // without making a copy.
     //
 
     class function ReinterpretBaseType(const pMatrix: PD2D1_MATRIX_3X2_F): D2D1_MATRIX_3X2_F; overload; static;
@@ -1071,7 +1071,7 @@ begin
     pf := _pixelFormat;
 
 
-  Result._pixelFormat := _pixelFormat;
+  Result._pixelFormat := pf;
   Result.dpiX := dpiX;
   Result.dpiY := dpiY;
 end;
@@ -1096,7 +1096,7 @@ begin
     pf := _pixelFormat;
 
   Result._type := _type;
-  Result._pixelFormat := _pixelFormat;
+  Result._pixelFormat := pf;
   Result.dpiX := dpiX;
   Result.dpiY := dpiY;
   Result.usage := usage;

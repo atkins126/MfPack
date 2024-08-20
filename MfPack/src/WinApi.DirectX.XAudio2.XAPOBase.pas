@@ -9,7 +9,7 @@
 // Release date: 07-07-2018
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: -
 //
 // Organisation: FactoryX
@@ -20,17 +20,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: See WinApi.DirectX.XAudio2.XAPO.pas for the rules governing XAPO interface behaviour.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -70,10 +70,10 @@ uses
   WinApi.WinApiTypes,
   {WinMM}
   WinApi.WinMM.MMReg,
+  WinApi.WinMM.MMeApi,
   {DirectX}
   WinApi.DirectX.XAudio2.XApo;
 
-  {$WEAKPACKAGEUNIT ON}
   {$MINENUMSIZE 4}
 
   {$IFDEF WIN32}
@@ -208,9 +208,9 @@ type
     // validation against the XAPO's registration properties.
     // Derived XAPOs should call the base implementation first.
     function LockForProcess(InputLockedParameterCount: UINT32;
-                            pInputLockedParameters: XAPO_LOCKFORPROCESS_PARAMETERS;
+                            pInputLockedParameters: PXAPO_LOCKFORPROCESS_PARAMETERS;
                             OutputLockedParameterCount: UINT32;
-                            pOutputLockedParameters: XAPO_LOCKFORPROCESS_PARAMETERS): HRESULT; stdcall;
+                            pOutputLockedParameters: PXAPO_LOCKFORPROCESS_PARAMETERS): HRESULT; stdcall;
 
     // Opposite of LockForProcess.
     // Derived XAPOs should call the base implementation first.
@@ -218,9 +218,9 @@ type
 
     // Needs POINTERMATH turned On!
     procedure Process(InputProcessParameterCount: UINT32;
-                      pInputProcessParameters: XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
+                      pInputProcessParameters: PXAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
                       OutputProcessParameterCount: UINT32;
-                      var pOutputProcessParameters: XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
+                      var pOutputProcessParameters: PXAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
                       IsEnabled: BOOL); stdcall;
 
     // Returns the number of input frames required to generate the requested number of output frames.
@@ -433,9 +433,9 @@ begin
 end;
 
 function CXAPOBase.LockForProcess(InputLockedParameterCount: UINT32;
-                                  pInputLockedParameters: XAPO_LOCKFORPROCESS_PARAMETERS;
+                                  pInputLockedParameters: PXAPO_LOCKFORPROCESS_PARAMETERS;
                                   OutputLockedParameterCount: UINT32;
-                                  pOutputLockedParameters: XAPO_LOCKFORPROCESS_PARAMETERS): HRESULT; stdcall;
+                                  pOutputLockedParameters: PXAPO_LOCKFORPROCESS_PARAMETERS): HRESULT; stdcall;
 begin
 
   Result := E_NOTIMPL; // Do your implementations here, by replacing this line for your code.
@@ -452,9 +452,9 @@ end;
 
 
 procedure CXAPOBase.Process(InputProcessParameterCount: UINT32;
-                            pInputProcessParameters: XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
+                            pInputProcessParameters: PXAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
                             OutputProcessParameterCount: UINT32;
-                            var pOutputProcessParameters: XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
+                            var pOutputProcessParameters: PXAPO_LOCKFORPROCESS_BUFFER_PARAMETERS;
                             IsEnabled: BOOL);
 begin
 

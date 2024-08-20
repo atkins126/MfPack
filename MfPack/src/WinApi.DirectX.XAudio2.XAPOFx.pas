@@ -9,7 +9,7 @@
 // Release date: 07-07-2018
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Cross-platform Audio Processing Objects
 // Declarations for the audio effects included with XAudio2.
 //
@@ -21,18 +21,18 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: This version of XAudio2 is available only in Windows 8, XBox one and later.
 //
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -69,9 +69,16 @@ interface
 uses
 
   {WinApi}
-  WinApi.Windows;
+  WinApi.Windows,
+  System.classes;
 
-  {$WEAKPACKAGEUNIT ON}
+  {$MINENUMSIZE 4}
+
+  {$IFDEF WIN32}
+    {$ALIGN 1}
+  {$ELSE}
+    {$ALIGN 8} // Win64
+  {$ENDIF}
 
   {$I 'XAudio2.inc'}
 
@@ -195,16 +202,16 @@ type
   // The framerate must be within [22000, 48000] Hz.
   PFXEQ_PARAMETERS = ^FXEQ_PARAMETERS;
   FXEQ_PARAMETERS = record
-    FrequencyCenter0: Single;        // center frequency in Hz, band 0
-    Gain0: Single;                   // boost/cut
-    Bandwidth0: Single;              // bandwidth, region of EQ is center frequency +/- bandwidth/2
-    FrequencyCenter1: Single;        // band 1
+    FrequencyCenter0: Single;        // Center frequency in Hz, band 0.
+    Gain0: Single;                   // Boost/cut
+    Bandwidth0: Single;              // Bandwidth, region of EQ is center frequency +/- bandwidth/2.
+    FrequencyCenter1: Single;        // Band 1.
     Gain1: Single;
     Bandwidth1: Single;
-    FrequencyCenter2: Single;        // band 2
+    FrequencyCenter2: Single;        // Band 2.
     Gain2: Single;
     Bandwidth2: Single;
-    FrequencyCenter3: Single;        // band 3
+    FrequencyCenter3: Single;        // Band 3.
     Gain3: Single;
     Bandwidth3: Single;
   end;
@@ -215,8 +222,8 @@ type
   // The mastering limiter supports only FLOAT32 audio formats.
   PFXMASTERINGLIMITER_PARAMETERS = ^FXMASTERINGLIMITER_PARAMETERS;
   FXMASTERINGLIMITER_PARAMETERS = record
-    Release: UINT32;                // release time (tuning factor with no specific units)
-    Loudness: UINT32;               // loudness target (threshold)
+    Release: UINT32;                // Release time (tuning factor with no specific units).
+    Loudness: UINT32;               // Loudness target (threshold).
   end;
   {$EXTERNALSYM FXMASTERINGLIMITER_PARAMETERS}
 
@@ -228,8 +235,8 @@ type
   //     Input: Stereo Output: Stereo
   PFXREVERB_PARAMETERS = ^FXREVERB_PARAMETERS;
   FXREVERB_PARAMETERS = record
-    Diffusion: Single;               // diffusion
-    RoomSize: Single;                // room size
+    Diffusion: Single;               // Diffusion.
+    RoomSize: Single;                // Room size.
   end;
   {$EXTERNALSYM FXREVERB_PARAMETERS}
 
@@ -238,18 +245,18 @@ type
   // Use of this structure is optional, the default MaxDelay is FXECHO_DEFAULT_DELAY.
   PFXECHO_INITDATA = ^FXECHO_INITDATA;
   FXECHO_INITDATA = record
-    MaxDelay: Single;               // maximum delay (all channels) in milliseconds, must be within [FXECHO_MIN_DELAY, FXECHO_MAX_DELAY]
+    MaxDelay: Single;               // Maximum delay (all channels) in milliseconds, must be within [FXECHO_MIN_DELAY, FXECHO_MAX_DELAY].
   end;
   {$EXTERNALSYM FXECHO_INITDATA}
 
 
-  // Echo parameters, used with IXAPOParameters::SetParameters:
+  // Echo parameters, used with IXAPOParameters.SetParameters:
   // The echo supports only FLOAT32 audio formats.
   PFXECHO_PARAMETERS = ^FXECHO_PARAMETERS;
   FXECHO_PARAMETERS = record
-    WetDryMix: Single;               // ratio of wet (processed) signal to dry (original) signal
-    Feedback: Single;                // amount of output fed back into input
-    Delay: Single;                   // delay (all channels) in milliseconds, must be within [FXECHO_MIN_DELAY, FXECHO_PARAMETERS.MaxDelay]
+    WetDryMix: Single;               // Ratio of wet (processed) signal to dry (original) signal.
+    Feedback: Single;                // aAmount of output fed back into input.
+    Delay: Single;                   // Delay (all channels) in milliseconds, must be within [FXECHO_MIN_DELAY, FXECHO_PARAMETERS.MaxDelay].
   end;
   {$EXTERNALSYM FXECHO_PARAMETERS}
 
@@ -271,8 +278,8 @@ type
   //  to XAudio2 to allow XAudio2 to dispose of the XAPO when it is no longer needed.
   //  Use IXAudio2.CreateSourceVoice or IXAudio2Voice.SetEffectChain to pass an XAPO to XAudio2.
   function CreateFX(const clsid: TGuid;
-                    out pEffect: IUnknown;
-                    pInitData: Pointer = nil;
+                    out pEffect: IInterface;
+                    const pInitData: Pointer = nil;
                     InitDataByteSize: UINT32 = 0): HRESULT; stdcall;
   {$EXTERNALSYM CreateFX}
 

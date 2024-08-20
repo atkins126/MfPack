@@ -10,7 +10,7 @@
 // Release date: 29-07-2012
 // Language: ENU
 //
-// Revision Version: 3.1.5
+// Revision Version: 3.1.7
 // Description: Common methods used by Media Foundation,
 //              Core Audio etc..
 //
@@ -22,17 +22,17 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 20/07/2023 All                 Carmel release  SDK 10.0.22621.0 (Windows 11)
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
 //
 // Related objects: -
-// Related projects: MfPackX315
+// Related projects: MfPackX317
 // Known Issues: -
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -77,11 +77,12 @@ uses
   {$ENDIF}
   {System}
   System.SysUtils,
+  System.WideStrUtils,
   System.UITypes,
   System.Types,
   System.SyncObjs,
-  {Vcl}
-  Vcl.Graphics,
+  {VCL}
+  VCL.Graphics,
   {MediaFoundationApi}
   WinApi.MediaFoundationApi.MfApi,
   WinApi.MediaFoundationApi.MfObjects,
@@ -89,9 +90,24 @@ uses
   WinApi.MediaFoundationApi.Evr,
   WinApi.MediaFoundationApi.MfError;
 
-  {$WEAKPACKAGEUNIT ON}
   {$I 'WinApiTypes.inc'}
   {$DEFINE IGNORE_COMPILERVERSION}
+
+  // WinApi.Windows
+  // Used by function CreateEventEx dwFlags.
+  {$IF COMPILERVERSION < 34.0}
+  const
+  CREATE_EVENT_MANUAL_RESET = DWord($0001);  // The initial state of the event object is signaled; otherwise, it is nonsignaled.
+
+  CREATE_EVENT_INITIAL_SET  = DWord($0002);  // The event must be manually reset using the ResetEvent function.
+                                             // Any number of waiting threads, or threads that subsequently begin
+                                             // wait operations for the specified event object,
+                                             // can be released while the object's state is signaled.
+                                             // If this flag is not specified, the system automatically resets
+                                             // the event after releasing a single waiting thread.
+  {$ENDIF}
+
+
 
 type
 
@@ -213,6 +229,12 @@ type
                            fps: Double;
                            ShowMilliSeconds: boolean = True ): string; inline;
 
+  // Converts the number of bytes, samplerate, channels and bits per second to hnstime and returns the timeformat.
+  function BytesToTimeStr(const pBytesWritten: Int64;
+                          const pSampleRate: Integer;
+                          const pChannels: Integer;
+                          const pBitsPerSample: Integer;
+                          pShowMilliSeconds: Boolean = True): string; inline;
 
   // Operating system
   function GetOSArchitecture(): string;
@@ -287,7 +309,7 @@ type
                            var lplpsz: POleStr): HResult; stdcall;
 
   // Simplified helper of StringToWideChar function
-  function StrToPWideChar(source: string): PWideChar; inline;
+  function StrToPWideChar(source: string): PWideChar; //inline;
 
 
   // MFVideoNormalizedRect methods
@@ -468,10 +490,40 @@ type
   function BoolToStrYesNo(const aBoolean: Boolean;
                           sYes: string = 'Yes';
                           sNo: string = 'No'): string; inline;
-  // = BoolToStr, For backward compatibility
+  // = BoolToStr, for backward compatibility.
   function MfpBoolToStr(const aBoolean: Boolean): string; inline;
   function BoolToStr(const aBoolean: Boolean): string; inline;
 
+  // Constrain function, checks the high- and lowband limits of a value.
+  function ConstrainValue(const Value: Integer;
+                          Min: Integer;
+                          Max: Integer): Integer; inline; overload;
+
+  function ConstrainValue(const Value: Int64;
+                          Min: Int64;
+                          Max: Int64): Int64; inline; overload;
+
+  function ConstrainValue(const Value: Float;
+                          Min: Float;
+                          Max: Float): Float; inline; overload;
+
+  function ConstrainValue(const Value: byte;
+                          Min: byte;
+                          Max: byte): byte; inline; overload;
+
+
+  // Maps a value in between minimum and maximum valueranges.
+  function MapRange(const aValue: Single;
+                    InMin: Single;
+                    InMax: Single;
+                    OutMin: Single;
+                    OutMax: Single): Single; inline; overload;
+
+  function MapRange(const aValue: Integer;
+                    InMin: Single;
+                    InMax: Single;
+                    OutMin: Single;
+                    OutMax: Single): Single; inline; overload;
 
   // Since Win 10, use this function to create a file.
   function CreateFile2(lpFileName: PWideChar;
@@ -494,14 +546,44 @@ type
                         cbDest: SIZE_T;
                         pszSrc: PWideChar): HRESULT; stdcall;
 
+  {$IF COMPILERVERSION < 29.0}
+  // Introduced: Delphi XE8
+  // Compares two Unicode strings.
+  // Digits in the strings are considered as numerical content rather than text.
+  // This test is not case-sensitive.
+  function StrCmpLogicalW(psz1: LPCWSTR;
+                          psz2: LPCWSTR): Integer; stdcall;
+  {$ENDIF}
+
+  // WinApi.Windows
+  {$IF COMPILERVERSION < 34.0}
+  function CreateEventEx(lpEventAttributes: PSecurityAttributes;
+                         lpName: LPCWSTR;
+                         dwFlags: DWord;
+                         dwDesiredAccess: DWord): THandle; stdcall;
+
+  function CreateEventExA(lpEventAttributes: PSecurityAttributes;
+                          lpName: LPCSTR;
+                          dwFlags: DWord;
+                          dwDesiredAccess: DWord): THandle; stdcall;
+
+  function CreateEventExW(lpEventAttributes: PSecurityAttributes;
+                          lpName: LPCWSTR;
+                          dwFlags: DWord;
+                          dwDesiredAccess: DWord): THandle; stdcall;
+  {$ENDIF}
+
+
 implementation
 
 uses
+  {System}
   System.TypInfo;
 
 const
   Kernel32Lib = 'kernel32.dll';
   Ole32Lib = 'Ole32.dll';
+  Shlwapi32Lib = 'Shlwapi.dll';
 
 
   VER_EQUAL             = 1;
@@ -525,7 +607,6 @@ const
   VER_MINORVERSION      = $0000001;
   VER_NT_WORKSTATION    = 1;
   VER_PRODUCT_TYPE      = $80;
-
 
 
 // SafeRelease
@@ -566,7 +647,7 @@ end;
 
 
 {$WARN SYMBOL_PLATFORM OFF}
-  // ole2: compare GUID type pointers
+// ole2: compare GUID type pointers
 function IsEqualPGUID;   external Ole32Lib name 'IsEqualGUID' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
 function IsEqualPIID;    external Ole32Lib name 'IsEqualIID' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
 function IsEqualPCLSID;  external Ole32Lib name 'IsEqualCLSID' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
@@ -581,9 +662,9 @@ var
 begin
   rg1 := PIntegerArray(@rguid1);
   rg2 := PIntegerArray(@rguid2);
-  Result :=  (rg1^[0] = rg2^[0]) AND
-             (rg1^[1] = rg2^[1]) AND
-             (rg1^[2] = rg2^[2]) AND
+  Result :=  (rg1^[0] = rg2^[0]) and
+             (rg1^[1] = rg2^[1]) and
+             (rg1^[2] = rg2^[2]) and
              (rg1^[3] = rg2^[3]);
 end;
 
@@ -645,7 +726,7 @@ end;
 
 // WTypes.h
 
-//MACRO translations
+// MACRO translations
 //==================
 procedure DECIMAL_SETZERO(var dec: DECIMAL); inline;
 begin
@@ -675,7 +756,7 @@ function Clip(clr: Integer): Byte; inline;
 begin
   if (clr > 255) then
     Result := Byte(255)
-  else if clr < 0 then
+  else if (clr < 0) then
     Result := Byte(0)
   else
     Result := Byte(clr);
@@ -688,12 +769,12 @@ end;
 
 function VerifyVersionInfo(var LPOSVERSIONINFOEX : OSVERSIONINFOEX;
                            dwTypeMask: DWORD;
-                           dwlConditionMask: int64): BOOL; stdcall; external Kernel32Lib name 'VerifyVersionInfoA';
+                           dwlConditionMask: Int64): BOOL; stdcall; external Kernel32Lib name 'VerifyVersionInfoA';
 
 
-function VerSetConditionMask(dwlConditionMask: int64;
+function VerSetConditionMask(dwlConditionMask: Int64;
                              dwTypeBitMask: DWORD;
-                             dwConditionMask: Byte): int64; stdcall; external Kernel32Lib;
+                             dwConditionMask: Byte): Int64; stdcall; external Kernel32Lib;
 
 
 function IsWinVerOrHigher(wMajorVersion, wMinorVersion, wServicePackMajor: Word): Boolean;
@@ -703,7 +784,7 @@ var
 
 begin
   FillChar(osvi,
-           sizeof(osvi),
+           SizeOf(osvi),
            0);
   osvi.dwOSVersionInfoSize := SizeOf(osvi);
   FillChar(condmask,
@@ -954,9 +1035,21 @@ try
     DelimiterFormat := ':';
 
   if ShowMilliSeconds then
-    Result := Format('%2.2d%s%2.2d%s%2.2d,%3.3d', [hours, DelimiterFormat, mins, DelimiterFormat, secs, DelimiterFormat, millisec])
+    Result := Format('%2.2d%s%2.2d%s%2.2d,%3.3d',
+                     [hours,
+                      DelimiterFormat,
+                      mins,
+                      DelimiterFormat,
+                      secs,
+                      DelimiterFormat,
+                      millisec])
   else
-    Result := Format('%2.2d%s%2.2d%s%2.2d', [hours, DelimiterFormat, mins, DelimiterFormat, secs]);
+    Result := Format('%2.2d%s%2.2d%s%2.2d',
+                     [hours,
+                      DelimiterFormat,
+                      mins,
+                      DelimiterFormat,
+                      secs]);
 
 except
   on exception do Result:= '00:00:00,000';
@@ -990,9 +1083,16 @@ try
 
 
   if ShowMilliSeconds then
-    Result := Format('%2.2d:%2.2d:%2.2d,%3.3d', [hours, mins, secs, millisec])
+    Result := Format('%2.2d:%2.2d:%2.2d,%3.3d',
+                     [hours,
+                      mins,
+                      secs,
+                      millisec])
   else
-    Result := Format('%2.2d:%2.2d:%2.2d', [hours, mins, secs]);
+    Result := Format('%2.2d:%2.2d:%2.2d',
+                     [hours,
+                      mins,
+                      secs]);
 
 except
   on exception do Result:= '00:00:00,000';
@@ -1023,9 +1123,15 @@ try
   millisec := wMsec;
 
   if ShowMilliSeconds then
-    Result := Format('%2.2d:%2.2d:%2.2d,%3.3d', [hours, mins, secs, millisec])
+    Result := Format('%2.2d:%2.2d:%2.2d,%3.3d',
+                     [hours,
+                      mins,
+                      secs,
+                      millisec])
   else
-    Result := Format('%2.2d:%2.2d:%2.2d', [hours, mins, secs]);
+    Result := Format('%2.2d:%2.2d:%2.2d', [hours,
+                                           mins,
+                                           secs]);
 
 except
   on exception do Result:= '00:00:00,000';
@@ -1097,12 +1203,18 @@ begin
     if ShowMilliSec then
       begin
         splitsec := splitsec + secs;
-        result := Format('%2.2d:%2.2d:%2.2f', [hours, mins, splitsec]);
+        result := Format('%2.2d:%2.2d:%2.2f',
+                         [hours,
+                          mins,
+                          splitsec]);
       end
     else
       begin
         secs := secs + Round(splitsec);
-        result := Format('%2.2d:%2.2d:%2.2d', [hours, mins, secs]);
+        result := Format('%2.2d:%2.2d:%2.2d',
+                         [hours,
+                          mins,
+                          secs]);
       end;
 
   except
@@ -1143,7 +1255,35 @@ begin
                       ShowMilliSeconds);
 end;
 
+// Converts the number of bytes samplerate, channels and bitspersecond to hnstime and retunrs the timeformat.
+function BytesToTimeStr(const pBytesWritten: Int64;
+                        const pSampleRate: Integer;
+                        const pChannels: Integer;
+                        const pBitsPerSample: Integer;
+                        pShowMilliSeconds: Boolean = True): string; inline;
+const
+  Bit32 = 4;
+  Bit24 = 3;
+  Bit16 = 2;
 
+var
+  hns: Int64;
+
+begin
+
+  // Calculate time in 100-nanosecond units.
+  if (pBitsPerSample = 16) then
+    hns := Trunc((pBytesWritten / (pSampleRate * Bit16 * pChannels)) * 10000000) // 16-bit audio.
+  else if (pBitsPerSample = 24) then
+    hns := Trunc((pBytesWritten / (pSampleRate * Bit24 * pChannels)) * 10000000) // 24-bit audio.
+  else if (pBitsPerSample = 32) then
+    hns := Trunc((pBytesWritten / (pSampleRate * Bit32 * pChannels)) * 10000000) // 32-bit audio.
+  else // Exotic
+    Exit;
+  // Call HnsTimeToStr function to format the time string
+  Result := HnsTimeToStr(hns,
+                         pShowMilliSeconds);
+end;
 
 // OS
 
@@ -1163,7 +1303,7 @@ begin
 {$ENDIF}
 
     else
-      Result := 'Unknown OSarchitecture';
+      Result := 'Unknown OS architecture';
   end;
 end;
 
@@ -1191,9 +1331,15 @@ begin
   if (Length(aValue) <> 7) or (aValue[1] <> '#') then
     Result := aDefault
   else
-    Result := RGB(StrToInt('$' + Copy(aValue, 2, 2)),
-                  StrToInt('$' + Copy(aValue, 4, 2)),
-                  StrToInt('$' + Copy(aValue, 6, 2)));
+    Result := RGB(StrToInt('$' + Copy(aValue,
+                                      2,
+                                      2)),
+                  StrToInt('$' + Copy(aValue,
+                                      4,
+                                      2)),
+                  StrToInt('$' + Copy(aValue,
+                                      6,
+                                      2)));
 end;
 
 
@@ -1212,10 +1358,10 @@ end;
 procedure CopyTColorToMFARGB(const cColor: TColor;
                              out argb: MFARGB); inline;
 begin
-  argb.rgbBlue  := (cColor shr 16) AND $FF;
-  argb.rgbGreen := (cColor shr 8) AND $FF;
-  argb.rgbRed   := (cColor AND $FF);
-  argb.rgbAlpha := (cColor shr 24) AND $FF;
+  argb.rgbBlue  := (cColor shr 16) and $FF;
+  argb.rgbGreen := (cColor shr 8) and $FF;
+  argb.rgbRed   := (cColor and $FF);
+  argb.rgbAlpha := (cColor shr 24) and $FF;
 end;
 
 
@@ -1346,8 +1492,8 @@ begin
     pf24bit  : Result := 'pf24bit';
     pf32bit  : Result := 'pf32bit';
     pfCustom : Result := 'pfCustom';
-    else
-      Result := 'Unknown';
+  else
+    Result := 'Unknown';
   end;
 end;
 
@@ -1711,7 +1857,7 @@ begin
   area.OffsetY := MakeOffset(y);
   area.Area.cx := dwWidth;
   area.Area.cy := dwHeight;
- Result := area;
+  Result := area;
 end;
 
 
@@ -1721,28 +1867,12 @@ end;
 {$WARN SYMBOL_PLATFORM ON}
 
 
-// Simplified helper of StringToWideChar function
-function StrToPWideChar(source: string): PWideChar; inline;
-var
-  pwResult: PWideChar;
-
+// Keep for previous versions;
+function StrToPWideChar(source: string): PWideChar;// inline;
 begin
-  // Important note to string to PWideChar conversions
-  //==================================================
-  // To prevent error $80070002 (The system cannot find the file specified.), you
-  // should use this function instead of using typecast PWideChar(stringvalue)!!!
-  GetMem(pwResult,
-         (Length(source) +1) * SizeOf(PWideChar));
-  try
-    StringToWideChar(source,
-                     pwResult,
-                     Length(source) +1); // +1 because a pending 0 is added
-  finally
-    //
-    Result := pwResult;
-    FreeMem(pwResult);
-  end;
+  Result := PWideChar(source);
 end;
+
 
 // FOURCC functions
 
@@ -1781,7 +1911,7 @@ end;
 function Get64bitBits(const data: UINT64;
                       const index: Integer): Integer; inline;
 begin
-  Result := (data shr (index shr 8)) AND // offset
+  Result := (data shr (index shr 8)) and // offset
             ((1 shl Byte(index)) - 1);   // mask
 end;
 
@@ -1799,11 +1929,11 @@ begin
   Mask := ((1 shl Byte(index)) - 1);
 
   //Assert(value <= Mask);
-  if val > mask then
+  if (val > mask) then
     val := mask;
 
   offset := index shr 8;
-  data := (data AND (not (mask shl offset)))
+  data := (data and (not (mask shl offset)))
            OR UINT64(val shl offset);
 end;
 
@@ -1814,7 +1944,7 @@ end;
 function GetDWordBits(const data: DWORD;
                       const index: Integer): Integer; inline;
 begin
-  Result := (data shr (index shr 8)) AND // offset
+  Result := (data shr (index shr 8)) and // offset
             ((1 shl Byte(index)) - 1);   // mask
 end;
 
@@ -1831,12 +1961,12 @@ begin
   val := value;
   Mask := ((1 shl Byte(index)) - 1);
 
-  //Assert(value <= Mask);
+  // Assert(value <= Mask);
   if val > mask then
     val := mask;
 
   offset := index shr 8;
-  data := (data AND (not (mask shl offset)))
+  data := (data and (not (mask shl offset)))
           OR DWORD(val shl offset);
 end;
 
@@ -1847,7 +1977,7 @@ end;
 function GetWordBits(const data: WORD;
                      const index: Integer): WORD; inline;
 begin
-  Result := (data shr (index shr 8)) AND // offset
+  Result := (data shr (index shr 8)) and // offset
             ((1 shl Byte(index)) - 1);   // mask
 end;
 
@@ -1869,7 +1999,7 @@ begin
     val := mask;
 
   offset := index shr 8;
-  data := (data AND (not (mask shl offset)))
+  data := (data and (not (mask shl offset)))
           OR WORD(val shl offset);
 end;
 
@@ -1880,7 +2010,7 @@ end;
 function GetByteBits(const data: Byte;
                      const index: Integer): Byte; inline;
 begin
-  Result := (data shr (index shr 8)) AND
+  Result := (data shr (index shr 8)) and
             ((1 shl Byte(index)) - 1);
 end;
 
@@ -1889,8 +2019,8 @@ procedure SetByteBits(var data: Byte;
                       const index: Integer;
                       const value: Integer); inline;
 begin
-  data := (data AND (Not ((index AND $FF) shl (index shr 8)))) or
-          ((value AND index AND $FF) shl (index shr 8));
+  data := (data and (not ((index and $FF) shl (index shr 8)))) or
+          ((value and index and $FF) shl (index shr 8));
 end;
 
 
@@ -1922,9 +2052,76 @@ begin
 end;
 
 
-function CreateFile2; external Kernel32Lib name 'CreateFile2';
+function ConstrainValue(const Value: Integer;
+                        Min: Integer;
+                        Max: Integer): Integer; inline; overload;
+begin
+  Result := Value;
+  if (Result < Min) then
+    Result := Min
+  else if (Result > Max) then
+    Result := Max
+end;
 
 
+function ConstrainValue(const Value: Int64;
+                        Min: Int64;
+                        Max: Int64): Int64; inline; overload;
+begin
+  Result := Value;
+  if (Result < Min) then
+    Result := Min
+  else if (Result > Max) then
+    Result := Max
+end;
+
+
+function ConstrainValue(const Value: Float;
+                        Min: Float;
+                        Max: Float): Float; inline; overload;
+begin
+  Result := Value;
+  if (Result < Min) then
+    Result := Min
+  else if (Result > Max) then
+    Result := Max;
+end;
+
+
+function ConstrainValue(const Value: byte;
+                        Min: byte;
+                        Max: byte): byte; inline; overload;
+begin
+  Result := Value;
+  if (Result < Min) then
+    Result := Min
+  else if (Result > Max) then
+    Result := Max;
+end;
+
+
+function MapRange(const aValue: Single;
+                  InMin: Single;
+                  InMax: Single;
+                  OutMin: Single;
+                  OutMax: Single): Single; inline; overload;
+begin
+  Result := (OutMin + (aValue - InMin) * (OutMax - OutMin) / (InMax - InMin));
+end;
+
+
+function MapRange(const aValue: Integer;
+                  InMin: Single;
+                  InMax: Single;
+                  OutMin: Single;
+                  OutMax: Single): Single; inline; overload;
+var
+  ival: Single;
+
+begin
+  ival := aValue;
+  Result := (OutMin + (ival - InMin) * (OutMax - OutMin) / (InMax - InMin));
+end;
 
 // Strings
 function StringCbCat(pszDest: PChar;
@@ -1944,7 +2141,22 @@ begin
 
 end;
 
-function StringCbCatA; external Kernel32Lib name 'StringCbCatA';
-function StringCbCatW; external Kernel32Lib name 'StringCbCatW';
+{$WARN SYMBOL_PLATFORM OFF}
+function CreateFile2; external Kernel32Lib name 'CreateFile2' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
+
+function StringCbCatA; external Kernel32Lib name 'StringCbCatA' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
+function StringCbCatW; external Kernel32Lib name 'StringCbCatW' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
+
+{$IF COMPILERVERSION < 29.0}
+function StrCmpLogicalW; external Shlwapi32Lib name 'StrCmpLogicalW' {$IF COMPILERVERSION > 20.0} delayed {$ENDIF};
+{$ENDIF}
+{$WARN SYMBOL_PLATFORM ON}
+
+// WinApi.Windows
+{$IF COMPILERVERSION < 34.0}
+function CreateEventEx; external Kernel32Lib name 'CreateEventExW';
+function CreateEventExA; external Kernel32Lib name 'CreateEventExA';
+function CreateEventExW; external Kernel32Lib name 'CreateEventExW';
+{$ENDIF}
 
 end.

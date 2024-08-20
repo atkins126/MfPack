@@ -10,7 +10,7 @@
 // Release date: 18-11-2022
 // Language: ENU
 //
-// Revision Version: 3.1.4
+// Revision Version: 3.1.7
 //
 // Description:
 //   This unit contains the DeviceExplorer class to discover video devices like webcams etc.
@@ -23,17 +23,16 @@
 // CHANGE LOG
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
-// 28/08/2022 All                 PiL release  SDK 10.0.22621.0 (Windows 11)
-// 20/02/2023 Tony                Fixed switching camera issue that results in Access Denied error.
+// 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows 10 (2H20) or later.
 //
 // Related objects: -
-// Related projects: MfPackX314/Samples/MFCaptureEngineVideoCapture
+// Related projects: MfPackX317/Samples/MFCaptureEngineVideoCapture
 //
 // Compiler version: 23 up to 35
-// SDK version: 10.0.22621.0
+// SDK version: 10.0.26100.0
 //
 // Todo: -
 //
@@ -64,7 +63,7 @@ unit DeviceExplorer;
 interface
 
   // Undefine this when not needed!
-  {$DEFINE SAVE_DEBUG_REPORT}
+  //{$DEFINE SAVE_DEBUG_REPORT}
 
 
 uses
@@ -274,8 +273,9 @@ var
 begin
   for i := 0 to Length(FDeviceProperties) -1 do
     FDeviceProperties[i].Reset;
+  // Dynamic array's are managed types, but just to be sure, assign nil to it.
+  FDeviceProperties := nil;
 
-  CoTaskMemFree(FDeviceProperties);
   FVideoFormatInfo.Reset();
 
   // Clear class properties
