@@ -23,6 +23,7 @@
 // Date       Person              Reason
 // ---------- ------------------- ----------------------------------------------
 // 30/06/2024 All                 RammStein release  SDK 10.0.26100.0 (Windows 11)
+// 28/09/2024 Tony                Moved method HandleMessages from MfMetLib to this unit.
 //------------------------------------------------------------------------------
 //
 // Remarks: Requires Windows Vista or later.
@@ -69,6 +70,7 @@ uses
   WinApi.Windows,
   WinApi.WinApiTypes,
   WinApi.ComBaseApi,
+  WinApi.Messages,
   {ActiveX}
   {$IFDEF USE_EMBARCADERO_DEF}
   WinApi.ActiveX,
@@ -573,6 +575,16 @@ type
                           dwDesiredAccess: DWord): THandle; stdcall;
   {$ENDIF}
 
+  // Alternative for ProcessMessages
+  // Example usage: HandleMessages(GetCurrentThread());
+  procedure HandleMessages(AThread: THandle;
+                           AWait: Cardinal = INFINITE);
+
+
+  // See: https://learn.microsoft.com/nl-nl/windows/win32/api/processthreadsapi/nf-processthreadsapi-openthread
+  function OpenThread(dwDesiredAccess: DWORD;
+                      bInheritHandle: BOOL;
+                      dwThreadId: DWORD): THandle; stdcall;
 
 implementation
 
@@ -2152,11 +2164,42 @@ function StrCmpLogicalW; external Shlwapi32Lib name 'StrCmpLogicalW' {$IF COMPIL
 {$ENDIF}
 {$WARN SYMBOL_PLATFORM ON}
 
+
+procedure HandleMessages(AThread: THandle;
+                         AWait: Cardinal = INFINITE);
+var
+  pMsg: TMsg;
+
+begin
+
+  while (MsgWaitForMultipleObjects(1,
+                                   AThread,
+                                   False,
+                                   AWait,
+                                   QS_ALLINPUT) = WAIT_OBJECT_0 + 1) do
+    begin
+      PeekMessage(pMsg,
+                  0,
+                  0,
+                  0,
+                  PM_REMOVE);  // Messages are not removed from the queue after processing by PeekMessage.
+
+      if pMsg.Message = WM_QUIT then
+        Exit;
+
+      TranslateMessage(pMsg);
+      DispatchMessage(pMsg);
+    end;
+end;
+
+
 // WinApi.Windows
 {$IF COMPILERVERSION < 34.0}
 function CreateEventEx; external Kernel32Lib name 'CreateEventExW';
 function CreateEventExA; external Kernel32Lib name 'CreateEventExA';
 function CreateEventExW; external Kernel32Lib name 'CreateEventExW';
 {$ENDIF}
+
+function OpenThread; external Kernel32Lib name 'OpenThread';
 
 end.
